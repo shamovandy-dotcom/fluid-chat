@@ -37,6 +37,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
     const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
     pinned.current = distanceFromBottom < BOTTOM_THRESHOLD_PX;
     setAtBottom(pinned.current);
+    actions.saveScrollPosition(conversationId, { top: element.scrollTop, atBottom: pinned.current });
     if (element.scrollTop < 240 && bucket?.hasMore && !bucket.loading) {
       previousHeight.current = element.scrollHeight;
       void actions.loadOlderMessages(conversationId);
@@ -72,12 +73,21 @@ export function MessageList({ conversationId }: { conversationId: string }) {
   }, [ready]);
 
   useLayoutEffect(() => {
-    pinned.current = true;
+    const saved = actions.getScrollPosition(conversationId);
+    pinned.current = saved?.atBottom ?? true;
     previousHeight.current = 0;
     lastHeight.current = 0;
-    setAtBottom(true);
-    scrollToBottom();
-  }, [conversationId, ready, scrollToBottom]);
+    setAtBottom(pinned.current);
+    if (pinned.current) scrollToBottom();
+    else if (scrollRef.current) scrollRef.current.scrollTop = saved?.top ?? 0;
+  }, [conversationId, ready, scrollToBottom, actions]);
+
+  useLayoutEffect(() => {
+    const element = scrollRef.current;
+    return () => {
+      if (element) actions.saveScrollPosition(conversationId, { top: element.scrollTop, atBottom: pinned.current });
+    };
+  }, [conversationId, ready, actions]);
 
   if (!bucket || (bucket.loading && messages.length === 0)) {
     return (

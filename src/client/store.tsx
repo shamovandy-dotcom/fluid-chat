@@ -8,10 +8,12 @@ import {
   useMemo,
   useReducer,
   useRef,
-  type ReactNode
+  type ReactNode,
+  type SetStateAction
 } from "react";
 import { io, type Socket } from "socket.io-client";
 import { api, ApiError, type SlashOutcome } from "./api";
+import { chatTabsStorageKey, emptyChatTabs, reduceChatTabs, restoreChatTabs, type ChatTabs, type ChatTabAction } from "./chat-tabs";
 import {
   commandName,
   conversationKind,
@@ -27,6 +29,7 @@ import { toggleReactionGroup, withReacted } from "@/shared/reactions";
 import type { MentionDirectory } from "@/shared/mention-text";
 import type {
   ConversationSummary,
+  FileSummary,
   MessageDto,
   NotificationDto,
   PublicUser,
@@ -76,7 +79,7 @@ export type RightPanel =
   | null;
 
 export type ModalState =
-  | { kind: "quick-switcher" }
+  | { kind: "quick-switcher"; newTab?: boolean }
   | { kind: "preferences" }
   | { kind: "admin" }
   | { kind: "invite" }
@@ -93,7 +96,7 @@ export type ModalState =
 
 export type Toast = { id: string; text: string; tone: "info" | "error" | "success" };
 
-export type MessageBucket = { items: MessageDto[]; hasMore: boolean; loading: boolean };
+export type MessageBucket = { items: MessageDto[]; hasMore: boolean; loading: boolean; loaded?: boolean };
 
 export type State = {
   status: "loading" | "anonymous" | "ready";
@@ -103,6 +106,10 @@ export type State = {
   bootstrap: WorkspaceBootstrap | null;
   view: View;
   rightPanel: RightPanel;
+  chatTabs: ChatTabs;
+  tabsRestored: boolean;
+  conversationPanels: Record<string, RightPanel>;
+  composerAttachments: Record<string, FileSummary[]>;
   modal: ModalState;
   messages: Record<string, MessageBucket>;
   threads: Record<string, MessageDto[]>;
@@ -125,6 +132,10 @@ const initialState: State = {
   bootstrap: null,
   view: { kind: "activity" },
   rightPanel: null,
+  chatTabs: emptyChatTabs,
+  tabsRestored: false,
+  conversationPanels: {},
+  composerAttachments: {},
   modal: null,
   messages: {},
   threads: {},
@@ -145,6 +156,9 @@ type Action =
   | { type: "bootstrap"; bootstrap: WorkspaceBootstrap }
   | { type: "conversations"; conversations: ConversationSummary[] }
   | { type: "view"; view: View }
+  | { type: "chat-tab"; action: ChatTabAction }
+  | { type: "restore-tabs"; workspaceId: string; tabs: ChatTabs }
+  | { type: "attachments"; key: string; files: SetStateAction<FileSummary[]> }
   | { type: "right-panel"; panel: RightPanel }
   | { type: "modal"; modal: ModalState }
   | { type: "messages"; conversationId: string; bucket: Partial<MessageBucket> }
@@ -199,8 +213,9 @@ function reducer(state: State, action: Action): State {
         status: action.session ? "ready" : "anonymous"
       };
     case "workspace":
-      return { ...state, workspaceId: action.workspaceId, bootstrap: null, messages: {}, threads: {} };
+      return { ...state, workspaceId: action.workspaceId, bootstrap: null, messages: {}, threads: {}, chatTabs: emptyChatTabs, tabsRestored: false, conversationPanels: {}, rightPanel: null, view: { kind: "activity" }, editingMessageId: null };
     case "bootstrap": {
+      if (action.bootstrap.workspace.id !== state.workspaceId) return state;
       const drafts = { ...state.drafts };
       for (const draft of action.bootstrap.drafts) {
         drafts[`${draft.conversationId}:${draft.parentMessageId ?? "root"}`] = draft.bodyText;
@@ -216,10 +231,25 @@ function reducer(state: State, action: Action): State {
       return state.bootstrap
         ? { ...state, bootstrap: { ...state.bootstrap, conversations: action.conversations } }
         : state;
+    case "restore-tabs":
+      if (action.workspaceId !== state.workspaceId) return state;
+      return { ...state, chatTabs: action.tabs, tabsRestored: true };
+    case "chat-tab": {
+      const chatTabs = reduceChatTabs(state.chatTabs, action.action);
+      const activate = action.action.type === "reopen" || (action.action.type === "open" && (!action.action.background || !state.chatTabs.activeId));
+      const changed = chatTabs.activeId !== state.chatTabs.activeId;
+      if (!activate && !(changed && state.view.kind === "conversation")) return { ...state, chatTabs };
+      const id = chatTabs.activeId;
+      return { ...state, chatTabs, view: id ? { kind: "conversation", conversationId: id } : { kind: "unreads" },
+        rightPanel: id ? state.conversationPanels[id] ?? null : null, editingMessageId: null, modal: null, sidebarOpen: false };
+    }
+    case "attachments":
+      return { ...state, composerAttachments: { ...state.composerAttachments, [action.key]: typeof action.files === "function" ? action.files(state.composerAttachments[action.key] ?? []) : action.files } };
     case "view":
-      return { ...state, view: action.view, modal: null };
+      return { ...state, view: action.view, rightPanel: null, editingMessageId: null, modal: null };
     case "right-panel":
-      return { ...state, rightPanel: action.panel };
+      return { ...state, rightPanel: action.panel, conversationPanels: state.view.kind === "conversation"
+        ? { ...state.conversationPanels, [state.view.conversationId]: action.panel } : state.conversationPanels };
     case "modal":
       return { ...state, modal: action.modal };
     case "messages": {
@@ -237,7 +267,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         messages: {
           ...state.messages,
-          [action.conversationId]: { items: merged, hasMore: action.hasMore, loading: false }
+          [action.conversationId]: { ...current, items: merged, hasMore: action.hasMore, loading: false }
         }
       };
     }
@@ -448,6 +478,10 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
   const stateRef = useRef(state);
   stateRef.current = state;
   const socketRef = useRef<Socket | null>(null);
+  const messageLoads = useRef(new Map<string, Promise<void>>());
+  const messageLoadTimes = useRef(new Map<string, number>());
+  const scrollPositions = useRef(new Map<string, { top: number; atBottom: boolean }>());
+  const workspaceRequest = useRef(0);
 
   const toast = useCallback(
     (text: string, tone: Toast["tone"] = "info") => {
@@ -507,29 +541,53 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
   );
 
   const loadMessages = useCallback(
-    async (conversationId: string) => {
-      dispatch({ type: "messages", conversationId, bucket: { loading: true } });
-      try {
-        const { messages, hasMore } = await api.conversations.messages(conversationId, { limit: 50 });
-        dispatch({ type: "messages", conversationId, bucket: { items: messages, hasMore, loading: false } });
-
-        const conversation = stateRef.current.bootstrap?.conversations.find((entry) => entry.id === conversationId);
-        const lastReadAt = conversation?.membership?.lastReadAt ?? null;
-        const firstUnread = lastReadAt
-          ? messages.find(
-              (message) =>
-                new Date(message.createdAt) > new Date(lastReadAt) &&
-                message.senderId !== stateRef.current.session?.id
-            )
-          : undefined;
-        dispatch({ type: "unread-marker", conversationId, messageId: firstUnread?.id ?? null });
-        await markRead(conversationId, messages.at(-1)?.id);
-      } catch (error) {
-        dispatch({ type: "messages", conversationId, bucket: { loading: false } });
-        fail(error);
-      }
+    async (conversationId: string, options?: { refresh?: boolean }) => {
+      const workspaceId = stateRef.current.workspaceId;
+      const key = `${workspaceId}:${conversationId}`;
+      const cached = stateRef.current.messages[conversationId];
+      if (cached?.loaded && (!options?.refresh || Date.now() - (messageLoadTimes.current.get(key) ?? 0) < 10_000)) return;
+      const pending = messageLoads.current.get(key);
+      if (pending) return pending;
+      const request = (async () => {
+        dispatch({ type: "messages", conversationId, bucket: { loading: true } });
+        try {
+          // Revalidate the cached window so returning to a tab also catches edits
+          // and messages missed while realtime was disconnected. Preserve older history.
+          const oldest = cached?.loaded ? cached.items.find(message => !message.id.startsWith("pending-")) : undefined;
+          let after = oldest ? new Date(new Date(oldest.createdAt).getTime() - 1).toISOString() : undefined;
+          let page = await api.conversations.messages(conversationId, { limit: 100, after });
+          const messages = [...page.messages];
+          while (after && page.hasMore && page.messages.length) {
+            if (stateRef.current.workspaceId !== workspaceId) return;
+            const next = page.messages.at(-1)!.createdAt;
+            if (next === after) break;
+            after = next;
+            page = await api.conversations.messages(conversationId, { limit: 100, after });
+            messages.push(...page.messages);
+          }
+          if (stateRef.current.workspaceId !== workspaceId) return;
+          messageLoadTimes.current.set(key, Date.now());
+          const fetchedIds = new Set(messages.map(message => message.id));
+          const newest = messages.at(-1)?.createdAt ?? "";
+          const arrivedDuringFetch = stateRef.current.messages[conversationId]?.items.filter(message => !fetchedIds.has(message.id) && (message.id.startsWith("pending-") || message.createdAt > newest)) ?? [];
+          const hasMore = oldest ? cached!.hasMore : page.hasMore;
+          dispatch({ type: "messages", conversationId, bucket: { items: sortByCreatedAt([...messages, ...arrivedDuringFetch]), hasMore, loading: false, loaded: true } });
+          const conversation = stateRef.current.bootstrap?.conversations.find(entry => entry.id === conversationId);
+          const lastReadAt = conversation?.membership?.lastReadAt;
+          const firstUnread = lastReadAt ? messages.find(message => new Date(message.createdAt) > new Date(lastReadAt) && message.senderId !== stateRef.current.session?.id) : undefined;
+          dispatch({ type: "unread-marker", conversationId, messageId: firstUnread?.id ?? null });
+        } catch (error) {
+          if (stateRef.current.workspaceId !== workspaceId) return;
+          dispatch({ type: "messages", conversationId, bucket: { loading: false } });
+          fail(error);
+        } finally {
+          messageLoads.current.delete(key);
+        }
+      })();
+      messageLoads.current.set(key, request);
+      return request;
     },
-    [dispatch, fail, markRead]
+    [dispatch, fail]
   );
 
   const loadOlderMessages = useCallback(
@@ -575,11 +633,9 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
   );
 
   const openConversation = useCallback(
-    async (conversationId: string) => {
-      dispatch({ type: "view", view: { kind: "conversation", conversationId } });
-      dispatch({ type: "right-panel", panel: null });
-      dispatch({ type: "sidebar", open: false });
-      await loadMessages(conversationId);
+    async (conversationId: string, options?: { newTab?: boolean; background?: boolean }) => {
+      dispatch({ type: "chat-tab", action: { type: "open", conversationId, ...options } });
+      await loadMessages(conversationId, { refresh: true });
     },
     [dispatch, loadMessages]
   );
@@ -717,22 +773,36 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
   );
 
   const selectWorkspace = useCallback(
-    async (workspaceId: string) => {
+    async (workspaceId: string, userId = stateRef.current.session?.id) => {
+      const requestId = ++workspaceRequest.current;
+      const previous = stateRef.current;
+      if (previous.tabsRestored && previous.workspaceId && previous.session) {
+        try { window.localStorage.setItem(chatTabsStorageKey(previous.session.id, previous.workspaceId), JSON.stringify(previous.chatTabs)); } catch { /* storage may be disabled */ }
+      }
+      scrollPositions.current.clear();
       // Captured before the dispatch: on boot this is null, which is how a real switch is
       // told apart from the initial workspace load.
       const previousWorkspaceId = stateRef.current.workspaceId;
       dispatch({ type: "workspace", workspaceId });
-      window.localStorage.setItem("fluidchat:workspace", workspaceId);
+      try { window.localStorage.setItem("fluidchat:workspace", workspaceId); } catch { /* storage may be disabled */ }
       try {
         const bootstrap = await refreshBootstrap(workspaceId);
+        if (requestId !== workspaceRequest.current) return;
         if (bootstrap) {
           identifyWorkspace(bootstrap.workspace, bootstrap.role);
           if (previousWorkspaceId && previousWorkspaceId !== workspaceId) track("workspace_switched", {});
         }
+        let storedTabs: unknown = null;
+        try { storedTabs = userId ? JSON.parse(window.localStorage.getItem(chatTabsStorageKey(userId, workspaceId)) ?? "null") : null; } catch { /* corrupt or unavailable storage */ }
+        const tabs = restoreChatTabs(storedTabs, new Set(bootstrap?.conversations.map(conversation => conversation.id)));
+        dispatch({ type: "restore-tabs", workspaceId, tabs });
         const first =
+          bootstrap?.conversations.find(conversation => conversation.id === tabs.activeId) ??
           bootstrap?.conversations.find((conversation) => conversation.channel?.name === "general") ??
           bootstrap?.conversations[0];
-        if (first) await openConversation(first.id);
+        const savedEmpty = storedTabs && typeof storedTabs === "object" && Array.isArray((storedTabs as ChatTabs).items) && (storedTabs as ChatTabs).items.length === 0;
+        if (savedEmpty) dispatch({ type: "view", view: { kind: "unreads" } });
+        else if (first) await openConversation(first.id, { newTab: true });
         else dispatch({ type: "view", view: { kind: "browse" } });
         await loadNotifications();
       } catch (error) {
@@ -818,6 +888,11 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
       loadMessages,
       loadOlderMessages,
       openConversation,
+      changeChatTabs: (action: ChatTabAction) => dispatch({ type: "chat-tab", action }),
+      getScrollPosition: (conversationId: string) => scrollPositions.current.get(conversationId),
+      saveScrollPosition: (conversationId: string, value: { top: number; atBottom: boolean }) => scrollPositions.current.set(conversationId, value),
+      setDraftLocally: (conversationId: string, bodyText: string, parentMessageId?: string | null) => dispatch({ type: "draft", key: draftKey(conversationId, parentMessageId), bodyText }),
+      setComposerAttachments: (key: string, files: SetStateAction<FileSummary[]>) => dispatch({ type: "attachments", key, files }),
       openThread,
       jumpToDate,
       sendMessage,
@@ -902,9 +977,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         dispatch({ type: "session", session: user, memberships: workspaces });
         if (!user || workspaces.length === 0) return;
-        const stored = window.localStorage.getItem("fluidchat:workspace");
+        let stored: string | null = null;
+        try { stored = window.localStorage.getItem("fluidchat:workspace"); } catch { /* storage may be disabled */ }
         const target = workspaces.find((entry) => entry.workspace.id === stored) ?? workspaces[0];
-        await actions.selectWorkspace(target.workspace.id);
+        await actions.selectWorkspace(target.workspace.id, user.id);
       })
       .catch(() => dispatch({ type: "session", session: null, memberships: [] }));
     return () => {
@@ -913,6 +989,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Runs once on mount; `actions` is stable enough for this bootstrap path.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!state.tabsRestored || !state.session || !state.workspaceId) return;
+    try { window.localStorage.setItem(chatTabsStorageKey(state.session.id, state.workspaceId), JSON.stringify(state.chatTabs)); } catch { /* storage may be disabled */ }
+  }, [state.chatTabs, state.tabsRestored, state.session?.id, state.workspaceId]);
+
+  const activeConversationId = state.view.kind === "conversation" ? state.view.conversationId : null;
+  const activeLoaded = activeConversationId ? state.messages[activeConversationId]?.loaded : false;
+  const activeLoading = activeConversationId ? state.messages[activeConversationId]?.loading : false;
+  useEffect(() => {
+    if (activeConversationId) void actions.loadMessages(activeConversationId);
+  }, [activeConversationId, actions]);
+
+  useEffect(() => {
+    if (!activeConversationId) return;
+    const readVisible = () => {
+      const current = stateRef.current;
+      const bucket = current.messages[activeConversationId];
+      if (current.view.kind === "conversation" && current.view.conversationId === activeConversationId && bucket?.loaded && !bucket.loading && document.visibilityState === "visible" && document.hasFocus()) {
+        void actions.markRead(activeConversationId, bucket.items.at(-1)?.id);
+      }
+    };
+    readVisible();
+    window.addEventListener("focus", readVisible);
+    document.addEventListener("visibilitychange", readVisible);
+    return () => {
+      window.removeEventListener("focus", readVisible);
+      document.removeEventListener("visibilitychange", readVisible);
+    };
+  }, [activeConversationId, activeLoaded, activeLoading, actions]);
 
   // Realtime connection: one socket per session, rooms follow the workspace.
   useEffect(() => {
@@ -951,7 +1057,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const active =
               stateRef.current.view.kind === "conversation" &&
               stateRef.current.view.conversationId === event.conversationId;
-            if (active && document.visibilityState === "visible") {
+            if (active && document.visibilityState === "visible" && document.hasFocus()) {
               void actions.markRead(event.conversationId, event.message.id);
             } else {
               void actions.refreshConversations();
@@ -1036,23 +1142,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, [state.session?.id, state.workspaceId, state.bootstrap?.conversations.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Coming back to the tab clears the badge for whatever is on screen.
-  useEffect(() => {
-    const onFocus = () => {
-      if (document.visibilityState !== "visible") return;
-      const view = stateRef.current.view;
-      if (view.kind !== "conversation") return;
-      const last = stateRef.current.messages[view.conversationId]?.items.at(-1);
-      void actions.markRead(view.conversationId, last?.id);
-    };
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onFocus);
-    return () => {
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onFocus);
-    };
-  }, [actions]);
-
   // Reminders and quiet hours are evaluated in `users.timezone`, but signup has
   // no way to ask the browser — everyone starts on the "UTC" column default.
   // Syncing here fills it in, and follows people when they travel.
@@ -1073,6 +1162,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const resync = () => {
       void actions.refreshConversations();
       void actions.loadNotifications();
+      const view = stateRef.current.view;
+      if (view.kind === "conversation") void actions.loadMessages(view.conversationId, { refresh: true });
     };
     resync();
     if (state.connected) return;

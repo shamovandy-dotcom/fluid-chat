@@ -9,7 +9,8 @@ import {
   type ChangeEvent,
   type ClipboardEvent,
   type DragEvent,
-  type KeyboardEvent
+  type KeyboardEvent,
+  type SetStateAction
 } from "react";
 import {
   Bold,
@@ -59,7 +60,8 @@ export function Composer({
   const draftKey = `${conversationId}:${parentMessageId ?? "root"}`;
   // `text` is always display form (`@bob`); tokens are restored at every exit.
   const [text, setText] = useState(() => toMentionDisplay(state.drafts[draftKey] ?? "", mentions));
-  const [attachments, setAttachments] = useState<FileSummary[]>([]);
+  const attachments = state.composerAttachments[draftKey] ?? [];
+  const setAttachments = useCallback((files: SetStateAction<FileSummary[]>) => actions.setComposerAttachments(draftKey, files), [actions, draftKey]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [broadcast, setBroadcast] = useState(false);
@@ -74,6 +76,14 @@ export function Composer({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const typingSentAt = useRef(0);
   const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingDraft = useRef<string | null>(null);
+  useEffect(() => () => {
+    if (draftTimer.current) clearTimeout(draftTimer.current);
+    if (pendingDraft.current !== null) {
+      actions.saveDraft(conversationId, pendingDraft.current, parentMessageId);
+      pendingDraft.current = null;
+    }
+  }, [actions, conversationId, parentMessageId]);
 
   const enterToSend = state.session?.preferences?.enterToSend !== false;
   const conversation = state.bootstrap?.conversations.find((entry) => entry.id === conversationId);
@@ -82,7 +92,6 @@ export function Composer({
     const draft = toMentionDisplay(state.drafts[draftKey] ?? "", mentions);
     setText(draft);
     setCaret(draft.length);
-    setAttachments([]);
     // Draft text is owned by the store; only reset when switching targets.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey]);
@@ -105,7 +114,12 @@ export function Composer({
     (value: string) => {
       if (draftTimer.current) clearTimeout(draftTimer.current);
       const bodyText = toMentionWire(value, mentions);
-      draftTimer.current = setTimeout(() => actions.saveDraft(conversationId, bodyText, parentMessageId), 700);
+      pendingDraft.current = bodyText;
+      actions.setDraftLocally(conversationId, bodyText, parentMessageId);
+      draftTimer.current = setTimeout(() => {
+        pendingDraft.current = null;
+        actions.saveDraft(conversationId, bodyText, parentMessageId);
+      }, 700);
     },
     [actions, conversationId, mentions, parentMessageId]
   );
@@ -273,6 +287,7 @@ export function Composer({
     setCaret(0);
     setAttachments([]);
     if (draftTimer.current) clearTimeout(draftTimer.current);
+    pendingDraft.current = null;
     await actions.sendMessage({
       conversationId,
       bodyText: body,

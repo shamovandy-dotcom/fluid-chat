@@ -307,7 +307,8 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
       <button
         type="button"
         className={`side-row ${unread ? "is-unread" : ""}`}
-        onClick={() => void actions.openConversation(conversation.id)}
+        onClick={(event) => void actions.openConversation(conversation.id, { newTab: event.metaKey || event.ctrlKey, background: (event.metaKey || event.ctrlKey) && !event.shiftKey })}
+        onAuxClick={(event) => { if (event.button === 1) { event.preventDefault(); void actions.openConversation(conversation.id, { newTab: true, background: true }); } }}
       >
         {conversation.channel ? (
           conversation.channel.visibility === "private" ? (
@@ -340,6 +341,8 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
       >
         {(close) => (
           <div className="menu">
+            <MenuItem onClick={() => { close(); void actions.openConversation(conversation.id, { newTab: true }); }}>Open in new chat tab</MenuItem>
+            <MenuDivider />
             <MenuItem
               onClick={async () => {
                 close();

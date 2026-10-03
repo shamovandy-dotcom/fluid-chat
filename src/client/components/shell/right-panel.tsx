@@ -20,7 +20,7 @@ export function RightPanel() {
 
   return (
     <aside className="right-panel" aria-label="Details panel">
-      {panel.kind === "thread" ? <ThreadPanel messageId={panel.messageId} onClose={close} /> : null}
+      {panel.kind === "thread" ? <ThreadPanel key={panel.messageId} messageId={panel.messageId} onClose={close} /> : null}
       {panel.kind === "profile" ? <ProfilePanel userId={panel.userId} onClose={close} /> : null}
       {panel.kind === "details" ? <DetailsPanel conversationId={panel.conversationId} onClose={close} /> : null}
       {panel.kind === "pins" ? <PinsPanel conversationId={panel.conversationId} onClose={close} /> : null}

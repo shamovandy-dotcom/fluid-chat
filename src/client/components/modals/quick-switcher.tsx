@@ -8,7 +8,7 @@ import { Avatar, Modal } from "../ui/primitives";
 type Entry = { id: string; label: string; hint?: string; run: () => void; icon: React.ReactNode };
 
 /** ⌘K: jump to any conversation, person, or view without leaving the keyboard. */
-export function QuickSwitcher({ onClose }: { onClose: () => void }) {
+export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void; newTab?: boolean }) {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const [query, setQuery] = useState("");
@@ -31,7 +31,7 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
         ) : (
           <Users size={15} />
         ),
-        run: () => void actions.openConversation(conversation.id)
+        run: () => void actions.openConversation(conversation.id, { newTab })
       });
     }
     for (const channel of state.bootstrap?.channels ?? []) {
@@ -41,11 +41,12 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
         label: `#${channel.name}`,
         hint: "Not joined",
         icon: <Hash size={15} />,
-        run: () => void actions.openConversation(channel.conversationId)
+        run: () => void actions.openConversation(channel.conversationId, { newTab })
       });
     }
     for (const member of state.bootstrap?.members ?? []) {
       if (member.user.id === state.session?.id) continue;
+      if (state.bootstrap?.conversations.some(conversation => conversation.type === "dm" && conversation.memberIds.includes(member.user.id))) continue;
       list.push({
         id: `user-${member.user.id}`,
         label: member.user.displayName,
@@ -57,7 +58,7 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
             api.conversations.openDm(state.workspaceId!, [member.user.id])
           );
           await actions.refreshBootstrap();
-          await actions.openConversation(conversation.id);
+          await actions.openConversation(conversation.id, { newTab });
         }
       });
     }
@@ -71,11 +72,11 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
       ["Open preferences", () => actions.setModal({ kind: "preferences" })],
       ["Invite people", () => actions.setModal({ kind: "invite" })]
     ];
-    for (const [label, run] of views) {
+    for (const [label, run] of newTab ? [] : views) {
       list.push({ id: label, label, icon: <Search size={14} />, run });
     }
     return list;
-  }, [actions, directory, state.bootstrap, state.session?.id, state.workspaceId]);
+  }, [actions, directory, state.bootstrap, state.session?.id, state.workspaceId, newTab]);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase().replace(/^[#@]/, "");
@@ -86,7 +87,7 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
   useEffect(() => setIndex(0), [query]);
 
   return (
-    <Modal title="Jump to" onClose={onClose} width={560} align="top">
+    <Modal title={newTab ? "Open chat in new tab" : "Jump to"} onClose={onClose} width={560} align="top">
       <div className="quick-switcher">
         <div className="search-field">
           <Search size={16} />
@@ -94,7 +95,7 @@ export function QuickSwitcher({ onClose }: { onClose: () => void }) {
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search channels, people and commands"
+            placeholder={newTab ? "Search channels and people" : "Search channels, people and commands"}
             onKeyDown={(event) => {
               if (event.key === "ArrowDown") {
                 event.preventDefault();

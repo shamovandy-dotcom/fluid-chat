@@ -8,6 +8,7 @@ import { Sidebar } from "./shell/sidebar";
 import { WorkspaceRail } from "./shell/workspace-rail";
 import { TopBar } from "./shell/top-bar";
 import { RightPanel } from "./shell/right-panel";
+import { ChatTabBar } from "./shell/chat-tab-bar";
 import { ConversationView } from "./shell/conversation-view";
 import { ActivityView, DraftsView, SavedView, ThreadsView, UnreadsView } from "./views/activity-views";
 import { BrowseChannelsView, FilesView, PeopleView, SearchView } from "./views/directory-views";
@@ -69,19 +70,24 @@ function AppRoot() {
             onClick={() => actions.setSidebarOpen(false)}
           />
         ) : null}
-        <main className="app-main">
-          {state.view.kind === "conversation" ? <ConversationView conversationId={state.view.conversationId} /> : null}
-          {state.view.kind === "activity" ? <ActivityView /> : null}
-          {state.view.kind === "threads" ? <ThreadsView /> : null}
-          {state.view.kind === "saved" ? <SavedView /> : null}
-          {state.view.kind === "drafts" ? <DraftsView /> : null}
-          {state.view.kind === "unreads" ? <UnreadsView /> : null}
-          {state.view.kind === "browse" ? <BrowseChannelsView /> : null}
-          {state.view.kind === "people" ? <PeopleView /> : null}
-          {state.view.kind === "files" ? <FilesView /> : null}
-          {state.view.kind === "search" ? <SearchView query={state.view.query} /> : null}
-        </main>
-        <RightPanel />
+        <div className="conversation-workspace">
+          <ChatTabBar />
+          <div className="conversation-workspace-body">
+            <main className="app-main" id="chat-tab-content" aria-label="Conversation content">
+              {state.view.kind === "conversation" ? <ConversationView key={state.view.conversationId} conversationId={state.view.conversationId} /> : null}
+              {state.view.kind === "activity" ? <ActivityView /> : null}
+              {state.view.kind === "threads" ? <ThreadsView /> : null}
+              {state.view.kind === "saved" ? <SavedView /> : null}
+              {state.view.kind === "drafts" ? <DraftsView /> : null}
+              {state.view.kind === "unreads" ? <UnreadsView /> : null}
+              {state.view.kind === "browse" ? <BrowseChannelsView /> : null}
+              {state.view.kind === "people" ? <PeopleView /> : null}
+              {state.view.kind === "files" ? <FilesView /> : null}
+              {state.view.kind === "search" ? <SearchView query={state.view.query} /> : null}
+            </main>
+            <RightPanel />
+          </div>
+        </div>
       </div>
       <Modals />
       <Toasts />
@@ -97,7 +103,7 @@ function Modals() {
 
   switch (modal.kind) {
     case "quick-switcher":
-      return <QuickSwitcher onClose={close} />;
+      return <QuickSwitcher onClose={close} newTab={modal.newTab} />;
     case "preferences":
       return <PreferencesModal onClose={close} />;
     case "admin":
@@ -180,6 +186,25 @@ function useHotkeys() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      // App shortcuts deliberately avoid the browser's own tab shortcuts.
+      if (event.altKey && !event.metaKey && !event.ctrlKey && !state.modal) {
+        const key = event.code.startsWith("Key") ? event.code.slice(3).toLowerCase() : event.code.startsWith("Digit") ? event.code.slice(5) : event.key.toLowerCase();
+        if (event.shiftKey && ["n", "w", "t"].includes(key)) {
+          event.preventDefault();
+          if (event.code === "KeyN" || key === "n") actions.setModal({ kind: "quick-switcher", newTab: true });
+          if (event.code === "KeyW" || key === "w") {
+            if (state.view.kind === "conversation") actions.changeChatTabs({ type: "close", conversationId: state.view.conversationId });
+          }
+          if (event.code === "KeyT" || key === "t") actions.changeChatTabs({ type: "reopen" });
+          return;
+        }
+        if (!event.shiftKey && /^[1-9]$/.test(key)) {
+          const index = key === "9" ? state.chatTabs.items.length - 1 : Number(key) - 1;
+          const tab = state.chatTabs.items[index];
+          if (tab) { event.preventDefault(); void actions.openConversation(tab.conversationId); }
+          return;
+        }
+      }
       const meta = event.metaKey || event.ctrlKey;
       const target = event.target as HTMLElement | null;
       const typing = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
@@ -239,7 +264,7 @@ function useHotkeys() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [actions, state.modal, state.rightPanel]);
+  }, [actions, state.modal, state.rightPanel, state.view, state.chatTabs, state.bootstrap]);
 }
 
 /**
