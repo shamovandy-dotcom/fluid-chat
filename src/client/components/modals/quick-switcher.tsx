@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Hash, Lock, Поиск, Users } from "lucide-react";
+import { Hash, Lock, Search, Users } from "lucide-react";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, Modal } from "../ui/primitives";
 
 type Entry = { id: string; label: string; hint?: string; run: () => void; icon: React.ReactNode };
 
 /** ⌘K: jump to any conversation, person, or view without leaving the keyboard. */
-export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакрыть: () => void; newTab?: boolean }) {
+export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void; newTab?: boolean }) {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const [query, setQuery] = useState("");
@@ -39,7 +39,7 @@ export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакр
       list.push({
         id: channel.id,
         label: `#${channel.name}`,
-        hint: "Не присоединился",
+        hint: "Not joined",
         icon: <Hash size={15} />,
         run: () => void actions.openConversation(channel.conversationId, { newTab })
       });
@@ -49,7 +49,7 @@ export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакр
       if (state.bootstrap?.conversations.some(conversation => conversation.type === "dm" && conversation.memberIds.includes(member.user.id))) continue;
       list.push({
         id: `user-${member.user.id}`,
-        label: member.user.displayИмя,
+        label: member.user.displayName,
         hint: member.user.title ?? undefined,
         icon: <Avatar user={member.user} size={20} presence={false} />,
         run: async () => {
@@ -63,17 +63,17 @@ export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакр
       });
     }
     const views: Array<[string, () => void]> = [
-      ["Go to Обсуждениеs", () => actions.setView({ kind: "threads" })],
-      ["Go to Активность", () => actions.setView({ kind: "activity" })],
-      ["Go to Все непрочитанные", () => actions.setView({ kind: "unreads" })],
-      ["Go to Черновики и отправленные", () => actions.setView({ kind: "drafts" })],
-      ["Go to На потом", () => actions.setView({ kind: "saved" })],
+      ["Go to Threads", () => actions.setView({ kind: "threads" })],
+      ["Go to Activity", () => actions.setView({ kind: "activity" })],
+      ["Go to All unreads", () => actions.setView({ kind: "unreads" })],
+      ["Go to Drafts & sent", () => actions.setView({ kind: "drafts" })],
+      ["Go to Later", () => actions.setView({ kind: "saved" })],
       ["Browse channels", () => actions.setView({ kind: "browse" })],
       ["Open preferences", () => actions.setModal({ kind: "preferences" })],
-      ["Пригласить участников", () => actions.setModal({ kind: "invite" })]
+      ["Invite people", () => actions.setModal({ kind: "invite" })]
     ];
     for (const [label, run] of newTab ? [] : views) {
-      list.push({ id: label, label, icon: <Поиск size={14} />, run });
+      list.push({ id: label, label, icon: <Search size={14} />, run });
     }
     return list;
   }, [actions, directory, state.bootstrap, state.session?.id, state.workspaceId, newTab]);
@@ -87,15 +87,15 @@ export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакр
   useEffect(() => setIndex(0), [query]);
 
   return (
-    <Modal title={newTab ? "Open chat in new tab" : "Перейти к"} onЗакрыть={onЗакрыть} width={560} align="top">
-      <div classИмя="quick-switcher">
-        <div classИмя="search-field">
-          <Поиск size={16} />
+    <Modal title={newTab ? "Open chat in new tab" : "Jump to"} onClose={onClose} width={560} align="top">
+      <div className="quick-switcher">
+        <div className="search-field">
+          <Search size={16} />
           <input
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={newTab ? "Поиск channels and people" : "Поиск channels, people and commands"}
+            placeholder={newTab ? "Search channels and people" : "Search channels, people and commands"}
             onKeyDown={(event) => {
               if (event.key === "ArrowDown") {
                 event.preventDefault();
@@ -108,32 +108,32 @@ export function QuickSwitcher({ onЗакрыть, newTab = false }: { onЗакр
               if (event.key === "Enter" && filtered[index]) {
                 event.preventDefault();
                 filtered[index].run();
-                onЗакрыть();
+                onClose();
               }
             }}
           />
         </div>
-        <ul classИмя="quick-list" role="listbox">
+        <ul className="quick-list" role="listbox">
           {filtered.map((entry, entryIndex) => (
             <li key={entry.id}>
               <button
                 type="button"
                 role="option"
                 aria-selected={entryIndex === index}
-                classИмя={entryIndex === index ? "is-active" : ""}
+                className={entryIndex === index ? "is-active" : ""}
                 onMouseEnter={() => setIndex(entryIndex)}
                 onClick={() => {
                   entry.run();
-                  onЗакрыть();
+                  onClose();
                 }}
               >
                 {entry.icon}
-                <span classИмя="quick-label">{entry.label}</span>
-                {entry.hint ? <span classИмя="quick-hint">{entry.hint}</span> : null}
+                <span className="quick-label">{entry.label}</span>
+                {entry.hint ? <span className="quick-hint">{entry.hint}</span> : null}
               </button>
             </li>
           ))}
-          {filtered.length === 0 ? <li classИмя="quick-empty">Nothing matches “{query}”.</li> : null}
+          {filtered.length === 0 ? <li className="quick-empty">Nothing matches “{query}”.</li> : null}
         </ul>
       </div>
     </Modal>
