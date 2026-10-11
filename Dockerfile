@@ -13,4 +13,4 @@ RUN npm run build
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "npm run db:migrate && NODE_OPTIONS=--max-old-space-size=384 npm run realtime"]
+CMD ["sh", "-c", "npm run db:migrate && node scripts/start-production.mjs"]
