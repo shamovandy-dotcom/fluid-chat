@@ -12,7 +12,7 @@ export function WorkspaceRail() {
   if (state.memberships.length === 0) return null;
 
   return (
-    <nav className="workspace-rail" aria-label="Workspaces">
+    <nav classИмя="workspace-rail" aria-label="Рабочие пространства">
       {state.memberships.map((membership) => {
         const active = membership.workspace.id === state.workspaceId;
         const label = membership.workspace.name;
@@ -20,7 +20,7 @@ export function WorkspaceRail() {
           <button
             key={membership.workspace.id}
             type="button"
-            className={`rail-tile ${active ? "is-active" : ""}`}
+            classИмя={`rail-tile ${active ? "is-active" : ""}`}
             title={label}
             aria-label={label}
             aria-current={active ? "true" : undefined}
@@ -28,25 +28,25 @@ export function WorkspaceRail() {
               if (!active) void actions.selectWorkspace(membership.workspace.id);
             }}
           >
-            <span className="rail-badge" aria-hidden>
-              {membership.workspace.iconEmoji ?? label.slice(0, 2).toUpperCase()}
+            <span classИмя="rail-badge" aria-hidden>
+              {membership.workspace.iconЭмодзи ?? label.slice(0, 2).toUpperCase()}
             </span>
-            <span className="rail-name">{label.split(/\s+/)[0]}</span>
+            <span classИмя="rail-name">{label.split(/\s+/)[0]}</span>
           </button>
         );
       })}
 
       <button
         type="button"
-        className="rail-tile rail-add"
-        title="Create a workspace"
-        aria-label="Create a workspace"
+        classИмя="rail-tile rail-add"
+        title="Создать рабочее пространство"
+        aria-label="Создать рабочее пространство"
         onClick={() => actions.setModal({ kind: "create-workspace" })}
       >
-        <span className="rail-badge" aria-hidden>
+        <span classИмя="rail-badge" aria-hidden>
           <Plus size={18} />
         </span>
-        <span className="rail-name">Add</span>
+        <span classИмя="rail-name">Add</span>
       </button>
     </nav>
   );
