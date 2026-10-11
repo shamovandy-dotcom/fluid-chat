@@ -42,11 +42,7 @@ export const pool = new Proxy({} as pg.Pool, {
 get(_target, property) {
 const actualPool = getPool();
 const value = Reflect.get(actualPool, property, actualPool);
-
-```
 return typeof value === "function" ? value.bind(actualPool) : value;
-```
-
 },
 });
 
@@ -54,10 +50,6 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 get(_target, property) {
 const actualDb = getDb();
 const value = Reflect.get(actualDb, property, actualDb);
-
-```
 return typeof value === "function" ? value.bind(actualDb) : value;
-```
-
 },
 });
