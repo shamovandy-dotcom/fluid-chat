@@ -93,7 +93,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
         <small>of {workspace?.seatLimit ?? 0} seats</small>
       </div>
       <div className="stat-card">
-        <span>Pending invites</span>
+        <span>Ожидают приглашения</span>
         <strong>{usage?.pendingInvites ?? "—"}</strong>
       </div>
       <div className="stat-card">
@@ -101,7 +101,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
         <strong>{usage?.fileCount ?? "—"}</strong>
       </div>
       <div className="stat-card">
-        <span>Plan</span>
+        <span>Тариф</span>
         <strong className="capitalize">{workspace?.plan ?? "free"}</strong>
         <small className="capitalize">{workspace?.subscriptionStatus}</small>
       </div>
@@ -151,10 +151,10 @@ function Участники({ workspaceId, isOwner }: { workspaceId: string; isO
                   }
                 }}
               >
-                <option value="owner">Owner</option>
-                <option value="admin">Admin</option>
-                <option value="member">Member</option>
-                <option value="guest">Guest</option>
+                <option value="owner">Владелец</option>
+                <option value="admin">Администратор</option>
+                <option value="member">Участник</option>
+                <option value="guest">Гость</option>
               </select>
             ) : (
               <span className="pill capitalize">{member.role}</span>
@@ -508,8 +508,8 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
               value={form.identity}
               onChange={(event) => setForm({ ...form, identity: event.target.value as "bot" | "self" })}
             >
-              <option value="bot">Its own bot identity</option>
-              <option value="self">Me</option>
+              <option value="bot">Отдельный профиль бота</option>
+              <option value="self">Я</option>
             </select>
           </label>
           {form.identity === "bot" ? (
@@ -519,8 +519,8 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
                 value={form.botRole}
                 onChange={(event) => setForm({ ...form, botRole: event.target.value as "member" | "admin" })}
               >
-                <option value="member">Member</option>
-                <option value="admin">Admin</option>
+                <option value="member">Участник</option>
+                <option value="admin">Администратор</option>
               </select>
             </label>
           ) : null}
@@ -557,7 +557,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
         </div>
 
         <fieldset className="scope-grid">
-          <legend>Scopes</legend>
+          <legend>Права доступа</legend>
           {catalogue.map((entry) => (
             <label key={entry.scope} className="checkbox-field">
               <input
