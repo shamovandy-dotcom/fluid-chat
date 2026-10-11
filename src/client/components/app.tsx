@@ -10,10 +10,10 @@ import { TopBar } from "./shell/top-bar";
 import { RightPanel } from "./shell/right-panel";
 import { ChatTabBar } from "./shell/chat-tab-bar";
 import { ConversationView } from "./shell/conversation-view";
-import { АктивностьView, DraftsView, СохранитьdView, ОбсуждениеsView, UnreadsView } from "./views/activity-views";
+import { АктивностьView, DraftsView, СохранитьdView, ОбсуждениеsView, НепрочитанныеView } from "./views/activity-views";
 import { BrowseКаналыView, ФайлыView, ЛюдиView, ПоискView } from "./views/directory-views";
 import { QuickSwitcher } from "./modals/quick-switcher";
-import { AdminConsole } from "./modals/admin-console";
+import { АдминистрированиеConsole } from "./modals/admin-console";
 import {
   AddЛюдиModal,
   СоздатьWorkspaceModal,
@@ -79,7 +79,7 @@ function AppRoot() {
               {state.view.kind === "threads" ? <ОбсуждениеsView /> : null}
               {state.view.kind === "saved" ? <СохранитьdView /> : null}
               {state.view.kind === "drafts" ? <DraftsView /> : null}
-              {state.view.kind === "unreads" ? <UnreadsView /> : null}
+              {state.view.kind === "unreads" ? <НепрочитанныеView /> : null}
               {state.view.kind === "browse" ? <BrowseКаналыView /> : null}
               {state.view.kind === "people" ? <ЛюдиView /> : null}
               {state.view.kind === "files" ? <ФайлыView /> : null}
@@ -107,7 +107,7 @@ function Modals() {
     case "preferences":
       return <ПредпочтенияModal onЗакрыть={close} />;
     case "admin":
-      return <AdminConsole onЗакрыть={close} />;
+      return <АдминистрированиеConsole onЗакрыть={close} />;
     case "invite":
       return <ПригласитьModal onЗакрыть={close} />;
     case "new-channel":
