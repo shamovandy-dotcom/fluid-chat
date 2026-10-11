@@ -48,7 +48,7 @@ function AppRoot() {
   if (state.status === "loading") {
     return (
       <div className="boot-screen">
-        <Spinner label="Loading Androlit Chat" />
+        <Spinner label="Загрузка Androlit Chat" />
       </div>
     );
   }
@@ -66,14 +66,14 @@ function AppRoot() {
           <button
             type="button"
             className="sidebar-scrim"
-            aria-label="Close navigation"
+            aria-label="Закрыть навигацию"
             onClick={() => actions.setSidebarOpen(false)}
           />
         ) : null}
         <div className="conversation-workspace">
           <ChatTabBar />
           <div className="conversation-workspace-body">
-            <main className="app-main" id="chat-tab-content" aria-label="Conversation content">
+            <main className="app-main" id="chat-tab-content" aria-label="Содержимое переписки">
               {state.view.kind === "conversation" ? <ConversationView key={state.view.conversationId} conversationId={state.view.conversationId} /> : null}
               {state.view.kind === "activity" ? <ActivityView /> : null}
               {state.view.kind === "threads" ? <ThreadsView /> : null}
