@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./styles.css";
 
 export const metadata: Metadata = {
-  title: "Fluid Chat",
-  description: "Self-hosted team chat: channels, DMs, threads, search and files",
+  title: "Androlit Chat",
+  description: "Androlit Chat — team messaging, channels, direct messages, threads, search and files",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }]
   }
