@@ -6,7 +6,7 @@ import {
   Bookmark,
   BookmarkCheck,
   Clock,
-  Копировать,
+  Copy,
   Download,
   Link2,
   MessageSquare,
@@ -384,7 +384,7 @@ export function MessageItem({
                   actions.toast("Сообщение text copied", "success");
                 }}
               >
-                <Копировать size={14} /> Копировать text
+                <Copy size={14} /> Копировать text
               </MenuItem>
               <MenuItem
                 onClick={() => {
