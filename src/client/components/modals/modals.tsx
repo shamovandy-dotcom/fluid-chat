@@ -67,9 +67,9 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
         <label className="field">
           Role
           <select value={role} onChange={(event) => setRole(event.target.value as typeof role)}>
-            <option value="member">Member — full access to public channels</option>
-            <option value="admin">Admin — can manage members and channels</option>
-            <option value="guest">Guest — only the channels you add them to</option>
+            <option value="member">Участник — full access to public channels</option>
+            <option value="admin">Администратор — can manage members and channels</option>
+            <option value="guest">Гость — only the channels you add them to</option>
           </select>
         </label>
         <button type="submit" className="button primary">
@@ -79,7 +79,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 
       {sent.length > 0 ? (
         <div className="invite-links">
-          <h4>Invitation links</h4>
+          <h4>Ссылки-приглашения</h4>
           {sent.map((link) => (
             <code key={link}>{link}</code>
           ))}
@@ -87,7 +87,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
       ) : null}
 
       <div className="modal-section">
-        <h4>Share an invite link</h4>
+        <h4>Поделиться ссылкой-приглашением</h4>
         <p className="muted">Anyone with the link can join as a member. The link expires in 30 days.</p>
         {inviteLink ? (
           <div className="copy-row">
@@ -193,7 +193,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
             onChange={(event) => setVisibility(event.target.checked ? "private" : "public")}
           />
           <span>
-            <strong>Make private</strong>
+            <strong>Сделать приватным</strong>
             <small>Only invited people can see this channel.</small>
           </span>
         </label>
@@ -386,7 +386,7 @@ export function AddPeopleModal({ conversationId, onClose }: { conversationId: st
                 </span>
               </button>
             ))}
-            {visible.length === 0 ? <p className="muted">Everyone in the workspace is already here.</p> : null}
+            {visible.length === 0 ? <p className="muted">Все in the workspace is already here.</p> : null}
           </div>
         </>
       )}
@@ -464,12 +464,12 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
       <label className="field">
         Очистить after
         <select value={minutes ?? ""} onChange={(event) => setMinutes(event.target.value ? Number(event.target.value) : null)}>
-          <option value="">Do not clear</option>
+          <option value="">Не очищать</option>
           <option value="30">30 minutes</option>
           <option value="60">1 hour</option>
           <option value="240">4 hours</option>
           <option value="480">Сегодня</option>
-          <option value="10080">This week</option>
+          <option value="10080">На этой неделе</option>
         </select>
       </label>
 
@@ -616,16 +616,16 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
           <label className="field">
             Theme
             <select value={preferences.theme ?? "system"} onChange={(event) => set({ theme: event.target.value })}>
-              <option value="system">Match system</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
+              <option value="system">Как в системе</option>
+              <option value="light">Светлая</option>
+              <option value="dark">Тёмная</option>
             </select>
           </label>
           <label className="field">
             Сообщение density
             <select value={preferences.messageDensity ?? "comfortable"} onChange={(event) => set({ messageDensity: event.target.value })}>
-              <option value="comfortable">Comfortable</option>
-              <option value="compact">Compact</option>
+              <option value="comfortable">Обычная</option>
+              <option value="compact">Компактная</option>
             </select>
           </label>
           <label className="field">
@@ -638,7 +638,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
           <label className="checkbox-field">
             <input type="checkbox" checked={preferences.enterToSend !== false} onChange={(event) => set({ enterToSend: event.target.checked })} />
             <span>
-              <strong>Press Enter to send</strong>
+              <strong>Нажимать Enter для отправки</strong>
               <small>When off, use Cmd/Ctrl+Enter to send.</small>
             </span>
           </label>
@@ -650,17 +650,17 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
           <label className="field">
             Desktop notifications
             <select value={preferences.desktopNotifications ?? "mentions"} onChange={(event) => set({ desktopNotifications: event.target.value })}>
-              <option value="all">Every new message</option>
+              <option value="all">Каждое новое сообщение</option>
               <option value="mentions">Личные сообщения and mentions</option>
-              <option value="none">Nothing</option>
+              <option value="none">Ничего</option>
             </select>
           </label>
           <label className="field">
             Электронная почта notifications
             <select value={preferences.emailNotifications ?? "mentions"} onChange={(event) => set({ emailNotifications: event.target.value })}>
-              <option value="all">Everything I miss</option>
+              <option value="all">Все пропущенные сообщения</option>
               <option value="mentions">Личные сообщения and mentions</option>
-              <option value="none">Nothing</option>
+              <option value="none">Ничего</option>
             </select>
           </label>
           <label className="checkbox-field">
@@ -845,7 +845,7 @@ export function ShareModal({ messageId, onClose }: { messageId: string; onClose:
       <label className="field">
         Share to
         <select value={target} onChange={(event) => setTarget(event.target.value)}>
-          <option value="">Pick a conversation</option>
+          <option value="">Выберите переписку</option>
           {(state.bootstrap?.conversations ?? []).map((conversation) => (
             <option key={conversation.id} value={conversation.id}>
               {conversation.channel ? `#${conversation.channel.name}` : conversationTitle(conversation, directory, state.session?.id)}
