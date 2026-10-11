@@ -31,7 +31,7 @@ export function AdminConsole({ onClose }: { onClose: () => void }) {
   const isOwner = state.bootstrap?.role === "owner";
 
   return (
-    <Modal title={`${state.bootstrap?.workspace.name ?? "Workspace"} settings`} onClose={onClose} width={860}>
+    <Modal title={`Настройки пространства «${state.bootstrap?.workspace.name ?? "Рабочее пространство"}»`} onClose={onClose} width={860}>
       <div className="panel-tabs wrap" role="tablist">
         {(
           [
@@ -90,7 +90,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
       <div className="stat-card">
         <span>Участники</span>
         <strong>{usage?.activeMembers ?? "—"}</strong>
-        <small>of {workspace?.seatLimit ?? 0} seats</small>
+        <small>из {workspace?.seatLimit ?? 0} мест</small>
       </div>
       <div className="stat-card">
         <span>Ожидают приглашения</span>
