@@ -416,7 +416,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                   />
                   <span>
                     <strong>Автоматически добавлять новых участников</strong>
-                    <small>Все who joins the workspace lands in this channel.</small>
+                    <small>Все, кто присоединяется к рабочему пространству, автоматически попадают в этот канал.</small>
                   </span>
                 </label>
 
