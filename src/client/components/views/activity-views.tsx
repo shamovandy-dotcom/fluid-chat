@@ -77,10 +77,10 @@ export function ActivityView() {
       <div className="view-filters">
         {(
           [
-            ["all", "All", <Bell key="a" size={14} />],
-            ["mention", "Mentions", <AtSign key="b" size={14} />],
+            ["all", "Все", <Bell key="a" size={14} />],
+            ["mention", "Упоминания", <AtSign key="b" size={14} />],
             ["thread_reply", "Обсуждения", <MessageSquare key="c" size={14} />],
-            ["reaction", "Reactions", <Bookmark key="d" size={14} />]
+            ["reaction", "Реакции", <Bookmark key="d" size={14} />]
           ] as const
         ).map(([value, text, icon]) => (
           <button
@@ -99,7 +99,7 @@ export function ActivityView() {
         {!notifications ? (
           <Spinner label="Загрузка активности" />
         ) : visible.length === 0 ? (
-          <EmptyState title="Вы are all caught up" body="Здесь отображаются упоминания, ответы в обсуждениях и реакции." />
+          <EmptyState title="Вы всё просмотрели" body="Здесь отображаются упоминания, ответы в обсуждениях и реакции." />
         ) : (
           visible.map((notification) => {
             const actor = notification.actorUserId ? directory.get(notification.actorUserId) : undefined;
@@ -134,21 +134,21 @@ export function ActivityView() {
 function describeNotification(type: string) {
   switch (type) {
     case "mention":
-      return "mentioned you in";
+      return "упомянул вас в";
     case "dm":
-      return "sent you a message";
+      return "отправил вам сообщение";
     case "thread_reply":
-      return "replied in a thread in";
+      return "ответил в обсуждении в";
     case "reaction":
-      return "reacted to your message in";
+      return "отреагировал на ваше сообщение в";
     case "invite_accepted":
-      return "joined the workspace";
+      return "присоединился к рабочему пространству";
     case "reminder":
-      return "reminder";
+      return "напоминание";
     case "keyword":
-      return "said a keyword you follow in";
+      return "использовал отслеживаемое вами слово в";
     case "channel_invite":
-      return "added you to a channel";
+      return "добавил вас в канал";
     default:
       return type;
   }
@@ -189,7 +189,7 @@ export function ThreadsView() {
                 <MessageItem key={reply.id} message={reply} context="list" />
               ))}
               <button type="button" className="button ghost" onClick={() => void actions.openThread(root.id)}>
-                Open thread
+                Открыть обсуждение
               </button>
             </div>
           ))
@@ -223,7 +223,7 @@ export function SavedView() {
           saved.map(({ message, savedAt }) => (
             <div key={message.id} className="panel-card">
               <div className="panel-card-head">
-                <Bookmark size={13} /> Saved {formatRelative(savedAt)}
+                <Bookmark size={13} /> Сохранено {formatRelative(savedAt)}
               </div>
               <MessageItem message={message} context="list" />
             </div>
@@ -255,7 +255,7 @@ export function DraftsView() {
       <ViewHeader title="Черновики и отправленные" subtitle="Черновики, запланированные сообщения и напоминания" />
       <div className="view-scroll">
         <h3 className="view-subhead">
-          <PenSquare size={14} /> Drafts
+          <PenSquare size={14} /> Черновики
         </h3>
         {!drafts ? (
           <Spinner label="Загрузка черновиков" />
@@ -281,16 +281,16 @@ export function DraftsView() {
         )}
 
         <h3 className="view-subhead">
-          <Clock size={14} /> Scheduled
+          <Clock size={14} /> Запланированные
         </h3>
         {scheduled.length === 0 ? (
-          <p className="muted padded">Nothing scheduled.</p>
+          <p className="muted padded">Нет запланированных сообщений.</p>
         ) : (
           scheduled.map((entry) => (
             <div key={entry.id} className="list-row is-static">
               <div className="list-row-head">
                 <strong>{label(entry.conversationId)}</strong>
-                <time>Sends {compactTimestamp(entry.sendAt)}</time>
+                <time>Отправка: {compactTimestamp(entry.sendAt)}</time>
                 <button
                   type="button"
                   className="icon-button"
@@ -309,10 +309,10 @@ export function DraftsView() {
         )}
 
         <h3 className="view-subhead">
-          <Bell size={14} /> Reminders
+          <Bell size={14} /> Напоминания
         </h3>
         {reminders.length === 0 ? (
-          <p className="muted padded">No reminders set.</p>
+          <p className="muted padded">Напоминаний нет.</p>
         ) : (
           reminders.map((reminder) => (
             <div key={reminder.id} className="list-row is-static">
@@ -327,7 +327,7 @@ export function DraftsView() {
                     load();
                   }}
                 >
-                  Complete
+                  Выполнено
                 </button>
               </div>
             </div>
