@@ -139,7 +139,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
 
   return (
-    <Modal title="Создать a channel" onClose={onClose}>
+    <Modal title="Создать канал" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
@@ -259,7 +259,7 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
         className="modal-input"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Поиск people"
+        placeholder="Поиск участников"
         autoFocus
       />
       <div className="picker-list">
@@ -362,7 +362,7 @@ export function AddPeopleModal({ conversationId, onClose }: { conversationId: st
             className="modal-input"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Поиск people"
+            placeholder="Поиск участников"
             autoFocus
           />
           <div className="picker-list">
@@ -419,7 +419,7 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title="Set a status"
+      title="Установить статус"
       onClose={onClose}
       footer={
         <>
@@ -458,7 +458,7 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
             </option>
           ))}
         </select>
-        <input value={text} onChange={(event) => setText(event.target.value)} placeholder="What is happening?" maxLength={140} />
+        <input value={text} onChange={(event) => setText(event.target.value)} placeholder="Что происходит?" maxLength={140} />
       </div>
 
       <label className="field">
@@ -510,7 +510,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
 
   return (
-    <Modal title="Изменить your profile" onClose={onClose}>
+    <Modal title="Изменить профиль" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
@@ -666,7 +666,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
           <label className="checkbox-field">
             <input type="checkbox" checked={preferences.notificationSound !== false} onChange={(event) => set({ notificationSound: event.target.checked })} />
             <span>
-              <strong>Play a sound for new messages</strong>
+              <strong>Воспроизводить звук при новых сообщениях</strong>
               <small>Follows the desktop setting above, and pauses during your notification schedule.</small>
             </span>
           </label>
@@ -734,7 +734,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
           <label className="checkbox-field">
             <input type="checkbox" checked={preferences.showUnreadsFirst === true} onChange={(event) => set({ showUnreadsFirst: event.target.checked })} />
             <span>
-              <strong>Sort the sidebar by unread first</strong>
+              <strong>Сначала показывать непрочитанные переписки</strong>
             </span>
           </label>
           <div className="field">
@@ -905,7 +905,7 @@ const SHORTCUTS: Array<[string, string]> = [
 
 export function ShortcutsModal({ onClose }: { onClose: () => void }) {
   return (
-    <Modal title="Keyboard shortcuts" onClose={onClose}>
+    <Modal title="Сочетания клавиш" onClose={onClose}>
       <ul className="shortcut-list">
         {SHORTCUTS.map(([keys, description]) => (
           <li key={keys}>
@@ -923,7 +923,7 @@ export function CreateWorkspaceModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
 
   return (
-    <Modal title="Создать a workspace" onClose={onClose}>
+    <Modal title="Создать рабочее пространство" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
