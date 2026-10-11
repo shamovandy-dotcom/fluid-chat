@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Hash, Lock } from "lucide-react";
+import { Check, Копировать, Hash, Lock } from "lucide-react";
 import { api } from "../../api";
 import { track } from "../../analytics";
 import { EMOJI_CATEGORIES } from "../../emoji";
@@ -10,7 +10,7 @@ import { Avatar, Modal } from "../ui/primitives";
 import { RichText } from "../message/rich-text";
 
 /* -------------------------------------------------------------------------- */
-/* Invite                                                                      */
+/* Пригласить                                                                      */
 /* -------------------------------------------------------------------------- */
 
 export function InviteModal({ onClose }: { onClose: () => void }) {
@@ -23,11 +23,11 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title={`Invite people to ${state.bootstrap?.workspace.name ?? "workspace"}`}
+      title={`Пригласить участников to ${state.bootstrap?.workspace.name ?? "workspace"}`}
       onClose={onClose}
       footer={
         <button type="button" className="button ghost" onClick={onClose}>
-          Done
+          Готово
         </button>
       }
     >
@@ -56,7 +56,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
         }}
       >
         <label className="field">
-          Email addresses
+          Электронная почта addresses
           <textarea
             value={emails}
             onChange={(event) => setEmails(event.target.value)}
@@ -73,7 +73,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
           </select>
         </label>
         <button type="submit" className="button primary">
-          Send invitations
+          Отправить invitations
         </button>
       </form>
 
@@ -101,7 +101,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
                 setTimeout(() => setCopied(false), 1500);
               }}
             >
-              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Copy"}
+              {copied ? <Check size={14} /> : <Копировать size={14} />} {copied ? "Copied" : "Копировать"}
             </button>
           </div>
         ) : (
@@ -119,7 +119,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
               }
             }}
           >
-            Create invite link
+            Создать invite link
           </button>
         )}
       </div>
@@ -128,7 +128,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* New channel                                                                 */
+/* Новый канал                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export function NewChannelModal({ onClose }: { onClose: () => void }) {
@@ -139,7 +139,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
 
   return (
-    <Modal title="Create a channel" onClose={onClose}>
+    <Modal title="Создать a channel" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
@@ -164,7 +164,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
         }}
       >
         <label className="field">
-          Name
+          Имя
           <div className="prefixed-input">
             <span>{visibility === "private" ? <Lock size={14} /> : <Hash size={15} />}</span>
             <input
@@ -178,11 +178,11 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
           </div>
         </label>
         <label className="field">
-          Description <span className="optional">(optional)</span>
+          Описание <span className="optional">(optional)</span>
           <input
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="What is this channel about?"
+            placeholder="О чём этот канал?"
             maxLength={500}
           />
         </label>
@@ -198,7 +198,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
           </span>
         </label>
         <button type="submit" className="button primary" disabled={!name.trim() || busy}>
-          Create channel
+          Создать channel
         </button>
       </form>
     </Modal>
@@ -221,7 +221,7 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title="New message"
+      title="Новое сообщение"
       onClose={onClose}
       footer={
         <button
@@ -259,7 +259,7 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
         className="modal-input"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Search people"
+        placeholder="Поиск people"
         autoFocus
       />
       <div className="picker-list">
@@ -285,9 +285,9 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
         ))}
         {visible.length === 0 ? (
           <div className="empty-state">
-            <strong>{query.trim() ? "No people found" : "No other members in this workspace yet"}</strong>
+            <strong>{query.trim() ? "Участники не найдены" : "В этом рабочем пространстве пока нет других участников"}</strong>
             <p className="muted">
-              Direct messages are available to people in this workspace. Invite another account to join this workspace first.
+              Личные сообщения are available to people in this workspace. Пригласить another account to join this workspace first.
             </p>
           </div>
         ) : null}
@@ -362,7 +362,7 @@ export function AddPeopleModal({ conversationId, onClose }: { conversationId: st
             className="modal-input"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search people"
+            placeholder="Поиск people"
             autoFocus
           />
           <div className="picker-list">
@@ -395,7 +395,7 @@ export function AddPeopleModal({ conversationId, onClose }: { conversationId: st
 }
 
 /* -------------------------------------------------------------------------- */
-/* Status                                                                      */
+/* Статус                                                                      */
 /* -------------------------------------------------------------------------- */
 
 const STATUS_PRESETS = [
@@ -431,7 +431,7 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
               onClose();
             }}
           >
-            Clear status
+            Очистить status
           </button>
           <button
             type="button"
@@ -445,13 +445,13 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
               onClose();
             }}
           >
-            Save
+            Сохранить
           </button>
         </>
       }
     >
       <div className="status-row">
-        <select value={emoji} onChange={(event) => setEmoji(event.target.value)} aria-label="Status emoji">
+        <select value={emoji} onChange={(event) => setEmoji(event.target.value)} aria-label="Статус emoji">
           {emojiOptions.map((option) => (
             <option key={option.name} value={option.name}>
               {option.char} :{option.name}:
@@ -462,13 +462,13 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
       </div>
 
       <label className="field">
-        Clear after
+        Очистить after
         <select value={minutes ?? ""} onChange={(event) => setMinutes(event.target.value ? Number(event.target.value) : null)}>
           <option value="">Do not clear</option>
           <option value="30">30 minutes</option>
           <option value="60">1 hour</option>
           <option value="240">4 hours</option>
-          <option value="480">Today</option>
+          <option value="480">Сегодня</option>
           <option value="10080">This week</option>
         </select>
       </label>
@@ -493,7 +493,7 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Profile editor                                                              */
+/* Профиль editor                                                              */
 /* -------------------------------------------------------------------------- */
 
 export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
@@ -510,7 +510,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
 
   return (
-    <Modal title="Edit your profile" onClose={onClose}>
+    <Modal title="Изменить your profile" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
@@ -525,7 +525,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
               phone: form.phone || null,
               timezone: form.timezone
             });
-            actions.toast("Profile updated", "success");
+            actions.toast("Профиль updated", "success");
             onClose();
           } catch (error) {
             actions.fail(error);
@@ -549,7 +549,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
         </div>
         <label className="field">
           What I do
-          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Product engineer" />
+          <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="Инженер по продукту" />
         </label>
         <label className="field">
           Pronouns
@@ -564,7 +564,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
           <input value={form.timezone} onChange={(event) => setForm({ ...form, timezone: event.target.value })} />
         </label>
         <div className="upload-avatar">
-          <span>Profile photo</span>
+          <span>Профиль photo</span>
           <input
             type="file"
             accept="image/*"
@@ -582,7 +582,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
           />
         </div>
         <button type="submit" className="button primary" disabled={busy}>
-          Save changes
+          Сохранить changes
         </button>
       </form>
     </Modal>
@@ -590,7 +590,7 @@ export function ProfileEditorModal({ onClose }: { onClose: () => void }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Preferences                                                                 */
+/* Предпочтения                                                                 */
 /* -------------------------------------------------------------------------- */
 
 export function PreferencesModal({ onClose }: { onClose: () => void }) {
@@ -602,11 +602,11 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
   const set = (input: Record<string, unknown>) => void actions.updatePreferences(input);
 
   return (
-    <Modal title="Preferences" onClose={onClose} width={640}>
+    <Modal title="Предпочтения" onClose={onClose} width={640}>
       <div className="panel-tabs" role="tablist">
         {(["appearance", "notifications", "advanced"] as const).map((entry) => (
           <button key={entry} type="button" role="tab" aria-selected={tab === entry} className={tab === entry ? "is-active" : ""} onClick={() => setTab(entry)}>
-            {entry === "appearance" ? "Appearance" : entry === "notifications" ? "Notifications" : "Advanced"}
+            {entry === "appearance" ? "Внешний вид" : entry === "notifications" ? "Уведомления" : "Дополнительно"}
           </button>
         ))}
       </div>
@@ -622,7 +622,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             </select>
           </label>
           <label className="field">
-            Message density
+            Сообщение density
             <select value={preferences.messageDensity ?? "comfortable"} onChange={(event) => set({ messageDensity: event.target.value })}>
               <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
@@ -651,15 +651,15 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             Desktop notifications
             <select value={preferences.desktopNotifications ?? "mentions"} onChange={(event) => set({ desktopNotifications: event.target.value })}>
               <option value="all">Every new message</option>
-              <option value="mentions">Direct messages and mentions</option>
+              <option value="mentions">Личные сообщения and mentions</option>
               <option value="none">Nothing</option>
             </select>
           </label>
           <label className="field">
-            Email notifications
+            Электронная почта notifications
             <select value={preferences.emailNotifications ?? "mentions"} onChange={(event) => set({ emailNotifications: event.target.value })}>
               <option value="all">Everything I miss</option>
-              <option value="mentions">Direct messages and mentions</option>
+              <option value="mentions">Личные сообщения and mentions</option>
               <option value="none">Nothing</option>
             </select>
           </label>
@@ -695,14 +695,14 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
                 type="time"
                 value={preferences.quietHoursStart ?? ""}
                 onChange={(event) => set({ quietHoursStart: event.target.value || null })}
-                aria-label="Quiet hours start"
+                aria-label="Начало тихого времени"
               />
               <span className="muted small">to</span>
               <input
                 type="time"
                 value={preferences.quietHoursEnd ?? ""}
                 onChange={(event) => set({ quietHoursEnd: event.target.value || null })}
-                aria-label="Quiet hours end"
+                aria-label="Окончание тихого времени"
               />
               {preferences.quietHoursStart || preferences.quietHoursEnd ? (
                 <button
@@ -710,7 +710,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
                   className="button ghost small"
                   onClick={() => set({ quietHoursStart: null, quietHoursEnd: null })}
                 >
-                  Clear
+                  Очистить
                 </button>
               ) : null}
             </div>
@@ -721,7 +721,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             onClick={async () => {
               if (typeof Notification === "undefined") return;
               const permission = await Notification.requestPermission();
-              actions.toast(permission === "granted" ? "Desktop notifications enabled" : "Permission denied");
+              actions.toast(permission === "granted" ? "Desktop notifications enabled" : "Недостаточно прав");
             }}
           >
             Enable browser notifications
@@ -801,13 +801,13 @@ export function ScheduleModal({
   });
 
   return (
-    <Modal title="Schedule message" onClose={onClose}>
+    <Modal title="Запланировать сообщение" onClose={onClose}>
       <p className="muted">This message will be sent automatically at the time you pick.</p>
       <blockquote className="schedule-preview">
         <RichText text={bodyText} />
       </blockquote>
       <label className="field">
-        Send at
+        Отправить at
         <input type="datetime-local" value={when} onChange={(event) => setWhen(event.target.value)} />
       </label>
       <button
@@ -821,7 +821,7 @@ export function ScheduleModal({
               parentMessageId
             });
             track("message_scheduled", {});
-            actions.toast("Message scheduled", "success");
+            actions.toast("Сообщение scheduled", "success");
             onClose();
           } catch (error) {
             actions.fail(error);
@@ -841,7 +841,7 @@ export function ShareModal({ messageId, onClose }: { messageId: string; onClose:
   const [comment, setComment] = useState("");
 
   return (
-    <Modal title="Share message" onClose={onClose}>
+    <Modal title="Поделиться сообщением" onClose={onClose}>
       <label className="field">
         Share to
         <select value={target} onChange={(event) => setTarget(event.target.value)}>
@@ -882,25 +882,25 @@ export function ShareModal({ messageId, onClose }: { messageId: string; onClose:
 /* -------------------------------------------------------------------------- */
 
 const SHORTCUTS: Array<[string, string]> = [
-  ["⌘K / Ctrl+K", "Jump to a conversation or person"],
+  ["⌘K / Ctrl+K", "Перейти к a conversation or person"],
   ["⌘/ / Ctrl+/", "Show this shortcut list"],
   ["⌘⇧K", "Start a direct message"],
   ["⌘⇧A", "Go to all unreads"],
   ["⌘⇧T", "Go to threads"],
   ["Alt+Shift+N", "Open a new chat tab"],
-  ["Alt+Shift+W", "Close the active chat tab"],
+  ["Alt+Shift+W", "Закрыть the active chat tab"],
   ["Alt+Shift+T", "Reopen the last closed chat tab"],
   ["Alt+1…9", "Switch chat tabs (9 selects the last)"],
   ["← / → / Home / End", "Switch tabs when a tab is focused"],
   ["Alt+Shift+← / →", "Reorder the focused chat tab"],
-  ["Delete / Shift+F10", "Close focused tab / open tab menu"],
+  ["Удалить / Shift+F10", "Закрыть focused tab / open tab menu"],
   ["Alt+↑ / Alt+↓", "Previous or next conversation"],
   ["⇧Esc", "Mark everything read"],
   ["⌘B / ⌘I", "Bold or italic in the composer"],
-  ["Enter", "Send the message"],
+  ["Enter", "Отправить the message"],
   ["Shift+Enter", "New line"],
-  ["↑", "Edit your last message"],
-  ["Esc", "Close the panel, modal or thread"]
+  ["↑", "Изменить your last message"],
+  ["Esc", "Закрыть the panel, modal or thread"]
 ];
 
 export function ShortcutsModal({ onClose }: { onClose: () => void }) {
@@ -923,7 +923,7 @@ export function CreateWorkspaceModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
 
   return (
-    <Modal title="Create a workspace" onClose={onClose}>
+    <Modal title="Создать a workspace" onClose={onClose}>
       <form
         className="stack-form"
         onSubmit={async (event) => {
@@ -941,11 +941,11 @@ export function CreateWorkspaceModal({ onClose }: { onClose: () => void }) {
         }}
       >
         <label className="field">
-          Workspace name
+          Название рабочего пространства
           <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Acme Inc" required autoFocus />
         </label>
         <button type="submit" className="button primary" disabled={name.trim().length < 2}>
-          Create workspace
+          Создать workspace
         </button>
       </form>
     </Modal>
