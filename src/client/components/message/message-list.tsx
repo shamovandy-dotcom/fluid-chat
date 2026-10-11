@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown } from "lucide-react";
-import type { MessageDto } from "@/shared/types";
+import type { СообщениеDto } from "@/shared/types";
 import { formatDayLabel, isSameDay } from "../../format";
 import { typingKey, useApp, useDirectory } from "../../store";
 import { Spinner } from "../ui/primitives";
-import { MessageItem } from "./message-item";
+import { СообщениеItem } from "./message-item";
 
 const GROUP_WINDOW_MS = 5 * 60 * 1000;
 // Tight on purpose: scrolling up even a little is a deliberate act, and we should
 // stop following the bottom the moment the reader does.
 const BOTTOM_THRESHOLD_PX = 48;
 
-export function MessageList({ conversationId }: { conversationId: string }) {
+export function СообщениеList({ conversationId }: { conversationId: string }) {
   const { state, actions } = useApp();
   const bucket = state.messages[conversationId];
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -38,11 +38,11 @@ export function MessageList({ conversationId }: { conversationId: string }) {
     pinned.current = distanceFromBottom < BOTTOM_THRESHOLD_PX;
     setAtBottom(pinned.current);
     actions.saveScrollPosition(conversationId, { top: element.scrollTop, atBottom: pinned.current });
-    if (element.scrollTop < 240 && bucket?.hasMore && !bucket.loading) {
+    if (element.scrollTop < 240 && bucket?.hasЕщё && !bucket.loading) {
       previousHeight.current = element.scrollHeight;
-      void actions.loadOlderMessages(conversationId);
+      void actions.loadOlderСообщениеs(conversationId);
     }
-  }, [actions, bucket?.hasMore, bucket?.loading, conversationId]);
+  }, [actions, bucket?.hasЕщё, bucket?.loading, conversationId]);
 
   // Keep the viewport anchored when older history is prepended.
   useLayoutEffect(() => {
@@ -92,7 +92,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
   if (!bucket || (bucket.loading && messages.length === 0)) {
     return (
       <div className="message-scroll is-loading">
-        <Spinner label="Loading messages" />
+        <Spinner label="Загрузка сообщений" />
       </div>
     );
   }
@@ -101,8 +101,8 @@ export function MessageList({ conversationId }: { conversationId: string }) {
     <div className="message-scroll-wrap">
       <div className="message-scroll" ref={scrollRef} onScroll={onScroll}>
         <div ref={contentRef}>
-          {bucket.hasMore ? (
-            <div className="history-loader">{bucket.loading ? <Spinner label="Loading history" /> : "Scroll for older messages"}</div>
+          {bucket.hasЕщё ? (
+            <div className="history-loader">{bucket.loading ? <Spinner label="Загрузка истории" /> : "Прокрутите, чтобы увидеть более ранние сообщения"}</div>
           ) : (
             <ConversationIntro conversationId={conversationId} />
           )}
@@ -130,7 +130,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
                     <span>New messages</span>
                   </div>
                 ) : null}
-                <MessageItem message={message} grouped={grouped} />
+                <СообщениеItem message={message} grouped={grouped} />
               </div>
             );
           })}
@@ -191,14 +191,14 @@ function ConversationIntro({ conversationId }: { conversationId: string }) {
 
 export function TypingIndicator({
   conversationId,
-  parentMessageId = null
+  parentСообщениеId = null
 }: {
   conversationId: string;
-  parentMessageId?: string | null;
+  parentСообщениеId?: string | null;
 }) {
   const { state } = useApp();
   const directory = useDirectory();
-  const typing = state.typing[typingKey(conversationId, parentMessageId)];
+  const typing = state.typing[typingKey(conversationId, parentСообщениеId)];
   const names = Object.keys(typing ?? {})
     .map((userId) => directory.get(userId)?.displayName)
     .filter(Boolean) as string[];
@@ -209,7 +209,7 @@ export function TypingIndicator({
       ? `${names[0]} is typing`
       : names.length === 2
         ? `${names[0]} and ${names[1]} are typing`
-        : "Several people are typing";
+        : "Несколько участников печатают";
   return (
     <div className="typing-indicator is-active" aria-live="polite">
       <span className="typing-dots">
@@ -222,7 +222,7 @@ export function TypingIndicator({
   );
 }
 
-export function MessageStack({ messages, context = "list" }: { messages: MessageDto[]; context?: "thread" | "list" }) {
+export function СообщениеStack({ messages, context = "list" }: { messages: СообщениеDto[]; context?: "thread" | "list" }) {
   return (
     <>
       {messages.map((message, index) => {
@@ -233,7 +233,7 @@ export function MessageStack({ messages, context = "list" }: { messages: Message
           previous.type === "user" &&
           message.type === "user" &&
           new Date(message.createdAt).getTime() - new Date(previous.createdAt).getTime() < GROUP_WINDOW_MS;
-        return <MessageItem key={message.id} message={message} grouped={grouped} context={context} />;
+        return <СообщениеItem key={message.id} message={message} grouped={grouped} context={context} />;
       })}
     </>
   );
