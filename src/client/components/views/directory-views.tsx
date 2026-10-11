@@ -54,7 +54,7 @@ export function BrowseChannelsView() {
       <div className="view-toolbar">
         <div className="search-field">
           <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск channels" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск каналов" />
         </div>
         <div className="view-filters">
           {(["all", "joined", "unjoined", "archived"] as const).map((entry) => (
@@ -67,7 +67,7 @@ export function BrowseChannelsView() {
 
       <div className="view-scroll">
         {!channels ? (
-          <Spinner label="Загрузка… channels" />
+          <Spinner label="Загрузка каналов…" />
         ) : visible.length === 0 ? (
           <EmptyState title="Каналы не найдены" body="Измените запрос или создайте канал." />
         ) : (
@@ -77,7 +77,7 @@ export function BrowseChannelsView() {
                 <span className="channel-row-name">
                   {channel.visibility === "private" ? <Lock size={14} /> : <Hash size={15} />}
                   {channel.name}
-                  {channel.archivedAt ? <span className="pill">archived</span> : null}
+                  {channel.archivedAt ? <span className="pill">В архиве</span> : null}
                 </span>
                 <span className="channel-row-meta">
                   {channel.memberCount ?? 0} members
@@ -139,7 +139,7 @@ export function PeopleView() {
       <div className="view-toolbar">
         <div className="search-field">
           <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск people" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск участников" />
         </div>
       </div>
 
@@ -180,14 +180,14 @@ export function FilesView() {
       <header className="view-header">
         <div>
           <h1>Файлы</h1>
-          <p>Everything shared in conversations you are in</p>
+          <p>Все файлы, которыми делились в ваших переписках</p>
         </div>
       </header>
       <div className="view-scroll">
         {!files ? (
-          <Spinner label="Загрузка… files" />
+          <Spinner label="Загрузка файлов…" />
         ) : files.length === 0 ? (
-          <EmptyState title="No files yet" body="Attach a file to a message to see it here." />
+          <EmptyState title="Файлов пока нет" body="Прикрепите файл к сообщению, чтобы он появился здесь." />
         ) : (
           <div className="file-grid wide">
             {files.map((file) => (
@@ -277,7 +277,7 @@ export function SearchView({ query }: { query: string }) {
           }}
         >
           <Search size={15} />
-          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Поиск messages" autoFocus />
+          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Поиск сообщений" autoFocus />
         </form>
         <div className="view-filters">
           {(["recent", "relevant"] as const).map((entry) => (
