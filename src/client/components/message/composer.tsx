@@ -13,18 +13,18 @@ import {
   type SetStateAction
 } from "react";
 import {
-  Bold,
+  Полужирный,
   Code,
   CodeSquare,
-  Italic,
+  Курсив,
   Link2,
   List,
   ListOrdered,
   Paperclip,
   Quote,
-  Send,
+  Отправить,
   Smile,
-  Strikethrough,
+  Зачёркнутый,
   Timer,
   X
 } from "lucide-react";
@@ -415,32 +415,32 @@ export function Composer({
 
       <div className="composer-box">
         <div className="composer-toolbar">
-          <IconButton label="Bold" onClick={() => wrapSelection("*")}>
-            <Bold size={15} />
+          <IconButton label="Полужирный" onClick={() => wrapSelection("*")}>
+            <Полужирный size={15} />
           </IconButton>
-          <IconButton label="Italic" onClick={() => wrapSelection("_")}>
-            <Italic size={15} />
+          <IconButton label="Курсив" onClick={() => wrapSelection("_")}>
+            <Курсив size={15} />
           </IconButton>
-          <IconButton label="Strikethrough" onClick={() => wrapSelection("~")}>
-            <Strikethrough size={15} />
+          <IconButton label="Зачёркнутый" onClick={() => wrapSelection("~")}>
+            <Зачёркнутый size={15} />
           </IconButton>
           <span className="toolbar-divider" />
-          <IconButton label="Link" onClick={() => wrapSelection("<", "|label>")}>
+          <IconButton label="Ссылка" onClick={() => wrapSelection("<", "|label>")}>
             <Link2 size={15} />
           </IconButton>
-          <IconButton label="Ordered list" onClick={() => prefixLines("1. ")}>
+          <IconButton label="Нумерованный список" onClick={() => prefixLines("1. ")}>
             <ListOrdered size={15} />
           </IconButton>
-          <IconButton label="Bulleted list" onClick={() => prefixLines("- ")}>
+          <IconButton label="Маркированный список" onClick={() => prefixLines("- ")}>
             <List size={15} />
           </IconButton>
-          <IconButton label="Blockquote" onClick={() => prefixLines("> ")}>
+          <IconButton label="Цитата" onClick={() => prefixLines("> ")}>
             <Quote size={15} />
           </IconButton>
-          <IconButton label="Inline code" onClick={() => wrapSelection("`")}>
+          <IconButton label="Строчный код" onClick={() => wrapSelection("`")}>
             <Code size={15} />
           </IconButton>
-          <IconButton label="Code block" onClick={() => wrapSelection("```\n", "\n```")}>
+          <IconButton label="Блок кода" onClick={() => wrapSelection("```\n", "\n```")}>
             <CodeSquare size={15} />
           </IconButton>
         </div>
@@ -497,13 +497,13 @@ export function Composer({
               hidden
               onChange={(event) => event.target.files && void uploadFiles(event.target.files)}
             />
-            <IconButton label="Attach file" onClick={() => fileInputRef.current?.click()}>
+            <IconButton label="Прикрепить файл" onClick={() => fileInputRef.current?.click()}>
               <Paperclip size={17} />
             </IconButton>
             <Popover
               width={340}
               trigger={({ toggle, ref }) => (
-                <button type="button" className="icon-button" ref={ref} onClick={toggle} aria-label="Emoji">
+                <button type="button" className="icon-button" ref={ref} onClick={toggle} aria-label="Эмодзи">
                   <Smile size={17} />
                 </button>
               )}
@@ -528,7 +528,7 @@ export function Composer({
 
           <div className="composer-right">
             <IconButton
-              label="Schedule for later"
+              label="Отправить позже"
               onClick={() =>
                 actions.setModal({
                   kind: "schedule",
@@ -547,13 +547,13 @@ export function Composer({
               onClick={() => void send()}
               disabled={!text.trim() && attachments.length === 0}
             >
-              <Send size={15} /> Send
+              <Отправить size={15} /> Отправить
             </button>
           </div>
         </div>
       </div>
       <p className="composer-hint">
-        {enterToSend ? "Enter to send · Shift+Enter for a new line" : "Cmd+Enter to send"} · Type / for commands
+        {enterToSend ? "Enter to send · Shift+Enter for a new line" : "Нажмите Cmd+Enter для отправки"} · Type / for commands
       </p>
     </div>
   );
