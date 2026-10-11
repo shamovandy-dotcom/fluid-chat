@@ -48,7 +48,7 @@ function AppRoot() {
   if (state.status === "loading") {
     return (
       <div className="boot-screen">
-        <Spinner label="Loading Fluid Chat" />
+        <Spinner label="Loading Androlit Chat" />
       </div>
     );
   }
@@ -314,7 +314,7 @@ function useDesktopNotifications() {
     for (const entry of fresh.slice(0, 3).reverse()) {
       const relevant = ALERTING_NOTIFICATION_TYPES.includes(entry.type);
       if (preference === "mentions" && !relevant) continue;
-      const banner = new Notification("Fluid Chat", {
+      const banner = new Notification("Androlit Chat", {
         body: entry.body ?? "New activity",
         tag: entry.id,
         icon: "/icon.svg"
