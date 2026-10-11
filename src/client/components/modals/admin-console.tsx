@@ -275,7 +275,7 @@ function Каналы({ workspaceId }: { workspaceId: string }) {
 
   useEffect(load, [load]);
 
-  if (!channels) return <Spinner label="Загрузка… channels" />;
+  if (!channels) return <Spinner label="Загрузка каналов…" />;
 
   return (
     <div className="admin-list">
