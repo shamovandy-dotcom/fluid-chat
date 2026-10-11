@@ -6,11 +6,11 @@ import {
   Bookmark,
   BookmarkCheck,
   Clock,
-  Copy,
+  Копировать,
   Download,
-  Link2,
-  MessageSquare,
-  MoreVertical,
+  Ссылка2,
+  СообщениеSquare,
+  ЕщёVertical,
   Pencil,
   Pin,
   PinOff,
@@ -18,24 +18,24 @@ import {
   Smile,
   Trash2
 } from "lucide-react";
-import type { FileSummary, MessageDto } from "@/shared/types";
+import type { FileSummary, СообщениеDto } from "@/shared/types";
 import { toMentionDisplay, toMentionWire } from "@/shared/mention-text";
 import { api } from "../../api";
 import { formatBytes, formatDateTime, formatRelative, formatTime } from "../../format";
 import { useApp, useDirectory, useMentionDirectory } from "../../store";
 import { Avatar, IconButton, MenuDivider, MenuItem, Popover } from "../ui/primitives";
-import { EmojiPicker } from "../ui/emoji-picker";
+import { ЭмодзиPicker } from "../ui/emoji-picker";
 import { ImagePreview } from "./image-preview";
-import { MessageReactions, QuickReactions } from "./reactions";
-import { EmojiValue, RichText } from "./rich-text";
+import { СообщениеДобавить реакциюions, QuickДобавить реакциюions } from "./reactions";
+import { ЭмодзиValue, RichText } from "./rich-text";
 
-export function MessageItem({
+export function СообщениеItem({
   message,
   grouped,
   context = "channel",
   highlight
 }: {
-  message: MessageDto;
+  message: СообщениеDto;
   grouped?: boolean;
   context?: "channel" | "thread" | "list";
   highlight?: boolean;
@@ -43,16 +43,16 @@ export function MessageItem({
   const { state, actions } = useApp();
   const directory = useDirectory();
   const mentions = useMentionDirectory();
-  const [localEditing, setLocalEditing] = useState(false);
-  // Edited text is held in display form, same as the composer.
-  const [editText, setEditText] = useState(() => toMentionDisplay(message.bodyText, mentions));
+  const [localИзменитьing, setLocalИзменитьing] = useState(false);
+  // Изменитьed text is held in display form, same as the composer.
+  const [editText, setИзменитьText] = useState(() => toMentionDisplay(message.bodyText, mentions));
   const [previewFile, setPreviewFile] = useState<FileSummary | null>(null);
   // ↑ in the composer asks the store to edit the last message you sent.
-  const editing = localEditing || state.editingMessageId === message.id;
-  const setEditing = (value: boolean) => {
-    setLocalEditing(value);
-    if (!value && state.editingMessageId === message.id) actions.setEditingMessage(null);
-    if (value) setEditText(toMentionDisplay(message.bodyText, mentions));
+  const editing = localИзменитьing || state.editingСообщениеId === message.id;
+  const setИзменитьing = (value: boolean) => {
+    setLocalИзменитьing(value);
+    if (!value && state.editingСообщениеId === message.id) actions.setИзменитьingСообщение(null);
+    if (value) setИзменитьText(toMentionDisplay(message.bodyText, mentions));
   };
   const sender = directory.get(message.senderId);
   const timeFormat = state.session?.preferences?.timeFormat ?? "12h";
@@ -60,15 +60,15 @@ export function MessageItem({
   const role = state.bootstrap?.role;
   const canModerate = role === "owner" || role === "admin";
   const pending = (message.metadata as { pending?: boolean } | null)?.pending === true;
-  const isMeMessage = (message.metadata as { subtype?: string } | null)?.subtype === "me_message";
-  const sharedId = (message.metadata as { sharedMessageId?: string } | null)?.sharedMessageId;
+  const isMeСообщение = (message.metadata as { subtype?: string } | null)?.subtype === "me_message";
+  const sharedId = (message.metadata as { sharedСообщениеId?: string } | null)?.sharedСообщениеId;
 
   useEffect(() => {
-    if (state.editingMessageId === message.id) setEditText(toMentionDisplay(message.bodyText, mentions));
+    if (state.editingСообщениеId === message.id) setИзменитьText(toMentionDisplay(message.bodyText, mentions));
     // Only reload when the store starts an edit. `mentions` changes identity on
     // every presence event, which must not discard what is being typed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.editingMessageId, message.id, message.bodyText]);
+  }, [state.editingСообщениеId, message.id, message.bodyText]);
 
   if (message.type !== "user") {
     return (
@@ -124,7 +124,7 @@ export function MessageItem({
               {sender?.displayName ?? "Unknown"}
             </button>
             {sender?.isBot ? <span className="pill app-pill">APP</span> : null}
-            {sender?.statusEmoji ? <EmojiValue value={`:${sender.statusEmoji}:`} /> : null}
+            {sender?.statusЭмодзи ? <ЭмодзиValue value={`:${sender.statusЭмодзи}:`} /> : null}
             <time dateTime={message.createdAt} title={formatDateTime(message.createdAt, timeFormat)}>
               {formatTime(message.createdAt, timeFormat)}
             </time>
@@ -144,8 +144,8 @@ export function MessageItem({
               event.preventDefault();
               try {
                 const { message: updated } = await api.messages.update(message.id, toMentionWire(editText, mentions));
-                actions.upsertMessage(updated);
-                setEditing(false);
+                actions.upsertСообщение(updated);
+                setИзменитьing(false);
               } catch (error) {
                 actions.fail(error);
               }
@@ -153,11 +153,11 @@ export function MessageItem({
           >
             <textarea
               value={editText}
-              onChange={(event) => setEditText(event.target.value)}
+              onChange={(event) => setИзменитьText(event.target.value)}
               rows={Math.min(8, editText.split("\n").length + 1)}
               autoFocus
               onKeyDown={(event) => {
-                if (event.key === "Escape") setEditing(false);
+                if (event.key === "Escape") setИзменитьing(false);
                 if (event.key === "Enter" && !event.shiftKey) {
                   event.preventDefault();
                   event.currentTarget.form?.requestSubmit();
@@ -165,21 +165,21 @@ export function MessageItem({
               }}
             />
             <div className="edit-actions">
-              <button type="button" className="button ghost" onClick={() => setEditing(false)}>
-                Cancel
+              <button type="button" className="button ghost" onClick={() => setИзменитьing(false)}>
+                Отмена
               </button>
               <button type="submit" className="button primary" disabled={!editText.trim()}>
-                Save changes
+                Сохранить changes
               </button>
             </div>
           </form>
         ) : (
-          <div className={isMeMessage ? "message-body is-action" : "message-body"}>
+          <div className={isMeСообщение ? "message-body is-action" : "message-body"}>
             <RichText text={message.bodyText} />
           </div>
         )}
 
-        {sharedId ? <SharedMessage messageId={sharedId} /> : null}
+        {sharedId ? <SharedСообщение messageId={sharedId} /> : null}
 
         {message.files.length > 0 ? (
           <div className="attachments">
@@ -229,7 +229,7 @@ export function MessageItem({
           </a>
         ))}
 
-        <MessageReactions message={message} />
+        <СообщениеДобавить реакциюions message={message} />
 
         {context !== "thread" && message.thread.replyCount > 0 ? (
           <button type="button" className="thread-summary" onClick={() => void actions.openThread(message.id)}>
@@ -241,30 +241,30 @@ export function MessageItem({
             <span className="thread-count">
               {message.thread.replyCount} {message.thread.replyCount === 1 ? "reply" : "replies"}
             </span>
-            {message.thread.lastReplyAt ? (
-              <span className="thread-time">Last reply {formatRelative(message.thread.lastReplyAt)}</span>
+            {message.thread.lastОтветитьAt ? (
+              <span className="thread-time">Last reply {formatRelative(message.thread.lastОтветитьAt)}</span>
             ) : null}
           </button>
         ) : null}
       </div>
 
-      <div className="message-toolbar" role="toolbar" aria-label="Message actions">
-        <QuickReactions message={message} />
+      <div className="message-toolbar" role="toolbar" aria-label="Действия с сообщением">
+        <QuickДобавить реакциюions message={message} />
         <Popover
           width={340}
           align="end"
           trigger={({ toggle, ref }) => (
-            <button type="button" ref={ref} onClick={toggle} title="Add reaction">
+            <button type="button" ref={ref} onClick={toggle} title="Добавить реакцию">
               <Smile size={16} />
             </button>
           )}
         >
-          {(close) => <EmojiPicker onPick={(value) => void actions.toggleReaction(message, value)} onClose={close} />}
+          {(close) => <ЭмодзиPicker onPick={(value) => void actions.toggleДобавить реакциюion(message, value)} onЗакрыть={close} />}
         </Popover>
 
         {context !== "thread" ? (
-          <button type="button" title="Reply in thread" onClick={() => void actions.openThread(message.id)}>
-            <MessageSquare size={16} />
+          <button type="button" title="Ответить в обсуждении" onClick={() => void actions.openThread(message.id)}>
+            <СообщениеSquare size={16} />
           </button>
         ) : null}
 
@@ -274,12 +274,12 @@ export function MessageItem({
 
         <button
           type="button"
-          title={message.saved ? "Remove from saved" : "Save for later"}
+          title={message.saved ? "Remove from saved" : "Сохранить на потом"}
           onClick={async () => {
             try {
               if (message.saved) await api.messages.unsave(message.id);
               else await api.messages.save(message.id);
-              actions.upsertMessage({ ...message, saved: !message.saved });
+              actions.upsertСообщение({ ...message, saved: !message.saved });
             } catch (error) {
               actions.fail(error);
             }
@@ -292,8 +292,8 @@ export function MessageItem({
           width={230}
           align="end"
           trigger={({ toggle, ref }) => (
-            <button type="button" ref={ref} onClick={toggle} title="More actions">
-              <MoreVertical size={16} />
+            <button type="button" ref={ref} onClick={toggle} title="Другие действия">
+              <ЕщёVertical size={16} />
             </button>
           )}
         >
@@ -302,11 +302,11 @@ export function MessageItem({
               {isAuthor ? (
                 <MenuItem
                   onClick={() => {
-                    setEditing(true);
+                    setИзменитьing(true);
                     close();
                   }}
                 >
-                  <Pencil size={14} /> Edit message
+                  <Pencil size={14} /> Изменить message
                 </MenuItem>
               ) : null}
               <MenuItem
@@ -315,15 +315,15 @@ export function MessageItem({
                   try {
                     if (message.pinned) await api.messages.unpin(message.id);
                     else await api.messages.pin(message.id);
-                    actions.upsertMessage({ ...message, pinned: !message.pinned });
-                    actions.toast(message.pinned ? "Message unpinned" : "Message pinned to this conversation");
+                    actions.upsertСообщение({ ...message, pinned: !message.pinned });
+                    actions.toast(message.pinned ? "Сообщение unpinned" : "Сообщение закреплено в этой переписке");
                   } catch (error) {
                     actions.fail(error);
                   }
                 }}
               >
                 {message.pinned ? <PinOff size={14} /> : <Pin size={14} />}
-                {message.pinned ? "Unpin from conversation" : "Pin to conversation"}
+                {message.pinned ? "Unpin from conversation" : "Закрепить в переписке"}
               </MenuItem>
               {message.thread.replyCount > 0 || context === "thread" ? (
                 <MenuItem
@@ -332,17 +332,17 @@ export function MessageItem({
                     const next = message.thread.following ? "muted" : "following";
                     try {
                       await api.messages.follow(message.id, next);
-                      actions.upsertMessage({
+                      actions.upsertСообщение({
                         ...message,
                         thread: { ...message.thread, following: next === "following" }
                       });
-                      actions.toast(next === "following" ? "Following this thread" : "You will not be notified about this thread");
+                      actions.toast(next === "following" ? "Following this thread" : "Вы не будете получать уведомления об этом обсуждении");
                     } catch (error) {
                       actions.fail(error);
                     }
                   }}
                 >
-                  <Bell size={14} /> {message.thread.following ? "Unfollow thread" : "Follow thread"}
+                  <Bell size={14} /> {message.thread.following ? "Не следить за обсуждением" : "Следить за обсуждением"}
                 </MenuItem>
               ) : null}
               <div className="menu-submenu">
@@ -381,20 +381,20 @@ export function MessageItem({
                 onClick={() => {
                   close();
                   void navigator.clipboard.writeText(message.bodyText);
-                  actions.toast("Message text copied", "success");
+                  actions.toast("Сообщение text copied", "success");
                 }}
               >
-                <Copy size={14} /> Copy text
+                <Копировать size={14} /> Копировать text
               </MenuItem>
               <MenuItem
                 onClick={() => {
                   close();
                   const url = `${window.location.origin}/?conversation=${message.conversationId}&message=${message.id}`;
                   void navigator.clipboard.writeText(url);
-                  actions.toast("Link copied to clipboard", "success");
+                  actions.toast("Ссылка copied to clipboard", "success");
                 }}
               >
-                <Link2 size={14} /> Copy link
+                <Ссылка2 size={14} /> Копировать link
               </MenuItem>
               <MenuItem
                 onClick={async () => {
@@ -404,7 +404,7 @@ export function MessageItem({
                   actions.toast("Marked unread from here");
                 }}
               >
-                <MessageSquare size={14} /> Mark unread from here
+                <СообщениеSquare size={14} /> Mark unread from here
               </MenuItem>
               {isAuthor || canModerate ? (
                 <>
@@ -413,7 +413,7 @@ export function MessageItem({
                     danger
                     onClick={async () => {
                       close();
-                      if (!window.confirm("Delete this message? This cannot be undone.")) return;
+                      if (!window.confirm("Удалить this message? This cannot be undone.")) return;
                       try {
                         await api.messages.remove(message.id);
                       } catch (error) {
@@ -421,7 +421,7 @@ export function MessageItem({
                       }
                     }}
                   >
-                    <Trash2 size={14} /> Delete message
+                    <Trash2 size={14} /> Удалить message
                   </MenuItem>
                 </>
               ) : null}
@@ -429,13 +429,13 @@ export function MessageItem({
           )}
         </Popover>
       </div>
-      {previewFile ? <ImagePreview file={previewFile} onClose={() => setPreviewFile(null)} /> : null}
+      {previewFile ? <ImagePreview file={previewFile} onЗакрыть={() => setPreviewFile(null)} /> : null}
     </article>
   );
 }
 
-function SharedMessage({ messageId }: { messageId: string }) {
-  const [message, setMessage] = useState<MessageDto | null>(null);
+function SharedСообщение({ messageId }: { messageId: string }) {
+  const [message, setСообщение] = useState<СообщениеDto | null>(null);
   const directory = useDirectory();
   const { state } = useApp();
   const timeFormat = state.session?.preferences?.timeFormat ?? "12h";
@@ -445,7 +445,7 @@ function SharedMessage({ messageId }: { messageId: string }) {
     api.messages
       .thread(messageId)
       .then(({ messages }) => {
-        if (!cancelled) setMessage(messages.find((entry) => entry.id === messageId) ?? null);
+        if (!cancelled) setСообщение(messages.find((entry) => entry.id === messageId) ?? null);
       })
       .catch(() => undefined);
     return () => {
@@ -454,7 +454,7 @@ function SharedMessage({ messageId }: { messageId: string }) {
   }, [messageId]);
 
   const sender = useMemo(() => (message ? directory.get(message.senderId) : undefined), [directory, message]);
-  if (!message) return <div className="quoted-message is-loading">Loading shared message…</div>;
+  if (!message) return <div className="quoted-message is-loading">Загрузка… shared message…</div>;
 
   return (
     <div className="quoted-message">
