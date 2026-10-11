@@ -15,10 +15,10 @@ export function formatDayLabel(value: string | Date) {
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
 
-  if (isSameDay(date, today)) return "Today";
-  if (isSameDay(date, yesterday)) return "Yesterday";
+  if (isSameDay(date, today)) return "Сегодня";
+  if (isSameDay(date, yesterday)) return "Вчера";
   const sameYear = date.getFullYear() === today.getFullYear();
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString("ru-RU", {
     weekday: "long",
     month: "long",
     day: "numeric",
