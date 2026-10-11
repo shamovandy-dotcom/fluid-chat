@@ -341,7 +341,7 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
       >
         {(close) => (
           <div className="menu">
-            <MenuItem onClick={() => { close(); void actions.openConversation(conversation.id, { newTab: true }); }}>Open in new chat tab</MenuItem>
+            <MenuItem onClick={() => { close(); void actions.openConversation(conversation.id, { newTab: true }); }}>Открыть в новой вкладке чата</MenuItem>
             <MenuDivider />
             <MenuItem
               onClick={async () => {
