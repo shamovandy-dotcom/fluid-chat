@@ -1,30 +1,30 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Hash, Lock, Search } from "lucide-react";
-import type { ChannelSummary, FileSummary, MessageDto } from "@/shared/types";
+import { Download, Hash, Lock, Поиск } from "lucide-react";
+import type { ChannelSummary, FileSummary, СообщениеDto } from "@/shared/types";
 import { api } from "../../api";
 import { track } from "../../analytics";
 import { formatBytes, formatRelative } from "../../format";
 import { useApp, useDirectory } from "../../store";
 import { Avatar, EmptyState, Spinner } from "../ui/primitives";
-import { MessageItem } from "../message/message-item";
+import { СообщениеItem } from "../message/message-item";
 import { HighlightProvider } from "../message/rich-text";
 
 type DirectoryChannel = ChannelSummary & { conversationId: string; joined: boolean };
 
-export function BrowseChannelsView() {
+export function BrowseКаналыView() {
   const { state, actions } = useApp();
-  const [channels, setChannels] = useState<DirectoryChannel[] | null>(null);
+  const [channels, setКаналы] = useState<DirectoryChannel[] | null>(null);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "joined" | "unjoined" | "archived">("all");
 
   useEffect(() => {
     if (!state.workspaceId) return;
     api.channels
-      .list(state.workspaceId, { includeArchived: filter === "archived" })
-      .then(({ channels: list }) => setChannels(list))
-      .catch(() => setChannels([]));
+      .list(state.workspaceId, { includeВ архиве: filter === "archived" })
+      .then(({ channels: list }) => setКаналы(list))
+      .catch(() => setКаналы([]));
   }, [state.workspaceId, filter]);
 
   const visible = useMemo(() => {
@@ -40,56 +40,56 @@ export function BrowseChannelsView() {
   }, [channels, filter, query]);
 
   return (
-    <section className="view">
-      <header className="view-header">
+    <section classИмя="view">
+      <header classИмя="view-header">
         <div>
-          <h1>Channels</h1>
+          <h1>Каналы</h1>
           <p>{visible.length} channels in this workspace</p>
         </div>
-        <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "new-channel" })}>
-          Create channel
+        <button type="button" classИмя="button primary" onClick={() => actions.setModal({ kind: "new-channel" })}>
+          Создать channel
         </button>
       </header>
 
-      <div className="view-toolbar">
-        <div className="search-field">
-          <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search channels" />
+      <div classИмя="view-toolbar">
+        <div classИмя="search-field">
+          <Поиск size={15} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск channels" />
         </div>
-        <div className="view-filters">
+        <div classИмя="view-filters">
           {(["all", "joined", "unjoined", "archived"] as const).map((entry) => (
-            <button key={entry} type="button" className={filter === entry ? "is-active" : ""} onClick={() => setFilter(entry)}>
-              {entry === "all" ? "All" : entry === "joined" ? "My channels" : entry === "unjoined" ? "Not joined" : "Archived"}
+            <button key={entry} type="button" classИмя={filter === entry ? "is-active" : ""} onClick={() => setFilter(entry)}>
+              {entry === "all" ? "All" : entry === "joined" ? "My channels" : entry === "unjoined" ? "Не присоединился" : "В архиве"}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="view-scroll">
+      <div classИмя="view-scroll">
         {!channels ? (
-          <Spinner label="Loading channels" />
+          <Spinner label="Загрузка… channels" />
         ) : visible.length === 0 ? (
-          <EmptyState title="No channels found" body="Try a different search, or create one." />
+          <EmptyState title="Каналы не найдены" body="Измените запрос или создайте канал." />
         ) : (
           visible.map((channel) => (
-            <div key={channel.id} className="channel-row">
-              <button type="button" className="channel-row-main" onClick={() => void actions.openConversation(channel.conversationId)}>
-                <span className="channel-row-name">
+            <div key={channel.id} classИмя="channel-row">
+              <button type="button" classИмя="channel-row-main" onClick={() => void actions.openConversation(channel.conversationId)}>
+                <span classИмя="channel-row-name">
                   {channel.visibility === "private" ? <Lock size={14} /> : <Hash size={15} />}
                   {channel.name}
-                  {channel.archivedAt ? <span className="pill">archived</span> : null}
+                  {channel.archivedAt ? <span classИмя="pill">archived</span> : null}
                 </span>
-                <span className="channel-row-meta">
+                <span classИмя="channel-row-meta">
                   {channel.memberCount ?? 0} members
                   {channel.description ? ` · ${channel.description}` : ""}
                 </span>
               </button>
               {channel.joined ? (
-                <span className="pill">Joined</span>
+                <span classИмя="pill">Joined</span>
               ) : (
                 <button
                   type="button"
-                  className="button ghost"
+                  classИмя="button ghost"
                   onClick={async () => {
                     try {
                       await api.channels.join(channel.id);
@@ -111,7 +111,7 @@ export function BrowseChannelsView() {
   );
 }
 
-export function PeopleView() {
+export function ЛюдиView() {
   const { state, actions } = useApp();
   const [query, setQuery] = useState("");
   const members = state.bootstrap?.members ?? [];
@@ -119,40 +119,40 @@ export function PeopleView() {
   const visible = members.filter((member) => {
     const term = query.trim().toLowerCase();
     if (!term) return true;
-    return `${member.user.displayName} ${member.user.handle ?? ""} ${member.user.title ?? ""}`
+    return `${member.user.displayИмя} ${member.user.handle ?? ""} ${member.user.title ?? ""}`
       .toLowerCase()
       .includes(term);
   });
 
   return (
-    <section className="view">
-      <header className="view-header">
+    <section classИмя="view">
+      <header classИмя="view-header">
         <div>
-          <h1>People</h1>
+          <h1>Люди</h1>
           <p>{members.length} members</p>
         </div>
-        <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "invite" })}>
-          Invite people
+        <button type="button" classИмя="button primary" onClick={() => actions.setModal({ kind: "invite" })}>
+          Пригласить участников
         </button>
       </header>
 
-      <div className="view-toolbar">
-        <div className="search-field">
-          <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search people" />
+      <div classИмя="view-toolbar">
+        <div classИмя="search-field">
+          <Поиск size={15} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск people" />
         </div>
       </div>
 
-      <div className="people-grid">
+      <div classИмя="people-grid">
         {visible.map((member) => (
           <button
             key={member.user.id}
             type="button"
-            className="person-card"
+            classИмя="person-card"
             onClick={() => actions.setRightPanel({ kind: "profile", userId: member.user.id })}
           >
             <Avatar user={member.user} size={56} />
-            <strong>{member.user.displayName}</strong>
+            <strong>{member.user.displayИмя}</strong>
             <span>{member.user.title ?? (member.role === "owner" ? "Workspace owner" : member.role)}</span>
             {member.user.statusText ? <small>{member.user.statusText}</small> : null}
           </button>
@@ -162,36 +162,36 @@ export function PeopleView() {
   );
 }
 
-export function FilesView() {
+export function ФайлыView() {
   const { state } = useApp();
   const directory = useDirectory();
-  const [files, setFiles] = useState<FileSummary[] | null>(null);
+  const [files, setФайлы] = useState<FileSummary[] | null>(null);
 
   useEffect(() => {
     if (!state.workspaceId) return;
     api.activity
       .files(state.workspaceId)
-      .then(({ files: list }) => setFiles(list))
-      .catch(() => setFiles([]));
+      .then(({ files: list }) => setФайлы(list))
+      .catch(() => setФайлы([]));
   }, [state.workspaceId]);
 
   return (
-    <section className="view">
-      <header className="view-header">
+    <section classИмя="view">
+      <header classИмя="view-header">
         <div>
-          <h1>Files</h1>
+          <h1>Файлы</h1>
           <p>Everything shared in conversations you are in</p>
         </div>
       </header>
-      <div className="view-scroll">
+      <div classИмя="view-scroll">
         {!files ? (
-          <Spinner label="Loading files" />
+          <Spinner label="Загрузка… files" />
         ) : files.length === 0 ? (
           <EmptyState title="No files yet" body="Attach a file to a message to see it here." />
         ) : (
-          <div className="file-grid wide">
+          <div classИмя="file-grid wide">
             {files.map((file) => (
-              <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" className="file-card">
+              <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" classИмя="file-card">
                 {file.mimeType.startsWith("image/") ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={file.url} alt="" loading="lazy" />
@@ -201,7 +201,7 @@ export function FilesView() {
                 <span>
                   <strong>{file.name}</strong>
                   <small>
-                    {formatBytes(file.size)} · {directory.get(file.uploaderId)?.displayName ?? "Someone"} ·{" "}
+                    {formatBytes(file.size)} · {directory.get(file.uploaderId)?.displayИмя ?? "Someone"} ·{" "}
                     {formatRelative(file.createdAt)}
                   </small>
                 </span>
@@ -214,7 +214,7 @@ export function FilesView() {
   );
 }
 
-export function SearchView({ query }: { query: string }) {
+export function ПоискView({ query }: { query: string }) {
   const { state, actions } = useApp();
   const [term, setTerm] = useState(query);
   // Highlight the free-text words, not the operator tokens.
@@ -227,7 +227,7 @@ export function SearchView({ query }: { query: string }) {
     [term]
   );
   const [sort, setSort] = useState<"recent" | "relevant">("recent");
-  const [results, setResults] = useState<Array<{ message: MessageDto; conversationId: string; channelName: string | null }> | null>(
+  const [results, setResults] = useState<Array<{ message: СообщениеDto; conversationId: string; channelИмя: string | null }> | null>(
     null
   );
 
@@ -245,7 +245,7 @@ export function SearchView({ query }: { query: string }) {
       .then(({ results: list }) => {
         if (cancelled) return;
         setResults(list);
-        // Only the committed query counts as a search. `term` changes on every keystroke,
+        // Вкл.ly the committed query counts as a search. `term` changes on every keystroke,
         // so tracking unconditionally here would emit one event per character typed.
         if (term === query) {
           track("search_performed", { sort, query_length: term.trim().length, result_count: list.length });
@@ -258,54 +258,54 @@ export function SearchView({ query }: { query: string }) {
   }, [state.workspaceId, term, sort, query]);
 
   return (
-    <section className="view">
-      <header className="view-header">
+    <section classИмя="view">
+      <header classИмя="view-header">
         <div>
-          <h1>Search</h1>
+          <h1>Поиск</h1>
           <p>
             Operators: <code>in:#channel</code> <code>from:@person</code> <code>has:file</code> <code>before:2026-01-01</code>
           </p>
         </div>
       </header>
 
-      <div className="view-toolbar">
+      <div classИмя="view-toolbar">
         <form
-          className="search-field grow"
+          classИмя="search-field grow"
           onSubmit={(event) => {
             event.preventDefault();
             actions.setView({ kind: "search", query: term });
           }}
         >
-          <Search size={15} />
-          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search messages" autoFocus />
+          <Поиск size={15} />
+          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Поиск messages" autoFocus />
         </form>
-        <div className="view-filters">
+        <div classИмя="view-filters">
           {(["recent", "relevant"] as const).map((entry) => (
-            <button key={entry} type="button" className={sort === entry ? "is-active" : ""} onClick={() => setSort(entry)}>
+            <button key={entry} type="button" classИмя={sort === entry ? "is-active" : ""} onClick={() => setSort(entry)}>
               Most {entry}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="view-scroll">
+      <div classИмя="view-scroll">
         {!results ? (
-          <Spinner label="Searching" />
+          <Spinner label="Поискing" />
         ) : results.length === 0 ? (
-          <EmptyState title="No matches" body="Try different words, or widen the filters." />
+          <EmptyState title="Совпадений не найдено" body="Измените запрос или расширьте фильтры." />
         ) : (
           <HighlightProvider terms={highlightTerms}>
             {results.map((result) => (
-              <div key={result.message.id} className="search-result">
+              <div key={result.message.id} classИмя="search-result">
                 <button
                   type="button"
-                  className="search-result-head"
+                  classИмя="search-result-head"
                   onClick={() => void actions.openConversation(result.conversationId)}
                 >
-                  {result.channelName ? `#${result.channelName}` : "Direct message"}
+                  {result.channelИмя ? `#${result.channelИмя}` : "Личное сообщение"}
                   <time>{formatRelative(result.message.createdAt)}</time>
                 </button>
-                <MessageItem message={result.message} context="list" />
+                <СообщениеItem message={result.message} context="list" />
               </div>
             ))}
           </HighlightProvider>
