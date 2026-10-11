@@ -3224,72 +3224,161 @@ textarea:focus {
    ========================================================================= */
 
 .auth-page {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
-  gap: var(--space-6);
+  gap: clamp(32px, 7vw, 104px);
   align-items: center;
   min-height: 100vh;
-  padding: var(--space-6);
-  background: linear-gradient(135deg, #3f0e40 0%, #4a154b 45%, #611f69 100%);
-  color: #ffffff;
+  padding: clamp(24px, 5vw, 72px);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 15% 20%, rgba(212, 175, 55, 0.12), transparent 38%), linear-gradient(135deg, #0b0d10 0%, #171a1f 55%, #22262b 100%);
+  color: #f5f5f2;
+}
+
+.auth-page::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 520px;
+  height: 520px;
+  left: -240px;
+  bottom: -300px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 45px rgba(212, 175, 55, 0.025), 0 0 0 90px rgba(212, 175, 55, 0.02);
 }
 
 .auth-hero {
-  max-width: 560px;
+  max-width: 600px;
   justify-self: end;
 }
 
+.auth-brand {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: clamp(36px, 6vh, 64px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.auth-brand-name {
+  display: flex;
+  gap: 0.18em;
+  align-items: baseline;
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  line-height: 1;
+}
+
+.auth-brand-name span:last-child { color: #d4af37; }
+
+.auth-brand-caption {
+  color: #a9adb3;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
 .auth-hero .eyebrow {
-  margin: 0 0 8px;
-  font-size: 13px;
+  margin: 0 0 14px;
+  color: #d4af37;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  opacity: 0.75;
 }
 
 .auth-hero h1 {
-  font-size: clamp(32px, 4vw, 46px);
-  font-weight: 900;
-  line-height: 1.1;
+  margin: 0;
+  font-size: clamp(38px, 5vw, 64px);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
 }
 
+.auth-hero h1 span { color: #d4af37; }
+
 .auth-hero .lede {
-  margin: var(--space-4) 0;
-  font-size: 17px;
-  opacity: 0.85;
+  max-width: 510px;
+  margin: 24px 0;
+  color: #c2c5ca;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .auth-points {
   display: grid;
-  gap: 8px;
-  margin: 0;
+  gap: 13px;
+  margin: 26px 0 0;
   padding: 0;
+  color: #e1e2e4;
+  font-size: 14px;
   list-style: none;
-  opacity: 0.85;
 }
 
 .auth-points li::before {
-  content: "✓";
-  margin-right: 8px;
-  color: #7fd1ae;
+  content: "↗";
+  margin-right: 11px;
+  color: #d4af37;
   font-weight: 900;
 }
+
+.auth-site-link {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 34px;
+  color: #d4af37;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.auth-site-link:hover { color: #f0d77c; }
 
 .auth-panel {
   display: grid;
   gap: var(--space-4);
-  width: min(420px, 100%);
-  padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--surface-raised);
-  color: var(--text);
-  box-shadow: var(--shadow-lg);
+  width: min(430px, 100%);
+  padding: clamp(24px, 3vw, 36px);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 8px;
+  background: linear-gradient(155deg, #202329, #15171b);
+  color: #f5f5f2;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
 }
 
 .auth-panel .segmented {
-  background: var(--surface-sunken);
+  background: #101216;
 }
+
+.auth-panel .segmented button.is-active {
+  background: #d4af37;
+  color: #171717;
+}
+
+.auth-panel .field { color: #d9dadd; }
+.auth-panel input {
+  border-color: #3c4047;
+  background: #111318;
+  color: #f5f5f2;
+}
+.auth-panel input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
+}
+.auth-panel .button.primary {
+  background: #d4af37;
+  color: #171717;
+}
+.auth-panel .button.primary:hover { background: #e3c45a; }
+.auth-panel .link-button { color: #d4af37; }
+.auth-panel .notice { overflow-wrap: anywhere; }
 
 /* =========================================================================
    Responsive
