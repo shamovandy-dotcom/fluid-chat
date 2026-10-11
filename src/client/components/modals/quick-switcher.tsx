@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Hash, Lock, Search, Users } from "lucide-react";
+import { Hash, Lock, Поиск, Users } from "lucide-react";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, Modal } from "../ui/primitives";
 
@@ -39,7 +39,7 @@ export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void
       list.push({
         id: channel.id,
         label: `#${channel.name}`,
-        hint: "Not joined",
+        hint: "Не присоединился",
         icon: <Hash size={15} />,
         run: () => void actions.openConversation(channel.conversationId, { newTab })
       });
@@ -63,17 +63,17 @@ export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void
       });
     }
     const views: Array<[string, () => void]> = [
-      ["Go to Threads", () => actions.setView({ kind: "threads" })],
-      ["Go to Activity", () => actions.setView({ kind: "activity" })],
-      ["Go to All unreads", () => actions.setView({ kind: "unreads" })],
-      ["Go to Drafts & sent", () => actions.setView({ kind: "drafts" })],
-      ["Go to Later", () => actions.setView({ kind: "saved" })],
+      ["Go to Обсуждения", () => actions.setView({ kind: "threads" })],
+      ["Go to Активность", () => actions.setView({ kind: "activity" })],
+      ["Go to Все непрочитанные", () => actions.setView({ kind: "unreads" })],
+      ["Go to Черновики и отправленные", () => actions.setView({ kind: "drafts" })],
+      ["Go to На потом", () => actions.setView({ kind: "saved" })],
       ["Browse channels", () => actions.setView({ kind: "browse" })],
       ["Open preferences", () => actions.setModal({ kind: "preferences" })],
-      ["Invite people", () => actions.setModal({ kind: "invite" })]
+      ["Пригласить участников", () => actions.setModal({ kind: "invite" })]
     ];
     for (const [label, run] of newTab ? [] : views) {
-      list.push({ id: label, label, icon: <Search size={14} />, run });
+      list.push({ id: label, label, icon: <Поиск size={14} />, run });
     }
     return list;
   }, [actions, directory, state.bootstrap, state.session?.id, state.workspaceId, newTab]);
@@ -87,15 +87,15 @@ export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void
   useEffect(() => setIndex(0), [query]);
 
   return (
-    <Modal title={newTab ? "Open chat in new tab" : "Jump to"} onClose={onClose} width={560} align="top">
+    <Modal title={newTab ? "Open chat in new tab" : "Перейти к"} onClose={onClose} width={560} align="top">
       <div className="quick-switcher">
         <div className="search-field">
-          <Search size={16} />
+          <Поиск size={16} />
           <input
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={newTab ? "Search channels and people" : "Search channels, people and commands"}
+            placeholder={newTab ? "Поиск channels and people" : "Поиск channels, people and commands"}
             onKeyDown={(event) => {
               if (event.key === "ArrowDown") {
                 event.preventDefault();
