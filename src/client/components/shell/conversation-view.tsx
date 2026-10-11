@@ -75,7 +75,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
           <button
             type="button"
             className={`star-toggle ${conversation.membership?.starred ? "is-on" : ""}`}
-            aria-label={conversation.membership?.starred ? "Unstar conversation" : "Star conversation"}
+            aria-label={conversation.membership?.starred ? "Unstar conversation" : "Добавить в избранное"}
             onClick={async () => {
               await api.conversations.updateMembership(conversationId, { starred: !conversation.membership?.starred });
               await actions.refreshConversations();
@@ -97,7 +97,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
               className="conversation-topic is-empty"
               onClick={() => actions.setRightPanel({ kind: "details", conversationId })}
             >
-              Add a topic
+              Добавить тему
             </button>
           ) : null}
         </div>
@@ -115,9 +115,9 @@ export function ConversationView({ conversationId }: { conversationId: string })
             <span>{conversation.memberIds.length}</span>
           </button>
 
-          <label className="jump-date" title="Jump to a date">
+          <label className="jump-date" title="Перейти к дате">
             <CalendarDays size={17} />
-            <span className="sr-only">Jump to a date</span>
+            <span className="sr-only">Перейти к дате</span>
             <input
               type="date"
               onChange={(event) => {
@@ -126,14 +126,14 @@ export function ConversationView({ conversationId }: { conversationId: string })
             />
           </label>
 
-          <IconButton label="Pinned messages" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
+          <IconButton label="Закреплено messages" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
             <Pin size={17} />
           </IconButton>
-          <IconButton label="Files" onClick={() => actions.setRightPanel({ kind: "files", conversationId })}>
+          <IconButton label="Файлы" onClick={() => actions.setRightPanel({ kind: "files", conversationId })}>
             <FileText size={17} />
           </IconButton>
           <IconButton
-            label={conversation.membership?.muted ? "Unmute conversation" : "Mute conversation"}
+            label={conversation.membership?.muted ? "Unmute conversation" : "Отключить уведомления"}
             onClick={async () => {
               await api.conversations.updateMembership(conversationId, { muted: !conversation.membership?.muted });
               await actions.refreshConversations();
@@ -142,11 +142,11 @@ export function ConversationView({ conversationId }: { conversationId: string })
             {conversation.membership?.muted ? <BellOff size={17} /> : <Bell size={17} />}
           </IconButton>
           {channel ? (
-            <IconButton label="Add people" onClick={() => actions.setModal({ kind: "add-people", conversationId })}>
+            <IconButton label="Добавить участников" onClick={() => actions.setModal({ kind: "add-people", conversationId })}>
               <UserPlus size={17} />
             </IconButton>
           ) : null}
-          <IconButton label="Conversation details" onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>
+          <IconButton label="Сведения о переписке" onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>
             <Info size={17} />
           </IconButton>
         </div>
@@ -188,10 +188,10 @@ export function ConversationView({ conversationId }: { conversationId: string })
               >
                 <label>
                   Title
-                  <input name="title" required maxLength={120} placeholder="Runbook" />
+                  <input name="title" required maxLength={120} placeholder="Инструкция" />
                 </label>
                 <label>
-                  Link
+                  Ссылка
                   <input name="url" type="url" required placeholder="https://" />
                 </label>
                 <button className="button primary" type="submit">
@@ -223,7 +223,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
         </div>
       ) : !joined && channel ? (
         <div className="composer-locked">
-          You are previewing #{channel.name}.
+          Вы are previewing #{channel.name}.
           <button
             type="button"
             className="button primary"
@@ -243,7 +243,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
       ) : (
         <Composer
           conversationId={conversationId}
-          placeholder={channel ? `Message #${channel.name}` : `Message ${title}`}
+          placeholder={channel ? `Сообщение #${channel.name}` : `Сообщение ${title}`}
         />
       )}
     </section>
