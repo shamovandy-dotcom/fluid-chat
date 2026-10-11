@@ -127,7 +127,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
                 ) : null}
                 {unreadMarkerId === message.id ? (
                   <div className="unread-divider">
-                    <span>New messages</span>
+                    <span>Новые сообщения</span>
                   </div>
                 ) : null}
                 <MessageItem message={message} grouped={grouped} />
@@ -149,7 +149,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
             scrollToBottom("smooth");
           }}
         >
-          <ArrowDown size={14} /> Jump to latest
+          <ArrowDown size={14} /> К последним сообщениям
         </button>
       ) : null}
     </div>
@@ -169,7 +169,7 @@ function ConversationIntro({ conversationId }: { conversationId: string }) {
           {conversation.channel.visibility === "private" ? "🔒" : "#"} {conversation.channel.name}
         </h2>
         <p>
-          This is the very beginning of the{" "}
+          Это самое начало{" "}
           <strong>
             {conversation.channel.visibility === "private" ? "" : "#"}
             {conversation.channel.name}
@@ -184,7 +184,7 @@ function ConversationIntro({ conversationId }: { conversationId: string }) {
   return (
     <div className="conversation-intro">
       <h2>{others.map((user) => user?.displayName ?? "Someone").join(", ")}</h2>
-      <p>This is the start of your direct message history. Only the people here can see it.</p>
+      <p>Это начало истории личных сообщений. Эту переписку видят только её участники.</p>
     </div>
   );
 }
