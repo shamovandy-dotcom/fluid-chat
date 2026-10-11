@@ -19,7 +19,7 @@ export function RightPanel() {
   const close = () => actions.setRightPanel(null);
 
   return (
-    <aside className="right-panel" aria-label="Details panel">
+    <aside className="right-panel" aria-label="Панель сведений">
       {panel.kind === "thread" ? <ThreadPanel key={panel.messageId} messageId={panel.messageId} onClose={close} /> : null}
       {panel.kind === "profile" ? <ProfilePanel userId={panel.userId} onClose={close} /> : null}
       {panel.kind === "details" ? <DetailsPanel conversationId={panel.conversationId} onClose={close} /> : null}
@@ -48,7 +48,7 @@ function PanelHeader({
       </div>
       <div className="panel-header-actions">
         {action}
-        <IconButton label="Close panel" onClick={onClose}>
+        <IconButton label="Закрыть панель" onClick={onClose}>
           <X size={18} />
         </IconButton>
       </div>
@@ -70,7 +70,7 @@ function ThreadPanel({ messageId, onClose }: { messageId: string; onClose: () =>
   return (
     <>
       <PanelHeader
-        title="Thread"
+        title="Обсуждение"
         subtitle={conversation ? conversationTitle(conversation, directory, state.session?.id) : undefined}
         onClose={onClose}
         action={
@@ -88,14 +88,14 @@ function ThreadPanel({ messageId, onClose }: { messageId: string; onClose: () =>
                 }
               }}
             >
-              {root.thread.following ? "Following" : "Follow"}
+              {root.thread.following ? "Following" : "Следить"}
             </button>
           ) : null
         }
       />
       <div className="panel-scroll">
         {!messages ? (
-          <Spinner label="Loading thread" />
+          <Spinner label="Загрузка обсуждения" />
         ) : (
           <>
             <MessageItem message={messages[0]} context="thread" />
@@ -113,7 +113,7 @@ function ThreadPanel({ messageId, onClose }: { messageId: string; onClose: () =>
         <Composer
           conversationId={root.conversationId}
           parentMessageId={root.id}
-          placeholder="Reply…"
+          placeholder="Ответить…"
           autoFocus
           onSent={() => void actions.openThread(messageId)}
         />
@@ -140,13 +140,13 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
     }
   }, [userId, directory]);
 
-  if (!user) return <PanelHeader title="Profile" onClose={onClose} />;
+  if (!user) return <PanelHeader title="Профиль" onClose={onClose} />;
 
   const localTime = localTimeIn(user.timezone, timeFormat);
 
   return (
     <>
-      <PanelHeader title="Profile" onClose={onClose} />
+      <PanelHeader title="Профиль" onClose={onClose} />
       <div className="panel-scroll profile-panel">
         <div className="profile-avatar">
           <Avatar user={user} size={160} presence={false} />
@@ -166,7 +166,7 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
               <dd>{user.pronouns}</dd>
             </>
           ) : null}
-          <dt>Email</dt>
+          <dt>Электронная почта</dt>
           <dd>
             <a href={`mailto:${user.email}`}>{user.email}</a>
           </dd>
@@ -182,7 +182,7 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
         <div className="profile-actions">
           {isSelf ? (
             <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "profile-editor" })}>
-              Edit profile
+              Изменить profile
             </button>
           ) : (
             <button
@@ -199,7 +199,7 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
                 }
               }}
             >
-              <MessageSquare size={15} /> Message
+              <MessageSquare size={15} /> Сообщение
             </button>
           )}
         </div>
@@ -223,13 +223,13 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
     setDescription(channel?.description ?? "");
   }, [channel?.id, channel?.topic, channel?.description]);
 
-  if (!conversation) return <PanelHeader title="Details" onClose={onClose} />;
+  if (!conversation) return <PanelHeader title="Сведения" onClose={onClose} />;
 
   return (
     <>
       <PanelHeader
         title={conversationTitle(conversation, directory, state.session?.id)}
-        subtitle={channel ? `${conversation.memberIds.length} members` : "Direct message"}
+        subtitle={channel ? `${conversation.memberIds.length} members` : "Личное сообщение"}
         onClose={onClose}
       />
       <div className="panel-tabs" role="tablist">
@@ -242,7 +242,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
             className={tab === entry ? "is-active" : ""}
             onClick={() => setTab(entry)}
           >
-            {entry === "about" ? "About" : entry === "members" ? "Members" : "Settings"}
+            {entry === "about" ? "About" : entry === "members" ? "Участники" : "Настройки"}
           </button>
         ))}
       </div>
@@ -252,7 +252,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
           channel ? (
             <div className="panel-section">
               <label className="field">
-                Topic
+                Тема
                 <input
                   value={topic}
                   onChange={(event) => setTopic(event.target.value)}
@@ -265,11 +265,11 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                       actions.fail(error);
                     }
                   }}
-                  placeholder="Add a topic"
+                  placeholder="Добавить тему"
                 />
               </label>
               <label className="field">
-                Description
+                Описание
                 <textarea
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
@@ -283,7 +283,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                     }
                   }}
                   rows={4}
-                  placeholder="What is this channel about?"
+                  placeholder="О чём этот канал?"
                 />
               </label>
               <p className="muted">
@@ -292,7 +292,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
             </div>
           ) : (
             <div className="panel-section">
-              <p className="muted">Direct messages are private to their participants.</p>
+              <p className="muted">Личные сообщения are private to their participants.</p>
             </div>
           )
         ) : null}
@@ -312,7 +312,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                   </button>
                   {channel && isAdmin && id !== state.session?.id ? (
                     <IconButton
-                      label={`Remove ${member?.displayName ?? "member"}`}
+                      label={`Удалить ${member?.displayName ?? "member"}`}
                       onClick={async () => {
                         try {
                           await api.channels.removeMember(channel.id, id);
@@ -334,7 +334,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                 className="button ghost"
                 onClick={() => actions.setModal({ kind: "add-people", conversationId })}
               >
-                Add people
+                Добавить участников
               </button>
             ) : null}
           </div>
@@ -357,7 +357,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                   }
                 }}
               >
-                Channel name
+                Название канала
                 <div className="inline-field">
                   <input name="name" defaultValue={channel.name} maxLength={80} />
                   <button type="submit" className="button ghost">
@@ -368,7 +368,7 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
             ) : null}
 
             <label className="field">
-              Notifications
+              Уведомления
               <select
                 value={conversation.membership?.notificationLevel ?? "all"}
                 onChange={async (event) => {
@@ -546,7 +546,7 @@ function WebhookSettings({ channelId }: { channelId: string }) {
             }
           }}
         >
-          Create
+          Создать
         </button>
       </div>
 
@@ -561,7 +561,7 @@ function WebhookSettings({ channelId }: { channelId: string }) {
               actions.toast("Webhook URL copied — it is not shown again", "success");
             }}
           >
-            Copy
+            Копировать
           </button>
         </div>
       ) : null}
@@ -603,17 +603,17 @@ function PinsPanel({ conversationId, onClose }: { conversationId: string; onClos
 
   return (
     <>
-      <PanelHeader title="Pinned" subtitle="Messages pinned to this conversation" onClose={onClose} />
+      <PanelHeader title="Закреплено" subtitle="Сообщения, закреплённые в этой переписке" onClose={onClose} />
       <div className="panel-scroll">
         {!pins ? (
-          <Spinner label="Loading pins" />
+          <Spinner label="Загрузка закреплённых сообщений" />
         ) : pins.length === 0 ? (
-          <EmptyState title="Nothing pinned yet" body="Pin important messages from their ⋯ menu." />
+          <EmptyState title="Пока ничего не закреплено" body="Закрепляйте важные сообщения через меню ⋯." />
         ) : (
           pins.map(({ message }) => (
             <div key={message.id} className="panel-card">
               <div className="panel-card-head">
-                <Pin size={13} /> Pinned
+                <Pin size={13} /> Закреплено
               </div>
               <MessageItem message={message} context="list" />
             </div>
@@ -636,12 +636,12 @@ function FilesPanel({ conversationId, onClose }: { conversationId: string; onClo
 
   return (
     <>
-      <PanelHeader title="Files" subtitle="Everything shared here" onClose={onClose} />
+      <PanelHeader title="Файлы" subtitle="Все файлы, которыми поделились здесь" onClose={onClose} />
       <div className="panel-scroll">
         {!files ? (
-          <Spinner label="Loading files" />
+          <Spinner label="Загрузка файлов" />
         ) : files.length === 0 ? (
-          <EmptyState title="No files yet" body="Drag a file into the message box to share it." />
+          <EmptyState title="Пока нет файлов" body="Перетащите файл в поле сообщения, чтобы поделиться им." />
         ) : (
           <div className="file-grid">
             {files.map((file) => (
