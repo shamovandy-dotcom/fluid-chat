@@ -468,7 +468,7 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
           <option value="30">30 минут</option>
           <option value="60">1 час</option>
           <option value="240">4 часа</option>
-          <option value="480">Сегодня</option>
+          <option value="480">8 часов</option>
           <option value="10080">На этой неделе</option>
         </select>
       </label>
