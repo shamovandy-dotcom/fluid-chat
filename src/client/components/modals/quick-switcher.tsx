@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Hash, Lock, Поиск, Users } from "lucide-react";
+import { Hash, Lock, Search, Users } from "lucide-react";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, Modal } from "../ui/primitives";
 
@@ -73,7 +73,7 @@ export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void
       ["Пригласить участников", () => actions.setModal({ kind: "invite" })]
     ];
     for (const [label, run] of newTab ? [] : views) {
-      list.push({ id: label, label, icon: <Поиск size={14} />, run });
+      list.push({ id: label, label, icon: <Search size={14} />, run });
     }
     return list;
   }, [actions, directory, state.bootstrap, state.session?.id, state.workspaceId, newTab]);
@@ -90,7 +90,7 @@ export function QuickSwitcher({ onClose, newTab = false }: { onClose: () => void
     <Modal title={newTab ? "Open chat in new tab" : "Перейти к"} onClose={onClose} width={560} align="top">
       <div className="quick-switcher">
         <div className="search-field">
-          <Поиск size={16} />
+          <Search size={16} />
           <input
             autoFocus
             value={query}
