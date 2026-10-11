@@ -1,5 +1,4 @@
 import http from "node:http";
-import next from "next";
 import { Server, type Socket } from "socket.io";
 import Redis from "ioredis";
 import { createAdapter } from "@socket.io/redis-adapter";
@@ -19,13 +18,11 @@ import { sessionCookieName } from "@/lib/auth";
 import type { RealtimeEvent } from "@/shared/types";
 import { broadcastPresence } from "@/server/services/presence";
 
-const dev = process.env.NODE_ENV !== "production";
-const port = Number(process.env.PORT ?? process.env.REALTIME_PORT ?? 3001);
+// This service runs separately from Next.js.
+// Do not use process.env.PORT here: Blitz uses port 10000 for public traffic.
+const port = Number(process.env.REALTIME_PORT ?? 3001);
 const host = "0.0.0.0";
 const redisUrl = process.env.REDIS_URL;
-
-const app = next({ dev });
-const handle = app.getRequestHandler();
 
 const connectionsByUser = new Map<string, number>();
 
@@ -36,7 +33,11 @@ function cookieValue(header: string | undefined, name: string) {
     const [rawKey, ...rawValue] = part.trim().split("=");
 
     if (rawKey === name) {
-      return decodeURIComponent(rawValue.join("="));
+      try {
+        return decodeURIComponent(rawValue.join("="));
+      } catch {
+        return null;
+      }
     }
   }
 
@@ -133,6 +134,8 @@ async function canJoinRoom(userId: string, room: string) {
   return false;
 }
 
+let io: Server;
+
 const httpServer = http.createServer((request, response) => {
   const pathname = new URL(
     request.url ?? "/",
@@ -141,11 +144,13 @@ const httpServer = http.createServer((request, response) => {
 
   if (pathname === "/health") {
     response.writeHead(200, {
-      "content-type": "application/json; charset=utf-8"
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
     });
     response.end(
       JSON.stringify({
         ok: true,
+        service: "realtime",
         connectedUsers: connectionsByUser.size,
         redis: !!redisUrl
       })
@@ -203,7 +208,7 @@ const httpServer = http.createServer((request, response) => {
         io.to(parsed.room).emit("event", parsed.event);
 
         response.writeHead(202, {
-          "content-type": "application/json"
+          "content-type": "application/json; charset=utf-8"
         });
         response.end(JSON.stringify({ ok: true }));
       } catch {
@@ -224,11 +229,13 @@ const httpServer = http.createServer((request, response) => {
     return;
   }
 
-  // All other requests are handled by the Next.js application.
-  void handle(request, response);
+  response.writeHead(404, {
+    "content-type": "application/json; charset=utf-8"
+  });
+  response.end(JSON.stringify({ error: "Not found" }));
 });
 
-const io = new Server(httpServer, {
+io = new Server(httpServer, {
   cors: {
     origin: process.env.APP_URL ?? "http://localhost:3000",
     credentials: true
@@ -415,17 +422,8 @@ if (subClient) {
   });
 }
 
-async function main() {
-  await app.prepare();
-
-  httpServer.listen(port, host, () => {
-    console.log(
-      `Fluid Chat (Next.js + Socket.IO) listening on ${host}:${port}; Redis: ${redisUrl ? "enabled" : "disabled"}`
-    );
-  });
-}
-
-main().catch((error) => {
-  console.error("Failed to start Fluid Chat server", error);
-  process.exit(1);
+httpServer.listen(port, host, () => {
+  console.log(
+    `Fluid Chat realtime listening on ${host}:${port}; Redis: ${redisUrl ? "enabled" : "disabled"}`
+  );
 });
