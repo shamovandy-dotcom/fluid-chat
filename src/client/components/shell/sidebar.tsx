@@ -76,7 +76,7 @@ export function Sidebar() {
           <button type="button" className="workspace-button" onClick={toggle} ref={ref}>
             <span className="workspace-name">
               {workspace?.iconEmoji ? <span aria-hidden>{workspace.iconEmoji}</span> : null}
-              {workspace?.name ?? "Workspace"}
+              {workspace?.name ?? "Рабочее пространство"}
             </span>
             <ChevronDown size={16} />
           </button>
