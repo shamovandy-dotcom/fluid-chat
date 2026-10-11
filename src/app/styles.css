@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700;800&display=swap");
+
 /* =========================================================================
    Fluid Chat design system
    Tokens first, then layout, then components. Every color is a variable so
@@ -5,7 +7,8 @@
    ========================================================================= */
 
 :root {
-  --font-sans: "Montserrat", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Manrope", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Montserrat", "Manrope", "Segoe UI", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
   --radius-sm: 6px;
@@ -147,6 +150,9 @@ h2,
 h3,
 h4 {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
   line-height: 1.25;
 }
 
