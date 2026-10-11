@@ -3578,3 +3578,56 @@ textarea:focus {
     height: 100dvh;
   }
 }
+
+/* Conversation viewport hardening: keep the composer inside the app viewport. */
+.app-shell,
+.app-body,
+.app-main,
+.conversation-workspace,
+.conversation-workspace-body {
+  min-height: 0;
+}
+
+.app-body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-main,
+.conversation-workspace,
+.conversation-workspace-body {
+  height: 100%;
+}
+
+.conversation-workspace-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.conversation {
+  flex: 1 1 0;
+  height: auto;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.message-scroll-wrap {
+  flex: 1 1 0;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.message-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.composer,
+.composer-locked {
+  flex: 0 0 auto;
+}
+
