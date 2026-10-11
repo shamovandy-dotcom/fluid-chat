@@ -85,7 +85,7 @@ export function BrowseChannelsView() {
                 </span>
               </button>
               {channel.joined ? (
-                <span className="pill">Joined</span>
+                <span className="pill">В команде</span>
               ) : (
                 <button
                   type="button"
@@ -153,7 +153,7 @@ export function PeopleView() {
           >
             <Avatar user={member.user} size={56} />
             <strong>{member.user.displayName}</strong>
-            <span>{member.user.title ?? (member.role === "owner" ? "Workspace owner" : member.role)}</span>
+            <span>{member.user.title ?? (member.role === "owner" ? "Владелец пространства" : member.role)}</span>
             {member.user.statusText ? <small>{member.user.statusText}</small> : null}
           </button>
         ))}
