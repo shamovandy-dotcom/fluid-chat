@@ -10,22 +10,22 @@ import { TopBar } from "./shell/top-bar";
 import { RightPanel } from "./shell/right-panel";
 import { ChatTabBar } from "./shell/chat-tab-bar";
 import { ConversationView } from "./shell/conversation-view";
-import { АктивностьView, DraftsView, СохранитьdView, ОбсуждениеsView, НепрочитанныеView } from "./views/activity-views";
-import { BrowseКаналыView, ФайлыView, ЛюдиView, ПоискView } from "./views/directory-views";
+import { ActivityView, DraftsView, SavedView, ThreadsView, UnreadsView } from "./views/activity-views";
+import { BrowseChannelsView, FilesView, PeopleView, SearchView } from "./views/directory-views";
 import { QuickSwitcher } from "./modals/quick-switcher";
-import { АдминистрированиеConsole } from "./modals/admin-console";
+import { AdminConsole } from "./modals/admin-console";
 import {
-  AddЛюдиModal,
-  СоздатьWorkspaceModal,
-  ПригласитьModal,
+  AddPeopleModal,
+  CreateWorkspaceModal,
+  InviteModal,
   NewChannelModal,
   NewDmModal,
-  ПредпочтенияModal,
-  ПрофильИзменитьorModal,
+  PreferencesModal,
+  ProfileEditorModal,
   ScheduleModal,
   ShareModal,
   ShortcutsModal,
-  СтатусModal
+  StatusModal
 } from "./modals/modals";
 import { Spinner } from "./ui/primitives";
 
@@ -42,13 +42,13 @@ function AppRoot() {
 
   useTheme();
   useHotkeys();
-  useDesktopУведомления();
-  useDeepСсылка();
+  useDesktopNotifications();
+  useDeepLink();
 
   if (state.status === "loading") {
     return (
-      <div classИмя="boot-screen">
-        <Spinner label="Загрузка Androlit Chat" />
+      <div className="boot-screen">
+        <Spinner label="Loading Androlit Chat" />
       </div>
     );
   }
@@ -57,33 +57,33 @@ function AppRoot() {
   if (state.memberships.length === 0) return <WorkspaceSetupScreen />;
 
   return (
-    <div classИмя={`app-shell ${state.sidebarOpen ? "sidebar-open" : ""}`}>
+    <div className={`app-shell ${state.sidebarOpen ? "sidebar-open" : ""}`}>
       <TopBar />
-      <div classИмя="app-body">
+      <div className="app-body">
         <WorkspaceRail />
         <Sidebar />
         {state.sidebarOpen ? (
           <button
             type="button"
-            classИмя="sidebar-scrim"
-            aria-label="Закрыть навигацию"
+            className="sidebar-scrim"
+            aria-label="Close navigation"
             onClick={() => actions.setSidebarOpen(false)}
           />
         ) : null}
-        <div classИмя="conversation-workspace">
+        <div className="conversation-workspace">
           <ChatTabBar />
-          <div classИмя="conversation-workspace-body">
-            <main classИмя="app-main" id="chat-tab-content" aria-label="Содержимое переписки">
+          <div className="conversation-workspace-body">
+            <main className="app-main" id="chat-tab-content" aria-label="Conversation content">
               {state.view.kind === "conversation" ? <ConversationView key={state.view.conversationId} conversationId={state.view.conversationId} /> : null}
-              {state.view.kind === "activity" ? <АктивностьView /> : null}
-              {state.view.kind === "threads" ? <ОбсуждениеsView /> : null}
-              {state.view.kind === "saved" ? <СохранитьdView /> : null}
+              {state.view.kind === "activity" ? <ActivityView /> : null}
+              {state.view.kind === "threads" ? <ThreadsView /> : null}
+              {state.view.kind === "saved" ? <SavedView /> : null}
               {state.view.kind === "drafts" ? <DraftsView /> : null}
-              {state.view.kind === "unreads" ? <НепрочитанныеView /> : null}
-              {state.view.kind === "browse" ? <BrowseКаналыView /> : null}
-              {state.view.kind === "people" ? <ЛюдиView /> : null}
-              {state.view.kind === "files" ? <ФайлыView /> : null}
-              {state.view.kind === "search" ? <ПоискView query={state.view.query} /> : null}
+              {state.view.kind === "unreads" ? <UnreadsView /> : null}
+              {state.view.kind === "browse" ? <BrowseChannelsView /> : null}
+              {state.view.kind === "people" ? <PeopleView /> : null}
+              {state.view.kind === "files" ? <FilesView /> : null}
+              {state.view.kind === "search" ? <SearchView query={state.view.query} /> : null}
             </main>
             <RightPanel />
           </div>
@@ -103,38 +103,38 @@ function Modals() {
 
   switch (modal.kind) {
     case "quick-switcher":
-      return <QuickSwitcher onЗакрыть={close} newTab={modal.newTab} />;
+      return <QuickSwitcher onClose={close} newTab={modal.newTab} />;
     case "preferences":
-      return <ПредпочтенияModal onЗакрыть={close} />;
+      return <PreferencesModal onClose={close} />;
     case "admin":
-      return <АдминистрированиеConsole onЗакрыть={close} />;
+      return <AdminConsole onClose={close} />;
     case "invite":
-      return <ПригласитьModal onЗакрыть={close} />;
+      return <InviteModal onClose={close} />;
     case "new-channel":
-      return <NewChannelModal onЗакрыть={close} />;
+      return <NewChannelModal onClose={close} />;
     case "new-dm":
-      return <NewDmModal onЗакрыть={close} />;
+      return <NewDmModal onClose={close} />;
     case "add-people":
-      return <AddЛюдиModal conversationId={modal.conversationId} onЗакрыть={close} />;
+      return <AddPeopleModal conversationId={modal.conversationId} onClose={close} />;
     case "shortcuts":
-      return <ShortcutsModal onЗакрыть={close} />;
+      return <ShortcutsModal onClose={close} />;
     case "status":
-      return <СтатусModal onЗакрыть={close} />;
+      return <StatusModal onClose={close} />;
     case "profile-editor":
-      return <ПрофильИзменитьorModal onЗакрыть={close} />;
+      return <ProfileEditorModal onClose={close} />;
     case "create-workspace":
-      return <СоздатьWorkspaceModal onЗакрыть={close} />;
+      return <CreateWorkspaceModal onClose={close} />;
     case "schedule":
       return (
         <ScheduleModal
           conversationId={modal.conversationId}
           bodyText={modal.bodyText}
-          parentСообщениеId={modal.parentСообщениеId}
-          onЗакрыть={close}
+          parentMessageId={modal.parentMessageId}
+          onClose={close}
         />
       );
     case "share":
-      return <ShareModal messageId={modal.messageId} onЗакрыть={close} />;
+      return <ShareModal messageId={modal.messageId} onClose={close} />;
     default:
       return null;
   }
@@ -151,9 +151,9 @@ function Toasts() {
 
   if (state.toasts.length === 0) return null;
   return (
-    <div classИмя="toast-stack" role="status" aria-live="polite">
+    <div className="toast-stack" role="status" aria-live="polite">
       {state.toasts.map((toast) => (
-        <button key={toast.id} type="button" classИмя={`toast is-${toast.tone}`} onClick={() => actions.dismissToast(toast.id)}>
+        <button key={toast.id} type="button" className={`toast is-${toast.tone}`} onClick={() => actions.dismissToast(toast.id)}>
           {toast.text}
         </button>
       ))}
@@ -207,7 +207,7 @@ function useHotkeys() {
       }
       const meta = event.metaKey || event.ctrlKey;
       const target = event.target as HTMLElement | null;
-      const typing = target?.tagИмя === "INPUT" || target?.tagИмя === "TEXTAREA" || target?.isContentИзменитьable;
+      const typing = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
 
       if (meta && event.key.toLowerCase() === "k" && !event.shiftKey) {
         event.preventDefault();
@@ -275,10 +275,10 @@ function useHotkeys() {
  * most once — three mentions in a row raise three banners rather than only the
  * newest surviving as `notifications[0]`.
  */
-function useDesktopУведомления() {
+function useDesktopNotifications() {
   const { state, actions } = useApp();
   const session = state.session;
-  const preference = session?.preferences?.desktopУведомления ?? "mentions";
+  const preference = session?.preferences?.desktopNotifications ?? "mentions";
   const notifications = state.notifications;
   const paused = notificationsPaused({
     quietHours: { start: session?.preferences?.quietHoursStart, end: session?.preferences?.quietHoursEnd },
@@ -329,12 +329,12 @@ function useDesktopУведомления() {
 }
 
 /** `/?conversation=…&message=…` opens a permalink from a copied message link. */
-function useDeepСсылка() {
+function useDeepLink() {
   const { state, actions } = useApp();
 
   useEffect(() => {
     if (!state.bootstrap) return;
-    const params = new URLПоискParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
     const conversationId = params.get("conversation");
     if (!conversationId) return;
     void actions.openConversation(conversationId).then(() => {
