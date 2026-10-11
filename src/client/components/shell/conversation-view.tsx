@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Bell,
-  BellOff,
+  BellВыкл.,
   CalendarDays,
   FileText,
   Hash,
@@ -20,7 +20,7 @@ import { api } from "../../api";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, IconButton, MenuDivider, MenuItem, Popover } from "../ui/primitives";
 import { Composer } from "../message/composer";
-import { MessageList } from "../message/message-list";
+import { СообщениеList } from "../message/message-list";
 
 export function ConversationView({ conversationId }: { conversationId: string }) {
   const { state, actions } = useApp();
@@ -46,8 +46,8 @@ export function ConversationView({ conversationId }: { conversationId: string })
 
   if (!conversation) {
     return (
-      <section className="conversation">
-        <div className="conversation-empty">This conversation is no longer available.</div>
+      <section classИмя="conversation">
+        <div classИмя="conversation-empty">This conversation is no longer available.</div>
       </section>
     );
   }
@@ -55,9 +55,9 @@ export function ConversationView({ conversationId }: { conversationId: string })
   const memberAvatars = conversation.memberIds.slice(0, 4);
 
   return (
-    <section className="conversation">
-      <header className="conversation-header">
-        <div className="conversation-title">
+    <section classИмя="conversation">
+      <header classИмя="conversation-header">
+        <div classИмя="conversation-title">
           <h1>
             {channel ? (
               channel.visibility === "private" ? (
@@ -74,10 +74,10 @@ export function ConversationView({ conversationId }: { conversationId: string })
           </h1>
           <button
             type="button"
-            className={`star-toggle ${conversation.membership?.starred ? "is-on" : ""}`}
-            aria-label={conversation.membership?.starred ? "Unstar conversation" : "Star conversation"}
+            classИмя={`star-toggle ${conversation.membership?.starred ? "is-on" : ""}`}
+            aria-label={conversation.membership?.starred ? "Unstar conversation" : "Добавить в избранное"}
             onClick={async () => {
-              await api.conversations.updateMembership(conversationId, { starred: !conversation.membership?.starred });
+              await api.conversations.updateУчастникиhip(conversationId, { starred: !conversation.membership?.starred });
               await actions.refreshConversations();
             }}
           >
@@ -86,7 +86,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
           {channel?.topic ? (
             <button
               type="button"
-              className="conversation-topic"
+              classИмя="conversation-topic"
               onClick={() => actions.setRightPanel({ kind: "details", conversationId })}
             >
               {channel.topic}
@@ -94,18 +94,18 @@ export function ConversationView({ conversationId }: { conversationId: string })
           ) : channel ? (
             <button
               type="button"
-              className="conversation-topic is-empty"
+              classИмя="conversation-topic is-empty"
               onClick={() => actions.setRightPanel({ kind: "details", conversationId })}
             >
-              Add a topic
+              Добавить тему
             </button>
           ) : null}
         </div>
 
-        <div className="conversation-actions">
+        <div classИмя="conversation-actions">
           <button
             type="button"
-            className="member-facepile"
+            classИмя="member-facepile"
             onClick={() => actions.setRightPanel({ kind: "details", conversationId })}
             aria-label={`${conversation.memberIds.length} members`}
           >
@@ -115,9 +115,9 @@ export function ConversationView({ conversationId }: { conversationId: string })
             <span>{conversation.memberIds.length}</span>
           </button>
 
-          <label className="jump-date" title="Jump to a date">
+          <label classИмя="jump-date" title="Перейти к дате">
             <CalendarDays size={17} />
-            <span className="sr-only">Jump to a date</span>
+            <span classИмя="sr-only">Перейти к дате</span>
             <input
               type="date"
               onChange={(event) => {
@@ -126,36 +126,36 @@ export function ConversationView({ conversationId }: { conversationId: string })
             />
           </label>
 
-          <IconButton label="Pinned messages" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
+          <IconButton label="Закреплено messages" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
             <Pin size={17} />
           </IconButton>
-          <IconButton label="Files" onClick={() => actions.setRightPanel({ kind: "files", conversationId })}>
+          <IconButton label="Файлы" onClick={() => actions.setRightPanel({ kind: "files", conversationId })}>
             <FileText size={17} />
           </IconButton>
           <IconButton
-            label={conversation.membership?.muted ? "Unmute conversation" : "Mute conversation"}
+            label={conversation.membership?.muted ? "Unmute conversation" : "Отключить уведомления"}
             onClick={async () => {
-              await api.conversations.updateMembership(conversationId, { muted: !conversation.membership?.muted });
+              await api.conversations.updateУчастникиhip(conversationId, { muted: !conversation.membership?.muted });
               await actions.refreshConversations();
             }}
           >
-            {conversation.membership?.muted ? <BellOff size={17} /> : <Bell size={17} />}
+            {conversation.membership?.muted ? <BellВыкл. size={17} /> : <Bell size={17} />}
           </IconButton>
           {channel ? (
-            <IconButton label="Add people" onClick={() => actions.setModal({ kind: "add-people", conversationId })}>
+            <IconButton label="Добавить участников" onClick={() => actions.setModal({ kind: "add-people", conversationId })}>
               <UserPlus size={17} />
             </IconButton>
           ) : null}
-          <IconButton label="Conversation details" onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>
+          <IconButton label="Сведения о переписке" onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>
             <Info size={17} />
           </IconButton>
         </div>
       </header>
 
       {channel ? (
-        <div className="bookmark-bar">
+        <div classИмя="bookmark-bar">
           {bookmarks.map((bookmark) => (
-            <a key={bookmark.id} href={bookmark.url} target="_blank" rel="noopener noreferrer" className="bookmark">
+            <a key={bookmark.id} href={bookmark.url} target="_blank" rel="noopener noreferrer" classИмя="bookmark">
               {bookmark.emoji ? <span aria-hidden>{bookmark.emoji}</span> : null}
               {bookmark.title}
             </a>
@@ -163,14 +163,14 @@ export function ConversationView({ conversationId }: { conversationId: string })
           <Popover
             width={320}
             trigger={({ toggle, ref }) => (
-              <button type="button" className="bookmark add" ref={ref} onClick={toggle}>
+              <button type="button" classИмя="bookmark add" ref={ref} onClick={toggle}>
                 <Plus size={13} /> Add a bookmark
               </button>
             )}
           >
             {(close) => (
               <form
-                className="stack-form"
+                classИмя="stack-form"
                 onSubmit={async (event) => {
                   event.preventDefault();
                   const form = new FormData(event.currentTarget);
@@ -188,13 +188,13 @@ export function ConversationView({ conversationId }: { conversationId: string })
               >
                 <label>
                   Title
-                  <input name="title" required maxLength={120} placeholder="Runbook" />
+                  <input name="title" required maxLength={120} placeholder="Инструкция" />
                 </label>
                 <label>
-                  Link
+                  Ссылка
                   <input name="url" type="url" required placeholder="https://" />
                 </label>
-                <button className="button primary" type="submit">
+                <button classИмя="button primary" type="submit">
                   Add bookmark
                 </button>
               </form>
@@ -203,15 +203,15 @@ export function ConversationView({ conversationId }: { conversationId: string })
         </div>
       ) : null}
 
-      <MessageList conversationId={conversationId} />
+      <СообщениеList conversationId={conversationId} />
 
       {channel?.archivedAt ? (
-        <div className="composer-locked">
+        <div classИмя="composer-locked">
           This channel is archived. It is read-only.
           {state.bootstrap?.role !== "member" ? (
             <button
               type="button"
-              className="button ghost"
+              classИмя="button ghost"
               onClick={async () => {
                 await api.channels.unarchive(channel.id);
                 await actions.refreshBootstrap();
@@ -222,11 +222,11 @@ export function ConversationView({ conversationId }: { conversationId: string })
           ) : null}
         </div>
       ) : !joined && channel ? (
-        <div className="composer-locked">
-          You are previewing #{channel.name}.
+        <div classИмя="composer-locked">
+          Вы are previewing #{channel.name}.
           <button
             type="button"
-            className="button primary"
+            classИмя="button primary"
             onClick={async () => {
               try {
                 await api.channels.join(channel.id);
@@ -243,7 +243,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
       ) : (
         <Composer
           conversationId={conversationId}
-          placeholder={channel ? `Message #${channel.name}` : `Message ${title}`}
+          placeholder={channel ? `Сообщение #${channel.name}` : `Сообщение ${title}`}
         />
       )}
     </section>
@@ -260,7 +260,7 @@ export function ConversationMenuItems({ conversationId }: { conversationId: stri
       <MenuDivider />
       <MenuItem
         onClick={async () => {
-          await api.conversations.updateMembership(conversationId, {
+          await api.conversations.updateУчастникиhip(conversationId, {
             notificationLevel: conversation.membership?.notificationLevel === "all" ? "mentions" : "all"
           });
           await actions.refreshConversations();
