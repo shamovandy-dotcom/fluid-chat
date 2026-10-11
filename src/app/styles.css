@@ -3542,13 +3542,34 @@ textarea:focus {
 }
 
 
-/* ANDROLIT chat viewport: keep the composer visible while history scrolls. */
+/* ANDROLIT chat viewport: constrain the app through its existing grid/flex chain.
+   The shell owns the viewport height. Nested panes must not each claim 100%,
+   or header/tab-bar heights can be added on top and push the composer off-screen. */
+.app-body,
+.conversation-workspace,
+.conversation-workspace-body,
+.app-main,
 .conversation {
+  min-height: 0;
+}
+
+.app-body,
+.app-main {
+  overflow: hidden;
+}
+
+.conversation-workspace,
+.conversation-workspace-body {
+  min-width: 0;
+}
+
+.app-main > .conversation {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
-  flex: 1 1 auto;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 100%;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -3562,68 +3583,18 @@ textarea:focus {
 }
 
 .message-scroll-wrap {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
 }
 
 .message-scroll {
-  min-height: 0;
-  overscroll-behavior: contain;
-}
-
-@supports (height: 100dvh) {
-  .app-shell {
-    height: 100dvh;
-  }
-}
-
-/* Conversation viewport hardening: keep the composer inside the app viewport. */
-.app-shell,
-.app-body,
-.app-main,
-.conversation-workspace,
-.conversation-workspace-body {
-  min-height: 0;
-}
-
-.app-body {
-  height: 100%;
-  overflow: hidden;
-}
-
-.app-main,
-.conversation-workspace,
-.conversation-workspace-body {
-  height: 100%;
-}
-
-.conversation-workspace-body {
-  min-height: 0;
-  overflow: hidden;
-}
-
-.conversation {
-  flex: 1 1 0;
-  height: auto;
-  max-height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.message-scroll-wrap {
-  flex: 1 1 0;
-  height: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.message-scroll {
-  height: 100%;
+  min-width: 0;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .composer,
@@ -3631,3 +3602,8 @@ textarea:focus {
   flex: 0 0 auto;
 }
 
+@supports (height: 100dvh) {
+  .app-shell {
+    height: 100dvh;
+  }
+}
