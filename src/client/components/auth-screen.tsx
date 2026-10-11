@@ -49,17 +49,22 @@ export function AuthScreen() {
   return (
     <main className="auth-page">
       <section className="auth-hero">
-        <p className="eyebrow">Androlit Chat</p>
-        <h1>Работа на ваших условиях.</h1>
+        <a className="auth-brand" href="https://androlit.ru/" target="_blank" rel="noreferrer" aria-label="АНДРОЛИТ — официальный сайт">
+          <span className="auth-brand-name"><span>АНДР</span><span>ОЛИТ</span></span>
+          <span className="auth-brand-caption">НЕРУДНЫЕ МАТЕРИАЛЫ ДЛЯ СТРОИТЕЛЬСТВА</span>
+        </a>
+        <p className="eyebrow">Корпоративное пространство</p>
+        <h1>АНДРОЛИТ<br /><span>на связи.</span></h1>
         <p className="lede">
-          Каналы, личные сообщения, обсуждения, поиск, файлы и реакции — всё под вашим контролем.
+          Внутренний мессенджер команды АНДРОЛИТ — рабочие обсуждения, сообщения и файлы в одном пространстве.
         </p>
         <ul className="auth-points">
-          <li>Общение в открытых и закрытых каналах</li>
-          <li>Обсуждения, упоминания, реакции, закреплённые и сохранённые сообщения</li>
-          <li>Статус присутствия в реальном времени, индикаторы набора текста и непрочитанные сообщения</li>
-          <li>Полнотекстовый поиск по всем доступным вам материалам</li>
+          <li>Командные каналы и личные сообщения</li>
+          <li>Обсуждения, упоминания и быстрые реакции</li>
+          <li>Обмен файлами и история переписки</li>
+          <li>Рабочая коммуникация в едином цифровом пространстве</li>
         </ul>
+        <a className="auth-site-link" href="https://androlit.ru/" target="_blank" rel="noreferrer">androlit.ru <span aria-hidden="true">↗</span></a>
       </section>
 
       <section className="auth-panel">
