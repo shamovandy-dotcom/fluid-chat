@@ -38,7 +38,7 @@ export function TopBar() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={`Поиск ${state.bootstrap?.workspace.name ?? "workspace"}`}
+          placeholder={`Поиск ${state.bootstrap?.workspace.name ?? "Рабочее пространство"}`}
           aria-label="Поиск сообщений"
           onKeyDown={(event) => {
             if (event.key === "Escape") setQuery("");
