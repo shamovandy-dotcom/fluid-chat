@@ -36,12 +36,12 @@ export function AdminConsole({ onClose }: { onClose: () => void }) {
         {(
           [
             ["overview", "Overview"],
-            ["members", "Members"],
+            ["members", "Участники"],
             ["invitations", "Invitations"],
-            ["channels", "Channels"],
+            ["channels", "Каналы"],
             ["emoji", "Emoji"],
             ["api", "API keys"],
-            ["settings", "Settings"],
+            ["settings", "Настройки"],
             ["audit", "Audit log"],
             ["export", "Export"]
           ] as Array<[Tab, string]>
@@ -55,12 +55,12 @@ export function AdminConsole({ onClose }: { onClose: () => void }) {
       {!workspaceId ? null : (
         <div className="admin-body">
           {tab === "overview" ? <Overview workspaceId={workspaceId} /> : null}
-          {tab === "members" ? <Members workspaceId={workspaceId} isOwner={isOwner} /> : null}
+          {tab === "members" ? <Участники workspaceId={workspaceId} isOwner={isOwner} /> : null}
           {tab === "invitations" ? <Invitations workspaceId={workspaceId} /> : null}
-          {tab === "channels" ? <Channels workspaceId={workspaceId} /> : null}
+          {tab === "channels" ? <Каналы workspaceId={workspaceId} /> : null}
           {tab === "emoji" ? <Emoji workspaceId={workspaceId} /> : null}
           {tab === "api" ? <ApiKeys workspaceId={workspaceId} /> : null}
-          {tab === "settings" ? <Settings workspaceId={workspaceId} isOwner={isOwner} /> : null}
+          {tab === "settings" ? <Настройки workspaceId={workspaceId} isOwner={isOwner} /> : null}
           {tab === "audit" ? <AuditLog workspaceId={workspaceId} /> : null}
           {tab === "export" ? <Exports workspaceId={workspaceId} isOwner={isOwner} /> : null}
           <p className="admin-note">
@@ -88,7 +88,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
   return (
     <div className="admin-grid">
       <div className="stat-card">
-        <span>Members</span>
+        <span>Участники</span>
         <strong>{usage?.activeMembers ?? "—"}</strong>
         <small>of {workspace?.seatLimit ?? 0} seats</small>
       </div>
@@ -97,7 +97,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
         <strong>{usage?.pendingInvites ?? "—"}</strong>
       </div>
       <div className="stat-card">
-        <span>Files</span>
+        <span>Файлы</span>
         <strong>{usage?.fileCount ?? "—"}</strong>
       </div>
       <div className="stat-card">
@@ -109,7 +109,7 @@ function Overview({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function Members({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
+function Участники({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
   const { actions } = useApp();
   const [members, setMembers] = useState<MemberRow[] | null>(null);
 
@@ -122,7 +122,7 @@ function Members({ workspaceId, isOwner }: { workspaceId: string; isOwner: boole
 
   useEffect(load, [load]);
 
-  if (!members) return <Spinner label="Loading members" />;
+  if (!members) return <Spinner label="Загрузка участников" />;
 
   return (
     <div className="admin-list">
@@ -164,7 +164,7 @@ function Members({ workspaceId, isOwner }: { workspaceId: string; isOwner: boole
                 type="button"
                 className="button ghost"
                 onClick={async () => {
-                  if (!window.confirm(`Remove ${member.user.displayName} from the workspace?`)) return;
+                  if (!window.confirm(`Удалить ${member.user.displayName} from the workspace?`)) return;
                   try {
                     await api.workspaces.removeMember(workspaceId, member.memberId);
                     load();
@@ -173,7 +173,7 @@ function Members({ workspaceId, isOwner }: { workspaceId: string; isOwner: boole
                   }
                 }}
               >
-                Remove
+                Удалить
               </button>
             ) : (
               <button
@@ -211,7 +211,7 @@ function Invitations({ workspaceId }: { workspaceId: string }) {
 
   useEffect(load, [load]);
 
-  if (!invites) return <Spinner label="Loading invitations" />;
+  if (!invites) return <Spinner label="Загрузка приглашений" />;
   const pending = invites.filter((invite) => !invite.acceptedAt && !invite.revokedAt && new Date(invite.expiresAt) > new Date());
 
   return (
@@ -262,7 +262,7 @@ function Invitations({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function Channels({ workspaceId }: { workspaceId: string }) {
+function Каналы({ workspaceId }: { workspaceId: string }) {
   const { actions } = useApp();
   const [channels, setChannels] = useState<Array<ChannelSummary & { conversationId: string }> | null>(null);
 
@@ -275,7 +275,7 @@ function Channels({ workspaceId }: { workspaceId: string }) {
 
   useEffect(load, [load]);
 
-  if (!channels) return <Spinner label="Loading channels" />;
+  if (!channels) return <Spinner label="Загрузка… channels" />;
 
   return (
     <div className="admin-list">
@@ -350,7 +350,7 @@ function Emoji({ workspaceId }: { workspaceId: string }) {
             onChange={async (event) => {
               const file = event.target.files?.[0];
               if (!file || !name.trim()) {
-                actions.toast("Name the emoji first", "error");
+                actions.toast("Имя the emoji first", "error");
                 return;
               }
               try {
@@ -375,7 +375,7 @@ function Emoji({ workspaceId }: { workspaceId: string }) {
             <button
               type="button"
               className="icon-button"
-              aria-label={`Delete :${entry.name}:`}
+              aria-label={`Удалить :${entry.name}:`}
               onClick={async () => {
                 await api.workspaces.deleteEmoji(entry.id);
                 load();
@@ -442,7 +442,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
 
       {secret ? (
         <div className="api-key-reveal">
-          <strong>Copy “{secret.name}” now — this is the only time it is shown.</strong>
+          <strong>Копировать “{secret.name}” now — this is the only time it is shown.</strong>
           <code>{secret.token}</code>
           <div className="admin-row-actions">
             <button
@@ -453,10 +453,10 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
                 actions.toast("API key copied to clipboard", "success");
               }}
             >
-              Copy key
+              Копировать key
             </button>
             <button type="button" className="button ghost" onClick={() => setSecret(null)}>
-              Done
+              Готово
             </button>
           </div>
           <small>
@@ -496,7 +496,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
           <input
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
-            placeholder="Release bot"
+            placeholder="Бот релизов"
             required
           />
         </label>
@@ -535,7 +535,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
             />
           </label>
           <label className="field">
-            Messages / minute
+            Сообщений в минуту
             <input
               type="number"
               min={1}
@@ -574,12 +574,12 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
         </fieldset>
 
         <button type="submit" className="button primary">
-          Create API key
+          Создать API key
         </button>
       </form>
 
       {!keys ? (
-        <Spinner label="Loading API keys" />
+        <Spinner label="Загрузка API-ключей" />
       ) : (
         <div className="admin-list">
           {keys.length === 0 ? <p className="muted">No API keys yet.</p> : null}
@@ -640,7 +640,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
+function Настройки({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
   const { state, actions } = useApp();
   const workspace = state.bootstrap?.workspace;
   const [form, setForm] = useState({
@@ -674,11 +674,11 @@ function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: bool
       }}
     >
       <label className="field">
-        Workspace name
+        Название рабочего пространства
         <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required />
       </label>
       <label className="field">
-        Description
+        Описание
         <textarea value={form.description ?? ""} onChange={(event) => setForm({ ...form, description: event.target.value })} rows={3} />
       </label>
       <label className="field">
@@ -688,7 +688,7 @@ function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: bool
       <label className="checkbox-field">
         <input type="checkbox" checked={form.membersCanInvite} onChange={(event) => setForm({ ...form, membersCanInvite: event.target.checked })} />
         <span>
-          <strong>Members can invite people</strong>
+          <strong>Участники can invite people</strong>
         </span>
       </label>
       <label className="checkbox-field">
@@ -698,12 +698,12 @@ function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: bool
           onChange={(event) => setForm({ ...form, membersCanCreateChannels: event.target.checked })}
         />
         <span>
-          <strong>Members can create channels</strong>
+          <strong>Участники can create channels</strong>
         </span>
       </label>
       {isOwner ? (
         <label className="field">
-          Message retention (days, blank keeps forever)
+          Сообщение retention (days, blank keeps forever)
           <input
             type="number"
             min={1}
@@ -713,7 +713,7 @@ function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: bool
         </label>
       ) : null}
       <button type="submit" className="button primary">
-        Save settings
+        Сохранить settings
       </button>
     </form>
   );
@@ -731,7 +731,7 @@ function AuditLog({ workspaceId }: { workspaceId: string }) {
       .catch(() => setEvents([]));
   }, [workspaceId]);
 
-  if (!events) return <Spinner label="Loading audit log" />;
+  if (!events) return <Spinner label="Загрузка журнала аудита" />;
 
   return (
     <div className="admin-list">
