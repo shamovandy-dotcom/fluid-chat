@@ -15,7 +15,7 @@ import {
   MoreHorizontal,
   PenSquare,
   Plus,
-  Отправить,
+  Send,
   Users
 } from "lucide-react";
 import type { ConversationSummary } from "@/shared/types";
@@ -247,7 +247,7 @@ export function Sidebar() {
           ))}
           {groups.dms.length === 0 ? (
             <button type="button" className="side-row is-muted" onClick={() => actions.setModal({ kind: "new-dm" })}>
-              <Отправить size={15} />
+              <Send size={15} />
               <span className="side-label">Начать переписку</span>
             </button>
           ) : null}
