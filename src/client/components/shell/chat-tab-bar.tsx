@@ -63,7 +63,7 @@ export function ChatTabBar() {
   }, [menu]);
 
   // Compute insertion points from the actual, possibly scrolled tab geometry.
-  // Pinned tabs stay in their own group, just as they do in a browser.
+  // Закреплено tabs stay in their own group, just as they do in a browser.
   useEffect(() => {
     if (!draggingId) return;
     let frame: number;
@@ -148,8 +148,8 @@ export function ChatTabBar() {
 
   const menuIndex = menu ? tabs.findIndex(tab => tab.conversationId === menu.id) : -1;
   return (
-    <div className="chat-tabs-bar" aria-label="Chat tabs">
-      <div className="chat-tabs-list" role="tablist" aria-label="Open conversations" ref={list}>
+    <div classИмя="chat-tabs-bar" aria-label="Вкладки чатов">
+      <div classИмя="chat-tabs-list" role="tablist" aria-label="Открытые переписки" ref={list}>
         {tabs.map((tab, index) => {
           const id = tab.conversationId;
           const label = title(id);
@@ -158,76 +158,76 @@ export function ChatTabBar() {
           const unread = conversation?.unreadCount ?? 0;
           const mentions = conversation?.mentionCount ?? 0;
           return (
-            <div key={id} data-chat-tab={id} className={`chat-tab ${activeId === id ? "is-active" : ""} ${tab.pinned ? "is-pinned" : ""} ${draggingId === id ? "is-dragging" : ""} ${drop?.id === id ? `drop-${drop.side}` : ""}`}
+            <div key={id} data-chat-tab={id} classИмя={`chat-tab ${activeId === id ? "is-active" : ""} ${tab.pinned ? "is-pinned" : ""} ${draggingId === id ? "is-dragging" : ""} ${drop?.id === id ? `drop-${drop.side}` : ""}`}
               onPointerDown={event => startDrag(event, id)} onPointerMove={moveDrag}
-              onPointerUp={() => endDrag()} onPointerCancel={() => endDrag(true)} onLostPointerCapture={() => { if (drag.current) endDrag(true); }}
+              onPointerUp={() => endDrag()} onPointerОтмена={() => endDrag(true)} onLostPointerCapture={() => { if (drag.current) endDrag(true); }}
               onContextMenu={event => { event.preventDefault(); openMenu(id, event.clientX, event.clientY); }}
               onAuxClick={event => { if (event.button === 1) { event.preventDefault(); closeTab(id); } }}>
-              <button type="button" className="chat-tab-select" role="tab" id={`chat-tab-${id}`} aria-controls="chat-tab-content" aria-selected={activeId === id}
+              <button type="button" classИмя="chat-tab-select" role="tab" id={`chat-tab-${id}`} aria-controls="chat-tab-content" aria-selected={activeId === id}
                 tabIndex={activeId === id || (!activeId && index === 0) ? 0 : -1}
                 aria-label={`${label}${tab.pinned ? ", pinned" : ""}${draft ? ", unsent draft" : ""}${unread ? `, ${unread} unread messages` : ""}`}
-                title={`${label}${draft ? " · Unsent draft" : ""}${tab.pinned ? " · Pinned" : ""}`}
+                title={`${label}${draft ? " · Черновик" : ""}${tab.pinned ? " · Закреплено" : ""}`}
                 onClick={() => { if (!suppressClick.current) void actions.openConversation(id); }}
                 onKeyDown={event => {
                   if (event.key === "Escape" && drag.current?.dragging) { event.preventDefault(); endDrag(true); return; }
                   if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
                     event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); openMenu(id, rect.left, rect.bottom); return;
                   }
-                  if (event.key === "Delete") { event.preventDefault(); closeTab(id); return; }
-                  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                  if (event.key === "Удалить") { event.preventDefault(); closeTab(id); return; }
+                  if (!["ArrowLeft", "ArrowRight", "Главная", "End"].includes(event.key)) return;
                   event.preventDefault();
-                  const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
+                  const nextIndex = event.key === "Главная" ? 0 : event.key === "End" ? tabs.length - 1 : (index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
                   if (event.altKey && event.shiftKey && event.key.startsWith("Arrow")) {
                     const target = Math.max(0, Math.min(tabs.length - 1, index + (event.key === "ArrowRight" ? 1 : -1)));
                     actions.changeChatTabs({ type: "move", conversationId: id, index: target });
                     setAnnouncement(`${label} tab reordered`); focusTab(id);
                   } else { void actions.openConversation(tabs[nextIndex].conversationId); focusTab(tabs[nextIndex].conversationId); }
                 }}>
-                {tabIcon(id)}<span className="chat-tab-label">{label}</span>
-                {tab.pinned ? <Pin className="chat-tab-pin" size={11} aria-hidden /> : null}
-                {draft ? <Pencil className="chat-tab-draft" size={12} aria-hidden /> : null}
-                {unread > 0 ? <span className={`chat-tab-unread ${mentions ? "has-mentions" : ""}`} aria-hidden>{Math.min(mentions || unread, 99)}{(mentions || unread) > 99 ? "+" : ""}</span> : null}
+                {tabIcon(id)}<span classИмя="chat-tab-label">{label}</span>
+                {tab.pinned ? <Pin classИмя="chat-tab-pin" size={11} aria-hidden /> : null}
+                {draft ? <Pencil classИмя="chat-tab-draft" size={12} aria-hidden /> : null}
+                {unread > 0 ? <span classИмя={`chat-tab-unread ${mentions ? "has-mentions" : ""}`} aria-hidden>{Math.min(mentions || unread, 99)}{(mentions || unread) > 99 ? "+" : ""}</span> : null}
               </button>
-              <button type="button" className="chat-tab-menu" aria-label={`Tab options for ${label}`} title="Tab options" onClick={event => { const rect = event.currentTarget.getBoundingClientRect(); openMenu(id, rect.left, rect.bottom); }}><MoreHorizontal size={13} /></button>
-              {!tab.pinned ? <button type="button" className="chat-tab-close" aria-label={`Close ${label} tab`} title="Close tab" onClick={() => closeTab(id)}><X size={14} /></button> : null}
+              <button type="button" classИмя="chat-tab-menu" aria-label={`Параметры вкладки for ${label}`} title="Параметры вкладки" onClick={event => { const rect = event.currentTarget.getBoundingClientRect(); openMenu(id, rect.left, rect.bottom); }}><MoreHorizontal size={13} /></button>
+              {!tab.pinned ? <button type="button" classИмя="chat-tab-close" aria-label={`Закрыть ${label} tab`} title="Закрыть вкладку" onClick={() => closeTab(id)}><X size={14} /></button> : null}
             </div>
           );
         })}
-        {tabs.length === 0 ? <span className="chat-tabs-empty">Open a conversation to get started</span> : null}
+        {tabs.length === 0 ? <span classИмя="chat-tabs-empty">Open a conversation to get started</span> : null}
       </div>
-      <button type="button" className="icon-button new-chat-tab" id="new-chat-tab" aria-label="Open chat in new tab" title="Open chat in new tab (Alt+Shift+N)" onClick={() => actions.setModal({ kind: "quick-switcher", newTab: true })}><Plus size={18} /></button>
-      <Popover width={300} align="end" trigger={({ toggle, ref }) => <button type="button" className="icon-button" ref={ref} onClick={toggle} aria-label="All open tabs" title="All open tabs"><ChevronDown size={17} /></button>}>
-        {close => <div className="menu"><div className="menu-heading"><strong>Open tabs</strong></div>
-          {tabs.map(tab => <MenuItem key={tab.conversationId} onClick={() => { close(); void actions.openConversation(tab.conversationId); }}>{tabIcon(tab.conversationId)}<span className="chat-tab-overflow-label">{title(tab.conversationId)}</span>{tab.pinned ? <Pin size={12} /> : null}</MenuItem>)}
+      <button type="button" classИмя="icon-button new-chat-tab" id="new-chat-tab" aria-label="Открыть чат в новой вкладке" title="Открыть чат в новой вкладке (Alt+Shift+N)" onClick={() => actions.setModal({ kind: "quick-switcher", newTab: true })}><Plus size={18} /></button>
+      <Popover width={300} align="end" trigger={({ toggle, ref }) => <button type="button" classИмя="icon-button" ref={ref} onClick={toggle} aria-label="Все открытые вкладки" title="Все открытые вкладки"><ChevronDown size={17} /></button>}>
+        {close => <div classИмя="menu"><div classИмя="menu-heading"><strong>Open tabs</strong></div>
+          {tabs.map(tab => <MenuItem key={tab.conversationId} onClick={() => { close(); void actions.openConversation(tab.conversationId); }}>{tabIcon(tab.conversationId)}<span classИмя="chat-tab-overflow-label">{title(tab.conversationId)}</span>{tab.pinned ? <Pin size={12} /> : null}</MenuItem>)}
           <MenuDivider /><MenuItem disabled={!state.chatTabs.closed.length} onClick={() => { close(); actions.changeChatTabs({ type: "reopen" }); }}>Reopen closed tab</MenuItem>
         </div>}
       </Popover>
-      <span className="sr-only" role="status" aria-live="polite">{announcement}</span>
+      <span classИмя="sr-only" role="status" aria-live="polite">{announcement}</span>
       {draggingId ? createPortal(
-        <div className="chat-tab-drag-preview" ref={dragPreview} aria-hidden="true"
+        <div classИмя="chat-tab-drag-preview" ref={dragPreview} aria-hidden="true"
           style={{ transform: `translate(${(drag.current?.x ?? 0) - 32}px, ${(drag.current?.y ?? 0) - 18}px)` }}>
-          {tabIcon(draggingId)}<span className="chat-tab-label">{title(draggingId)}</span>
+          {tabIcon(draggingId)}<span classИмя="chat-tab-label">{title(draggingId)}</span>
         </div>, document.body
       ) : null}
       {menu && menuIndex >= 0 ? createPortal(
-        <div className="chat-tab-context menu" role="menu" aria-label={`Options for ${title(menu.id)}`} ref={menuRef} style={{ left: menu.x, top: menu.y }}
+        <div classИмя="chat-tab-context menu" role="menu" aria-label={`Options for ${title(menu.id)}`} ref={menuRef} style={{ left: menu.x, top: menu.y }}
           onKeyDown={event => {
-            if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+            if (!["ArrowDown", "ArrowUp", "Главная", "End"].includes(event.key)) return;
             event.preventDefault();
             const buttons = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? []);
             const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
-            const index = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (current + (event.key === "ArrowDown" ? 1 : buttons.length - 1)) % buttons.length;
+            const index = event.key === "Главная" ? 0 : event.key === "End" ? buttons.length - 1 : (current + (event.key === "ArrowDown" ? 1 : buttons.length - 1)) % buttons.length;
             buttons[index]?.focus();
           }}>
-          <button type="button" role="menuitem" className="menu-item" onClick={() => { actions.changeChatTabs({ type: "pin", conversationId: menu.id }); focusTab(menu.id); setMenu(null); }}>{tabs[menuIndex].pinned ? "Unpin tab" : "Pin tab"}</button>
-          <button type="button" role="menuitem" className="menu-item" disabled={menuIndex === 0 || tabs[menuIndex - 1]?.pinned !== tabs[menuIndex].pinned} onClick={() => { actions.changeChatTabs({ type: "move", conversationId: menu.id, index: menuIndex - 1 }); focusTab(menu.id); setMenu(null); }}>Move tab left</button>
-          <button type="button" role="menuitem" className="menu-item" disabled={menuIndex === tabs.length - 1 || tabs[menuIndex + 1]?.pinned !== tabs[menuIndex].pinned} onClick={() => { actions.changeChatTabs({ type: "move", conversationId: menu.id, index: menuIndex + 1 }); focusTab(menu.id); setMenu(null); }}>Move tab right</button>
+          <button type="button" role="menuitem" classИмя="menu-item" onClick={() => { actions.changeChatTabs({ type: "pin", conversationId: menu.id }); focusTab(menu.id); setMenu(null); }}>{tabs[menuIndex].pinned ? "Unpin tab" : "Закрепить вкладку"}</button>
+          <button type="button" role="menuitem" classИмя="menu-item" disabled={menuIndex === 0 || tabs[menuIndex - 1]?.pinned !== tabs[menuIndex].pinned} onClick={() => { actions.changeChatTabs({ type: "move", conversationId: menu.id, index: menuIndex - 1 }); focusTab(menu.id); setMenu(null); }}>Move tab left</button>
+          <button type="button" role="menuitem" classИмя="menu-item" disabled={menuIndex === tabs.length - 1 || tabs[menuIndex + 1]?.pinned !== tabs[menuIndex].pinned} onClick={() => { actions.changeChatTabs({ type: "move", conversationId: menu.id, index: menuIndex + 1 }); focusTab(menu.id); setMenu(null); }}>Move tab right</button>
           <MenuDivider />
-          <button type="button" role="menuitem" className="menu-item" onClick={() => { closeTab(menu.id); setMenu(null); }}>Close tab</button>
-          <button type="button" role="menuitem" className="menu-item" disabled={!tabs.some(tab => tab.conversationId !== menu.id && !tab.pinned)} onClick={() => { actions.changeChatTabs({ type: "close", conversationId: menu.id, scope: "others" }); focusTab(menu.id); setMenu(null); }}>Close other tabs</button>
-          <button type="button" role="menuitem" className="menu-item" disabled={!tabs.slice(menuIndex + 1).some(tab => !tab.pinned)} onClick={() => { actions.changeChatTabs({ type: "close", conversationId: menu.id, scope: "right" }); focusTab(menu.id); setMenu(null); }}>Close tabs to the right</button>
+          <button type="button" role="menuitem" classИмя="menu-item" onClick={() => { closeTab(menu.id); setMenu(null); }}>Закрыть вкладку</button>
+          <button type="button" role="menuitem" classИмя="menu-item" disabled={!tabs.some(tab => tab.conversationId !== menu.id && !tab.pinned)} onClick={() => { actions.changeChatTabs({ type: "close", conversationId: menu.id, scope: "others" }); focusTab(menu.id); setMenu(null); }}>Закрыть other tabs</button>
+          <button type="button" role="menuitem" classИмя="menu-item" disabled={!tabs.slice(menuIndex + 1).some(tab => !tab.pinned)} onClick={() => { actions.changeChatTabs({ type: "close", conversationId: menu.id, scope: "right" }); focusTab(menu.id); setMenu(null); }}>Закрыть вкладкуs to the right</button>
           <MenuDivider />
-          <button type="button" role="menuitem" className="menu-item" disabled={!state.chatTabs.closed.length} onClick={() => { actions.changeChatTabs({ type: "reopen" }); setMenu(null); }}>Reopen closed tab</button>
+          <button type="button" role="menuitem" classИмя="menu-item" disabled={!state.chatTabs.closed.length} onClick={() => { actions.changeChatTabs({ type: "reopen" }); setMenu(null); }}>Reopen closed tab</button>
         </div>, document.body
       ) : null}
     </div>
