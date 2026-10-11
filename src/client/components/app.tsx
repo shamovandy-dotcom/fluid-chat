@@ -171,7 +171,7 @@ function useTheme() {
     const root = document.documentElement;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
-      const resolved = theme === "system" ? (media.matches ? "dark" : "light") : theme;
+      const resolved = theme === "system" ? "dark" : theme;
       root.dataset.theme = resolved;
       root.dataset.density = density;
     };
