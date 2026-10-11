@@ -217,7 +217,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
                 await actions.refreshBootstrap();
               }}
             >
-              Unarchive
+              Восстановить из архива
             </button>
           ) : null}
         </div>
