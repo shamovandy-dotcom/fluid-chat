@@ -12,7 +12,7 @@ import { Avatar, Modal, Spinner } from "../ui/primitives";
 type Tab = "overview" | "members" | "invitations" | "channels" | "emoji" | "api" | "settings" | "audit" | "export";
 
 type MemberRow = { memberId: string; role: string; status: string; user: PublicUser };
-type ПригласитьRow = {
+type InviteRow = {
   id: string;
   email: string | null;
   role: string;
@@ -24,46 +24,46 @@ type ПригласитьRow = {
   maxUses: number | null;
 };
 
-export function AdminConsole({ onЗакрыть }: { onЗакрыть: () => void }) {
+export function AdminConsole({ onClose }: { onClose: () => void }) {
   const { state } = useApp();
   const [tab, setTab] = useState<Tab>("overview");
   const workspaceId = state.workspaceId;
   const isOwner = state.bootstrap?.role === "owner";
 
   return (
-    <Modal title={`${state.bootstrap?.workspace.name ?? "Workspace"} settings`} onЗакрыть={onЗакрыть} width={860}>
-      <div classИмя="panel-tabs wrap" role="tablist">
+    <Modal title={`${state.bootstrap?.workspace.name ?? "Workspace"} settings`} onClose={onClose} width={860}>
+      <div className="panel-tabs wrap" role="tablist">
         {(
           [
             ["overview", "Overview"],
-            ["members", "Участники"],
+            ["members", "Members"],
             ["invitations", "Invitations"],
-            ["channels", "Каналы"],
+            ["channels", "Channels"],
             ["emoji", "Emoji"],
             ["api", "API keys"],
-            ["settings", "Настройки"],
+            ["settings", "Settings"],
             ["audit", "Audit log"],
             ["export", "Export"]
           ] as Array<[Tab, string]>
         ).map(([value, label]) => (
-          <button key={value} type="button" role="tab" aria-selected={tab === value} classИмя={tab === value ? "is-active" : ""} onClick={() => setTab(value)}>
+          <button key={value} type="button" role="tab" aria-selected={tab === value} className={tab === value ? "is-active" : ""} onClick={() => setTab(value)}>
             {label}
           </button>
         ))}
       </div>
 
       {!workspaceId ? null : (
-        <div classИмя="admin-body">
+        <div className="admin-body">
           {tab === "overview" ? <Overview workspaceId={workspaceId} /> : null}
-          {tab === "members" ? <Участники workspaceId={workspaceId} isOwner={isOwner} /> : null}
+          {tab === "members" ? <Members workspaceId={workspaceId} isOwner={isOwner} /> : null}
           {tab === "invitations" ? <Invitations workspaceId={workspaceId} /> : null}
-          {tab === "channels" ? <Каналы workspaceId={workspaceId} /> : null}
+          {tab === "channels" ? <Channels workspaceId={workspaceId} /> : null}
           {tab === "emoji" ? <Emoji workspaceId={workspaceId} /> : null}
           {tab === "api" ? <ApiKeys workspaceId={workspaceId} /> : null}
-          {tab === "settings" ? <Настройки workspaceId={workspaceId} isOwner={isOwner} /> : null}
+          {tab === "settings" ? <Settings workspaceId={workspaceId} isOwner={isOwner} /> : null}
           {tab === "audit" ? <AuditLog workspaceId={workspaceId} /> : null}
           {tab === "export" ? <Exports workspaceId={workspaceId} isOwner={isOwner} /> : null}
-          <p classИмя="admin-note">
+          <p className="admin-note">
             Signed in as {state.session?.email} · role: {state.bootstrap?.role}
           </p>
         </div>
@@ -73,7 +73,7 @@ export function AdminConsole({ onЗакрыть }: { onЗакрыть: () => voi
 }
 
 function Overview({ workspaceId }: { workspaceId: string }) {
-  const [usage, setUsage] = useState<{ activeУчастники: number; pendingПригласитьs: number; fileCount: number } | null>(null);
+  const [usage, setUsage] = useState<{ activeMembers: number; pendingInvites: number; fileCount: number } | null>(null);
   const { state } = useApp();
 
   useEffect(() => {
@@ -86,58 +86,58 @@ function Overview({ workspaceId }: { workspaceId: string }) {
   const workspace = state.bootstrap?.workspace;
 
   return (
-    <div classИмя="admin-grid">
-      <div classИмя="stat-card">
-        <span>Участники</span>
-        <strong>{usage?.activeУчастники ?? "—"}</strong>
+    <div className="admin-grid">
+      <div className="stat-card">
+        <span>Members</span>
+        <strong>{usage?.activeMembers ?? "—"}</strong>
         <small>of {workspace?.seatLimit ?? 0} seats</small>
       </div>
-      <div classИмя="stat-card">
+      <div className="stat-card">
         <span>Pending invites</span>
-        <strong>{usage?.pendingПригласитьs ?? "—"}</strong>
+        <strong>{usage?.pendingInvites ?? "—"}</strong>
       </div>
-      <div classИмя="stat-card">
-        <span>Файлы</span>
+      <div className="stat-card">
+        <span>Files</span>
         <strong>{usage?.fileCount ?? "—"}</strong>
       </div>
-      <div classИмя="stat-card">
+      <div className="stat-card">
         <span>Plan</span>
-        <strong classИмя="capitalize">{workspace?.plan ?? "free"}</strong>
-        <small classИмя="capitalize">{workspace?.subscriptionСтатус}</small>
+        <strong className="capitalize">{workspace?.plan ?? "free"}</strong>
+        <small className="capitalize">{workspace?.subscriptionStatus}</small>
       </div>
     </div>
   );
 }
 
-function Участники({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
+function Members({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
   const { actions } = useApp();
-  const [members, setУчастники] = useState<MemberRow[] | null>(null);
+  const [members, setMembers] = useState<MemberRow[] | null>(null);
 
   const load = useCallback(() => {
     api.workspaces
       .members(workspaceId, true)
-      .then(({ members: list }) => setУчастники(list as MemberRow[]))
-      .catch(() => setУчастники([]));
+      .then(({ members: list }) => setMembers(list as MemberRow[]))
+      .catch(() => setMembers([]));
   }, [workspaceId]);
 
   useEffect(load, [load]);
 
-  if (!members) return <Spinner label="Загрузка участников" />;
+  if (!members) return <Spinner label="Loading members" />;
 
   return (
-    <div classИмя="admin-list">
+    <div className="admin-list">
       {members.map((member) => (
-        <div key={member.memberId} classИмя="admin-row">
-          <div classИмя="admin-row-main">
+        <div key={member.memberId} className="admin-row">
+          <div className="admin-row-main">
             <Avatar user={member.user} size={32} />
             <span>
-              <strong>{member.user.displayИмя}</strong>
+              <strong>{member.user.displayName}</strong>
               <small>
                 {member.user.email} · {member.status}
               </small>
             </span>
           </div>
-          <div classИмя="admin-row-actions">
+          <div className="admin-row-actions">
             {isOwner ? (
               <select
                 value={member.role}
@@ -157,14 +157,14 @@ function Участники({ workspaceId, isOwner }: { workspaceId: string; isO
                 <option value="guest">Guest</option>
               </select>
             ) : (
-              <span classИмя="pill capitalize">{member.role}</span>
+              <span className="pill capitalize">{member.role}</span>
             )}
             {member.status === "active" ? (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
-                  if (!window.confirm(`Удалить ${member.user.displayИмя} from the workspace?`)) return;
+                  if (!window.confirm(`Remove ${member.user.displayName} from the workspace?`)) return;
                   try {
                     await api.workspaces.removeMember(workspaceId, member.memberId);
                     load();
@@ -173,12 +173,12 @@ function Участники({ workspaceId, isOwner }: { workspaceId: string; isO
                   }
                 }}
               >
-                Удалить
+                Remove
               </button>
             ) : (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
                   try {
                     await api.workspaces.updateMember(workspaceId, member.memberId, { status: "active" });
@@ -200,26 +200,26 @@ function Участники({ workspaceId, isOwner }: { workspaceId: string; isO
 
 function Invitations({ workspaceId }: { workspaceId: string }) {
   const { actions } = useApp();
-  const [invites, setПригласитьs] = useState<ПригласитьRow[] | null>(null);
+  const [invites, setInvites] = useState<InviteRow[] | null>(null);
 
   const load = useCallback(() => {
     api.invites
       .list(workspaceId)
-      .then(({ invites: list }) => setПригласитьs(list as ПригласитьRow[]))
-      .catch(() => setПригласитьs([]));
+      .then(({ invites: list }) => setInvites(list as InviteRow[]))
+      .catch(() => setInvites([]));
   }, [workspaceId]);
 
   useEffect(load, [load]);
 
-  if (!invites) return <Spinner label="Загрузка приглашений" />;
+  if (!invites) return <Spinner label="Loading invitations" />;
   const pending = invites.filter((invite) => !invite.acceptedAt && !invite.revokedAt && new Date(invite.expiresAt) > new Date());
 
   return (
-    <div classИмя="admin-list">
-      {pending.length === 0 ? <p classИмя="muted">No pending invitations.</p> : null}
+    <div className="admin-list">
+      {pending.length === 0 ? <p className="muted">No pending invitations.</p> : null}
       {pending.map((invite) => (
-        <div key={invite.id} classИмя="admin-row">
-          <div classИмя="admin-row-main">
+        <div key={invite.id} className="admin-row">
+          <div className="admin-row-main">
             <span>
               <strong>{invite.email ?? "Shareable invite link"}</strong>
               <small>
@@ -228,10 +228,10 @@ function Invitations({ workspaceId }: { workspaceId: string }) {
               </small>
             </span>
           </div>
-          <div classИмя="admin-row-actions">
+          <div className="admin-row-actions">
             <button
               type="button"
-              classИмя="button ghost"
+              className="button ghost"
               onClick={async () => {
                 try {
                   const { inviteUrl } = await api.invites.resend(invite.id);
@@ -247,7 +247,7 @@ function Invitations({ workspaceId }: { workspaceId: string }) {
             </button>
             <button
               type="button"
-              classИмя="button ghost"
+              className="button ghost"
               onClick={async () => {
                 await api.invites.revoke(invite.id);
                 load();
@@ -262,26 +262,26 @@ function Invitations({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function Каналы({ workspaceId }: { workspaceId: string }) {
+function Channels({ workspaceId }: { workspaceId: string }) {
   const { actions } = useApp();
-  const [channels, setКаналы] = useState<Array<ChannelSummary & { conversationId: string }> | null>(null);
+  const [channels, setChannels] = useState<Array<ChannelSummary & { conversationId: string }> | null>(null);
 
   const load = useCallback(() => {
     api.channels
-      .list(workspaceId, { includeВ архиве: true })
-      .then(({ channels: list }) => setКаналы(list))
-      .catch(() => setКаналы([]));
+      .list(workspaceId, { includeArchived: true })
+      .then(({ channels: list }) => setChannels(list))
+      .catch(() => setChannels([]));
   }, [workspaceId]);
 
   useEffect(load, [load]);
 
-  if (!channels) return <Spinner label="Загрузка… channels" />;
+  if (!channels) return <Spinner label="Loading channels" />;
 
   return (
-    <div classИмя="admin-list">
+    <div className="admin-list">
       {channels.map((channel) => (
-        <div key={channel.id} classИмя="admin-row">
-          <div classИмя="admin-row-main">
+        <div key={channel.id} className="admin-row">
+          <div className="admin-row-main">
             {channel.visibility === "private" ? <Lock size={14} /> : <Hash size={15} />}
             <span>
               <strong>{channel.name}</strong>
@@ -290,11 +290,11 @@ function Каналы({ workspaceId }: { workspaceId: string }) {
               </small>
             </span>
           </div>
-          <div classИмя="admin-row-actions">
+          <div className="admin-row-actions">
             {channel.archivedAt ? (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
                   await api.channels.unarchive(channel.id);
                   load();
@@ -306,7 +306,7 @@ function Каналы({ workspaceId }: { workspaceId: string }) {
             ) : channel.name !== "general" ? (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
                   if (!window.confirm(`Archive #${channel.name}?`)) return;
                   await api.channels.archive(channel.id);
@@ -327,7 +327,7 @@ function Каналы({ workspaceId }: { workspaceId: string }) {
 function Emoji({ workspaceId }: { workspaceId: string }) {
   const { actions } = useApp();
   const [emoji, setEmoji] = useState<CustomEmojiDto[] | null>(null);
-  const [name, setИмя] = useState("");
+  const [name, setName] = useState("");
 
   const load = useCallback(() => {
     api.workspaces
@@ -339,24 +339,24 @@ function Emoji({ workspaceId }: { workspaceId: string }) {
   useEffect(load, [load]);
 
   return (
-    <div classИмя="stack-form">
-      <label classИмя="field">
+    <div className="stack-form">
+      <label className="field">
         Add custom emoji
-        <div classИмя="emoji-upload">
-          <input value={name} onChange={(event) => setИмя(event.target.value)} placeholder="party-parrot" />
+        <div className="emoji-upload">
+          <input value={name} onChange={(event) => setName(event.target.value)} placeholder="party-parrot" />
           <input
             type="file"
             accept="image/*"
             onChange={async (event) => {
               const file = event.target.files?.[0];
               if (!file || !name.trim()) {
-                actions.toast("Имя the emoji first", "error");
+                actions.toast("Name the emoji first", "error");
                 return;
               }
               try {
                 const { file: uploaded } = await api.files.upload(workspaceId, file);
                 await api.workspaces.createEmoji(workspaceId, name.trim().toLowerCase(), uploaded.id);
-                setИмя("");
+                setName("");
                 load();
                 await actions.refreshBootstrap();
               } catch (error) {
@@ -366,16 +366,16 @@ function Emoji({ workspaceId }: { workspaceId: string }) {
           />
         </div>
       </label>
-      <div classИмя="emoji-admin-grid">
+      <div className="emoji-admin-grid">
         {(emoji ?? []).map((entry) => (
-          <div key={entry.id} classИмя="emoji-admin-card">
+          <div key={entry.id} className="emoji-admin-card">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={entry.imageUrl} alt={`:${entry.name}:`} width={28} height={28} />
             <code>:{entry.name}:</code>
             <button
               type="button"
-              classИмя="icon-button"
-              aria-label={`Удалить :${entry.name}:`}
+              className="icon-button"
+              aria-label={`Delete :${entry.name}:`}
               onClick={async () => {
                 await api.workspaces.deleteEmoji(entry.id);
                 load();
@@ -386,7 +386,7 @@ function Emoji({ workspaceId }: { workspaceId: string }) {
             </button>
           </div>
         ))}
-        {emoji?.length === 0 ? <p classИмя="muted">No custom emoji yet.</p> : null}
+        {emoji?.length === 0 ? <p className="muted">No custom emoji yet.</p> : null}
       </div>
     </div>
   );
@@ -433,30 +433,30 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
     }));
 
   return (
-    <div classИмя="stack-form">
-      <p classИмя="muted">
+    <div className="stack-form">
+      <p className="muted">
         An API key calls the same endpoints this app does, so anything a person can do here, a script or an agent can
         automate. Keys are pinned to this workspace, limited to the scopes you grant and rate limited per key. The full
         route list lives at <code>/api/meta/routes</code>.
       </p>
 
       {secret ? (
-        <div classИмя="api-key-reveal">
-          <strong>Копировать “{secret.name}” now — this is the only time it is shown.</strong>
+        <div className="api-key-reveal">
+          <strong>Copy “{secret.name}” now — this is the only time it is shown.</strong>
           <code>{secret.token}</code>
-          <div classИмя="admin-row-actions">
+          <div className="admin-row-actions">
             <button
               type="button"
-              classИмя="button primary"
+              className="button primary"
               onClick={() => {
                 void navigator.clipboard.writeText(secret.token);
                 actions.toast("API key copied to clipboard", "success");
               }}
             >
-              Копировать key
+              Copy key
             </button>
-            <button type="button" classИмя="button ghost" onClick={() => setSecret(null)}>
-              Готово
+            <button type="button" className="button ghost" onClick={() => setSecret(null)}>
+              Done
             </button>
           </div>
           <small>
@@ -466,7 +466,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
       ) : null}
 
       <form
-        classИмя="stack-form"
+        className="stack-form"
         onSubmit={async (event) => {
           event.preventDefault();
           if (form.scopes.length === 0) {
@@ -491,18 +491,18 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
           }
         }}
       >
-        <label classИмя="field">
+        <label className="field">
           Key name
           <input
             value={form.name}
             onChange={(event) => setForm({ ...form, name: event.target.value })}
-            placeholder="Бот релизов"
+            placeholder="Release bot"
             required
           />
         </label>
 
-        <div classИмя="api-key-row">
-          <label classИмя="field">
+        <div className="api-key-row">
+          <label className="field">
             Acts as
             <select
               value={form.identity}
@@ -513,7 +513,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
             </select>
           </label>
           {form.identity === "bot" ? (
-            <label classИмя="field">
+            <label className="field">
               Bot role
               <select
                 value={form.botRole}
@@ -524,7 +524,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
               </select>
             </label>
           ) : null}
-          <label classИмя="field">
+          <label className="field">
             Requests / minute
             <input
               type="number"
@@ -534,8 +534,8 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
               onChange={(event) => setForm({ ...form, rateLimitPerMinute: Number(event.target.value) })}
             />
           </label>
-          <label classИмя="field">
-            Сообщениеs / minute
+          <label className="field">
+            Messages / minute
             <input
               type="number"
               min={1}
@@ -544,7 +544,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
               onChange={(event) => setForm({ ...form, messageLimitPerMinute: Number(event.target.value) })}
             />
           </label>
-          <label classИмя="field">
+          <label className="field">
             Expires in days
             <input
               type="number"
@@ -556,10 +556,10 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
           </label>
         </div>
 
-        <fieldset classИмя="scope-grid">
+        <fieldset className="scope-grid">
           <legend>Scopes</legend>
           {catalogue.map((entry) => (
-            <label key={entry.scope} classИмя="checkbox-field">
+            <label key={entry.scope} className="checkbox-field">
               <input
                 type="checkbox"
                 checked={form.scopes.includes(entry.scope)}
@@ -573,25 +573,25 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
           ))}
         </fieldset>
 
-        <button type="submit" classИмя="button primary">
-          Создать API key
+        <button type="submit" className="button primary">
+          Create API key
         </button>
       </form>
 
       {!keys ? (
-        <Spinner label="Загрузка API-ключей" />
+        <Spinner label="Loading API keys" />
       ) : (
-        <div classИмя="admin-list">
-          {keys.length === 0 ? <p classИмя="muted">No API keys yet.</p> : null}
+        <div className="admin-list">
+          {keys.length === 0 ? <p className="muted">No API keys yet.</p> : null}
           {keys.map((key) => (
-            <div key={key.id} classИмя="admin-row">
-              <div classИмя="admin-row-main">
+            <div key={key.id} className="admin-row">
+              <div className="admin-row-main">
                 <span>
                   <strong>
                     {key.name} <code>{key.prefix}…</code>
                   </strong>
                   <small>
-                    as {key.actor.displayИмя}
+                    as {key.actor.displayName}
                     {key.actor.isBot ? " (bot)" : ""} · {key.scopes.length} scopes · {key.rateLimitPerMinute}/min ·{" "}
                     {key.requestCount} calls ·{" "}
                     {key.lastUsedAt ? `last used ${formatRelative(key.lastUsedAt)}` : "never used"}
@@ -599,10 +599,10 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
                   </small>
                 </span>
               </div>
-              <div classИмя="admin-row-actions">
+              <div className="admin-row-actions">
                 <button
                   type="button"
-                  classИмя="button ghost"
+                  className="button ghost"
                   onClick={async () => {
                     if (!window.confirm(`Rotate “${key.name}”? The current secret stops working immediately.`)) return;
                     try {
@@ -618,7 +618,7 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
                 </button>
                 <button
                   type="button"
-                  classИмя="button ghost"
+                  className="button ghost"
                   onClick={async () => {
                     if (!window.confirm(`Revoke “${key.name}”? Anything using it stops working.`)) return;
                     try {
@@ -640,21 +640,21 @@ function ApiKeys({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function Настройки({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
+function Settings({ workspaceId, isOwner }: { workspaceId: string; isOwner: boolean }) {
   const { state, actions } = useApp();
   const workspace = state.bootstrap?.workspace;
   const [form, setForm] = useState({
     name: workspace?.name ?? "",
     description: workspace?.description ?? "",
     iconEmoji: workspace?.iconEmoji ?? "",
-    membersCanПригласить: workspace?.membersCanПригласить ?? true,
-    membersCanСоздатьКаналы: workspace?.membersCanСоздатьКаналы ?? true,
+    membersCanInvite: workspace?.membersCanInvite ?? true,
+    membersCanCreateChannels: workspace?.membersCanCreateChannels ?? true,
     retentionDays: workspace?.retentionDays ?? ""
   });
 
   return (
     <form
-      classИмя="stack-form"
+      className="stack-form"
       onSubmit={async (event) => {
         event.preventDefault();
         try {
@@ -662,8 +662,8 @@ function Настройки({ workspaceId, isOwner }: { workspaceId: string; isO
             name: form.name,
             description: form.description || null,
             iconEmoji: form.iconEmoji || null,
-            membersCanПригласить: form.membersCanПригласить,
-            membersCanСоздатьКаналы: form.membersCanСоздатьКаналы,
+            membersCanInvite: form.membersCanInvite,
+            membersCanCreateChannels: form.membersCanCreateChannels,
             retentionDays: form.retentionDays === "" ? null : Number(form.retentionDays)
           });
           await actions.refreshBootstrap();
@@ -673,37 +673,37 @@ function Настройки({ workspaceId, isOwner }: { workspaceId: string; isO
         }
       }}
     >
-      <label classИмя="field">
-        Название рабочего пространства
+      <label className="field">
+        Workspace name
         <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required />
       </label>
-      <label classИмя="field">
-        Описание
+      <label className="field">
+        Description
         <textarea value={form.description ?? ""} onChange={(event) => setForm({ ...form, description: event.target.value })} rows={3} />
       </label>
-      <label classИмя="field">
+      <label className="field">
         Icon emoji
         <input value={form.iconEmoji ?? ""} onChange={(event) => setForm({ ...form, iconEmoji: event.target.value })} placeholder="🚀" />
       </label>
-      <label classИмя="checkbox-field">
-        <input type="checkbox" checked={form.membersCanПригласить} onChange={(event) => setForm({ ...form, membersCanПригласить: event.target.checked })} />
+      <label className="checkbox-field">
+        <input type="checkbox" checked={form.membersCanInvite} onChange={(event) => setForm({ ...form, membersCanInvite: event.target.checked })} />
         <span>
-          <strong>Участники can invite people</strong>
+          <strong>Members can invite people</strong>
         </span>
       </label>
-      <label classИмя="checkbox-field">
+      <label className="checkbox-field">
         <input
           type="checkbox"
-          checked={form.membersCanСоздатьКаналы}
-          onChange={(event) => setForm({ ...form, membersCanСоздатьКаналы: event.target.checked })}
+          checked={form.membersCanCreateChannels}
+          onChange={(event) => setForm({ ...form, membersCanCreateChannels: event.target.checked })}
         />
         <span>
-          <strong>Участники can create channels</strong>
+          <strong>Members can create channels</strong>
         </span>
       </label>
       {isOwner ? (
-        <label classИмя="field">
-          Сообщение retention (days, blank keeps forever)
+        <label className="field">
+          Message retention (days, blank keeps forever)
           <input
             type="number"
             min={1}
@@ -712,15 +712,15 @@ function Настройки({ workspaceId, isOwner }: { workspaceId: string; isO
           />
         </label>
       ) : null}
-      <button type="submit" classИмя="button primary">
-        Сохранить settings
+      <button type="submit" className="button primary">
+        Save settings
       </button>
     </form>
   );
 }
 
 function AuditLog({ workspaceId }: { workspaceId: string }) {
-  const [events, setEvents] = useState<Array<{ id: string; type: string; createdAt: string; actor: { displayИмя: string } | null }> | null>(
+  const [events, setEvents] = useState<Array<{ id: string; type: string; createdAt: string; actor: { displayName: string } | null }> | null>(
     null
   );
 
@@ -731,15 +731,15 @@ function AuditLog({ workspaceId }: { workspaceId: string }) {
       .catch(() => setEvents([]));
   }, [workspaceId]);
 
-  if (!events) return <Spinner label="Загрузка журнала аудита" />;
+  if (!events) return <Spinner label="Loading audit log" />;
 
   return (
-    <div classИмя="admin-list">
+    <div className="admin-list">
       {events.map((event) => (
-        <div key={event.id} classИмя="admin-row compact">
+        <div key={event.id} className="admin-row compact">
           <span>
             <strong>{event.type}</strong>
-            <small>{event.actor?.displayИмя ?? "system"}</small>
+            <small>{event.actor?.displayName ?? "system"}</small>
           </span>
           <time>{formatRelative(event.createdAt)}</time>
         </div>
@@ -761,17 +761,17 @@ function Exports({ workspaceId, isOwner }: { workspaceId: string; isOwner: boole
 
   useEffect(load, [load]);
 
-  if (!isOwner) return <p classИмя="muted">Вкл.ly workspace owners can export data.</p>;
+  if (!isOwner) return <p className="muted">Only workspace owners can export data.</p>;
 
   return (
-    <div classИмя="stack-form">
-      <p classИмя="muted">
+    <div className="stack-form">
+      <p className="muted">
         Exports include every message, channel, member and active file manifest as JSONL and CSV, stored in object storage
         for 7 days.
       </p>
       <button
         type="button"
-        classИмя="button primary"
+        className="button primary"
         onClick={async () => {
           try {
             await api.workspaces.requestExport(workspaceId);
@@ -784,11 +784,11 @@ function Exports({ workspaceId, isOwner }: { workspaceId: string; isOwner: boole
       >
         Start a new export
       </button>
-      <div classИмя="admin-list">
+      <div className="admin-list">
         {(jobs ?? []).map((job) => (
-          <div key={job.id} classИмя="admin-row compact">
+          <div key={job.id} className="admin-row compact">
             <span>
-              <strong classИмя="capitalize">{job.status}</strong>
+              <strong className="capitalize">{job.status}</strong>
               <small>{job.fileUrl ?? "Preparing…"}</small>
             </span>
             <time>{formatRelative(job.createdAt)}</time>
