@@ -28,7 +28,7 @@ export function useConversationLabel() {
   return (conversationId: string | null) => {
     if (!conversationId) return "";
     const conversation = state.bootstrap?.conversations.find((entry) => entry.id === conversationId);
-    if (!conversation) return "a conversation";
+    if (!conversation) return "переписка";
     return conversation.channel
       ? `#${conversation.channel.name}`
       : conversationTitle(conversation, directory, state.session?.id);
