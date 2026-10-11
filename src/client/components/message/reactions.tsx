@@ -47,7 +47,7 @@ export function MessageReactions({ message }: { message: MessageDto }) {
       <Popover
         width={340}
         trigger={({ toggle, ref }) => (
-          <button type="button" className="reaction add-reaction" onClick={toggle} ref={ref} aria-label="Add reaction">
+          <button type="button" className="reaction add-reaction" onClick={toggle} ref={ref} aria-label="Добавить реакцию">
             <Smile size={14} />
           </button>
         )}
@@ -117,7 +117,7 @@ function ReactionTooltip({
   names,
   label
 }: {
-  anchor: React.RefObject<HTMLButtonElement | null>;
+  anchor: Добавить реакцию.RefObject<HTMLButtonElement | null>;
   emoji: string;
   names: string;
   label: string;
@@ -171,7 +171,7 @@ export function QuickReactions({ message }: { message: MessageDto }) {
         <button
           key={value}
           type="button"
-          title={`React with ${emojiLabel(value)}`}
+          title={`Добавить реакцию with ${emojiLabel(value)}`}
           onClick={() => {
             rememberEmoji(value);
             void actions.toggleReaction(message, value);
