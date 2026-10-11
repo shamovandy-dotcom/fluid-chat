@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Поиск } from "lucide-react";
 import { EMOJI_CATEGORIES, applySkinTone, emojiChar, frequentEmoji, rememberEmoji, searchEmoji } from "../../emoji";
 import { useApp, useCustomEmoji } from "../../store";
 
@@ -35,13 +35,13 @@ export function EmojiPicker({ onPick, onClose }: { onPick: (value: string) => vo
   return (
     <div className="emoji-picker">
       <div className="emoji-search">
-        <Search size={14} />
+        <Поиск size={14} />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search emoji"
+          placeholder="Поиск эмодзи"
           autoFocus
-          aria-label="Search emoji"
+          aria-label="Поиск эмодзи"
         />
       </div>
 
