@@ -49,7 +49,7 @@ export function AuthScreen() {
   return (
     <main className="auth-page">
       <section className="auth-hero">
-        <p className="eyebrow">Fluid Chat</p>
+        <p className="eyebrow">Androlit Chat</p>
         <h1>Where work happens, on your own terms.</h1>
         <p className="lede">
           Channels, direct messages, threads, search, files and reactions — self-hosted, exportable and yours.
