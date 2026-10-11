@@ -29,7 +29,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const workspace = state.bootstrap?.workspace;
   const conversations = state.bootstrap?.conversations ?? [];
-  const isAdmin = state.bootstrap?.role === "owner" || state.bootstrap?.role === "admin";
+  const isАдминистрирование = state.bootstrap?.role === "owner" || state.bootstrap?.role === "admin";
 
   const groups = useMemo(() => {
     const visible = conversations.filter(
@@ -104,7 +104,7 @@ export function Sidebar() {
             >
               <Hash size={14} /> Создать канал
             </MenuItem>
-            {isAdmin ? (
+            {isАдминистрирование ? (
               <MenuItem
                 onClick={() => {
                   actions.setModal({ kind: "admin" });
@@ -203,7 +203,7 @@ export function Sidebar() {
                       close();
                     }}
                   >
-                    <Compass size={14} /> Browse channels
+                    <Compass size={14} /> Обзор каналов
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
