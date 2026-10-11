@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, HelpCircle, LogOut, Menu, Moon, Search, Settings, Smile, UserCircle } from "lucide-react";
+import { Clock, HelpCircle, LogOut, Menu, Moon, Поиск, Настройки, Smile, UserCircle } from "lucide-react";
 import { useApp } from "../../store";
 import { Avatar, MenuDivider, MenuItem, Popover } from "../ui/primitives";
 
@@ -18,7 +18,7 @@ export function TopBar() {
         <button
           type="button"
           className="icon-button menu-toggle"
-          aria-label="Toggle navigation"
+          aria-label="Переключить навигацию"
           aria-expanded={state.sidebarOpen}
           onClick={() => actions.setSidebarOpen(!state.sidebarOpen)}
         >
@@ -34,12 +34,12 @@ export function TopBar() {
           if (query.trim()) actions.setView({ kind: "search", query: query.trim() });
         }}
       >
-        <Search size={15} />
+        <Поиск size={15} />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={`Search ${state.bootstrap?.workspace.name ?? "workspace"}`}
-          aria-label="Search messages"
+          placeholder={`Поиск ${state.bootstrap?.workspace.name ?? "workspace"}`}
+          aria-label="Поиск сообщений"
           onKeyDown={(event) => {
             if (event.key === "Escape") setQuery("");
             if (event.key === "Enter" && query.trim()) {
@@ -52,7 +52,7 @@ export function TopBar() {
       </form>
 
       <div className="top-bar-right">
-        <button type="button" className="icon-button" onClick={() => actions.setModal({ kind: "shortcuts" })} aria-label="Keyboard shortcuts">
+        <button type="button" className="icon-button" onClick={() => actions.setModal({ kind: "shortcuts" })} aria-label="Сочетания клавиш">
           <HelpCircle size={18} />
         </button>
 
@@ -60,7 +60,7 @@ export function TopBar() {
           width={300}
           align="end"
           trigger={({ toggle, ref }) => (
-            <button type="button" className="avatar-button" ref={ref} onClick={toggle} aria-label="You">
+            <button type="button" className="avatar-button" ref={ref} onClick={toggle} aria-label="Вы">
               <Avatar user={session ?? undefined} size={30} />
             </button>
           )}
@@ -69,7 +69,7 @@ export function TopBar() {
             <div className="menu">
               <div className="menu-heading">
                 <strong>{session?.displayName}</strong>
-                <span>{session?.statusText ? `${session.statusEmoji ? "" : ""} ${session.statusText}` : "Set a status"}</span>
+                <span>{session?.statusText ? `${session.statusEmoji ? "" : ""} ${session.statusText}` : "Установить статус"}</span>
               </div>
               <MenuItem
                 onClick={() => {
@@ -77,7 +77,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Smile size={14} /> Update your status
+                <Smile size={14} /> Обновить your status
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -102,7 +102,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <UserCircle size={14} /> Edit profile
+                <UserCircle size={14} /> Изменить profile
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -110,7 +110,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Settings size={14} /> Preferences
+                <Настройки size={14} /> Предпочтения
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -128,7 +128,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <LogOut size={14} /> Sign out
+                <LogOut size={14} /> Выйти
               </MenuItem>
             </div>
           )}
