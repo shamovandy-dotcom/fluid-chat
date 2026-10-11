@@ -92,7 +92,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
   if (!bucket || (bucket.loading && messages.length === 0)) {
     return (
       <div className="message-scroll is-loading">
-        <Spinner label="Loading messages" />
+        <Spinner label="Загрузка сообщений" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export function MessageList({ conversationId }: { conversationId: string }) {
       <div className="message-scroll" ref={scrollRef} onScroll={onScroll}>
         <div ref={contentRef}>
           {bucket.hasMore ? (
-            <div className="history-loader">{bucket.loading ? <Spinner label="Loading history" /> : "Scroll for older messages"}</div>
+            <div className="history-loader">{bucket.loading ? <Spinner label="Загрузка истории" /> : "Прокрутите, чтобы увидеть более ранние сообщения"}</div>
           ) : (
             <ConversationIntro conversationId={conversationId} />
           )}
@@ -209,7 +209,7 @@ export function TypingIndicator({
       ? `${names[0]} is typing`
       : names.length === 2
         ? `${names[0]} and ${names[1]} are typing`
-        : "Several people are typing";
+        : "Несколько участников печатают";
   return (
     <div className="typing-indicator is-active" aria-live="polite">
       <span className="typing-dots">
