@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Hash, Lock, Search } from "lucide-react";
+import { Download, Hash, Lock, Поиск } from "lucide-react";
 import type { ChannelSummary, FileSummary, MessageDto } from "@/shared/types";
 import { api } from "../../api";
 import { track } from "../../analytics";
@@ -43,23 +43,23 @@ export function BrowseChannelsView() {
     <section className="view">
       <header className="view-header">
         <div>
-          <h1>Channels</h1>
+          <h1>Каналы</h1>
           <p>{visible.length} channels in this workspace</p>
         </div>
         <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "new-channel" })}>
-          Create channel
+          Создать channel
         </button>
       </header>
 
       <div className="view-toolbar">
         <div className="search-field">
-          <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search channels" />
+          <Поиск size={15} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск channels" />
         </div>
         <div className="view-filters">
           {(["all", "joined", "unjoined", "archived"] as const).map((entry) => (
             <button key={entry} type="button" className={filter === entry ? "is-active" : ""} onClick={() => setFilter(entry)}>
-              {entry === "all" ? "All" : entry === "joined" ? "My channels" : entry === "unjoined" ? "Not joined" : "Archived"}
+              {entry === "all" ? "All" : entry === "joined" ? "My channels" : entry === "unjoined" ? "Не присоединился" : "В архиве"}
             </button>
           ))}
         </div>
@@ -67,9 +67,9 @@ export function BrowseChannelsView() {
 
       <div className="view-scroll">
         {!channels ? (
-          <Spinner label="Loading channels" />
+          <Spinner label="Загрузка… channels" />
         ) : visible.length === 0 ? (
-          <EmptyState title="No channels found" body="Try a different search, or create one." />
+          <EmptyState title="Каналы не найдены" body="Измените запрос или создайте канал." />
         ) : (
           visible.map((channel) => (
             <div key={channel.id} className="channel-row">
@@ -128,18 +128,18 @@ export function PeopleView() {
     <section className="view">
       <header className="view-header">
         <div>
-          <h1>People</h1>
+          <h1>Люди</h1>
           <p>{members.length} members</p>
         </div>
         <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "invite" })}>
-          Invite people
+          Пригласить участников
         </button>
       </header>
 
       <div className="view-toolbar">
         <div className="search-field">
-          <Search size={15} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search people" />
+          <Поиск size={15} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск people" />
         </div>
       </div>
 
@@ -179,13 +179,13 @@ export function FilesView() {
     <section className="view">
       <header className="view-header">
         <div>
-          <h1>Files</h1>
+          <h1>Файлы</h1>
           <p>Everything shared in conversations you are in</p>
         </div>
       </header>
       <div className="view-scroll">
         {!files ? (
-          <Spinner label="Loading files" />
+          <Spinner label="Загрузка… files" />
         ) : files.length === 0 ? (
           <EmptyState title="No files yet" body="Attach a file to a message to see it here." />
         ) : (
@@ -261,7 +261,7 @@ export function SearchView({ query }: { query: string }) {
     <section className="view">
       <header className="view-header">
         <div>
-          <h1>Search</h1>
+          <h1>Поиск</h1>
           <p>
             Operators: <code>in:#channel</code> <code>from:@person</code> <code>has:file</code> <code>before:2026-01-01</code>
           </p>
@@ -276,8 +276,8 @@ export function SearchView({ query }: { query: string }) {
             actions.setView({ kind: "search", query: term });
           }}
         >
-          <Search size={15} />
-          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Search messages" autoFocus />
+          <Поиск size={15} />
+          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Поиск messages" autoFocus />
         </form>
         <div className="view-filters">
           {(["recent", "relevant"] as const).map((entry) => (
@@ -290,9 +290,9 @@ export function SearchView({ query }: { query: string }) {
 
       <div className="view-scroll">
         {!results ? (
-          <Spinner label="Searching" />
+          <Spinner label="Поиск…" />
         ) : results.length === 0 ? (
-          <EmptyState title="No matches" body="Try different words, or widen the filters." />
+          <EmptyState title="Совпадений не найдено" body="Измените запрос или расширьте фильтры." />
         ) : (
           <HighlightProvider terms={highlightTerms}>
             {results.map((result) => (
@@ -302,7 +302,7 @@ export function SearchView({ query }: { query: string }) {
                   className="search-result-head"
                   onClick={() => void actions.openConversation(result.conversationId)}
                 >
-                  {result.channelName ? `#${result.channelName}` : "Direct message"}
+                  {result.channelName ? `#${result.channelName}` : "Личное сообщение"}
                   <time>{formatRelative(result.message.createdAt)}</time>
                 </button>
                 <MessageItem message={result.message} context="list" />
