@@ -1,8 +1,14 @@
 FROM node:22-alpine
 
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
 COPY . .
-EXPOSE 3000
-CMD ["npm", "run", "start"]
+
+RUN npm run build
+
+EXPOSE 10000
+
+CMD ["sh", "-c", "npm run db:migrate && (npm run worker &) && npm run realtime"]
