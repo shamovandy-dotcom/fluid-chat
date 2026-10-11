@@ -6,7 +6,7 @@ import {
   Bookmark,
   BookmarkCheck,
   Clock,
-  Copy,
+  Копировать,
   Download,
   Link2,
   MessageSquare,
@@ -166,10 +166,10 @@ export function MessageItem({
             />
             <div className="edit-actions">
               <button type="button" className="button ghost" onClick={() => setEditing(false)}>
-                Cancel
+                Отмена
               </button>
               <button type="submit" className="button primary" disabled={!editText.trim()}>
-                Save changes
+                Сохранить changes
               </button>
             </div>
           </form>
@@ -248,13 +248,13 @@ export function MessageItem({
         ) : null}
       </div>
 
-      <div className="message-toolbar" role="toolbar" aria-label="Message actions">
+      <div className="message-toolbar" role="toolbar" aria-label="Действия с сообщением">
         <QuickReactions message={message} />
         <Popover
           width={340}
           align="end"
           trigger={({ toggle, ref }) => (
-            <button type="button" ref={ref} onClick={toggle} title="Add reaction">
+            <button type="button" ref={ref} onClick={toggle} title="Добавить реакцию">
               <Smile size={16} />
             </button>
           )}
@@ -263,7 +263,7 @@ export function MessageItem({
         </Popover>
 
         {context !== "thread" ? (
-          <button type="button" title="Reply in thread" onClick={() => void actions.openThread(message.id)}>
+          <button type="button" title="Ответить в обсуждении" onClick={() => void actions.openThread(message.id)}>
             <MessageSquare size={16} />
           </button>
         ) : null}
@@ -274,7 +274,7 @@ export function MessageItem({
 
         <button
           type="button"
-          title={message.saved ? "Remove from saved" : "Save for later"}
+          title={message.saved ? "Remove from saved" : "Сохранить на потом"}
           onClick={async () => {
             try {
               if (message.saved) await api.messages.unsave(message.id);
@@ -292,7 +292,7 @@ export function MessageItem({
           width={230}
           align="end"
           trigger={({ toggle, ref }) => (
-            <button type="button" ref={ref} onClick={toggle} title="More actions">
+            <button type="button" ref={ref} onClick={toggle} title="Другие действия">
               <MoreVertical size={16} />
             </button>
           )}
@@ -306,7 +306,7 @@ export function MessageItem({
                     close();
                   }}
                 >
-                  <Pencil size={14} /> Edit message
+                  <Pencil size={14} /> Изменить message
                 </MenuItem>
               ) : null}
               <MenuItem
@@ -316,14 +316,14 @@ export function MessageItem({
                     if (message.pinned) await api.messages.unpin(message.id);
                     else await api.messages.pin(message.id);
                     actions.upsertMessage({ ...message, pinned: !message.pinned });
-                    actions.toast(message.pinned ? "Message unpinned" : "Message pinned to this conversation");
+                    actions.toast(message.pinned ? "Сообщение unpinned" : "Сообщение закреплено в этой переписке");
                   } catch (error) {
                     actions.fail(error);
                   }
                 }}
               >
                 {message.pinned ? <PinOff size={14} /> : <Pin size={14} />}
-                {message.pinned ? "Unpin from conversation" : "Pin to conversation"}
+                {message.pinned ? "Unpin from conversation" : "Закрепить в переписке"}
               </MenuItem>
               {message.thread.replyCount > 0 || context === "thread" ? (
                 <MenuItem
@@ -336,13 +336,13 @@ export function MessageItem({
                         ...message,
                         thread: { ...message.thread, following: next === "following" }
                       });
-                      actions.toast(next === "following" ? "Following this thread" : "You will not be notified about this thread");
+                      actions.toast(next === "following" ? "Following this thread" : "Вы не будете получать уведомления об этом обсуждении");
                     } catch (error) {
                       actions.fail(error);
                     }
                   }}
                 >
-                  <Bell size={14} /> {message.thread.following ? "Unfollow thread" : "Follow thread"}
+                  <Bell size={14} /> {message.thread.following ? "Не следить за обсуждением" : "Следить за обсуждением"}
                 </MenuItem>
               ) : null}
               <div className="menu-submenu">
@@ -381,20 +381,20 @@ export function MessageItem({
                 onClick={() => {
                   close();
                   void navigator.clipboard.writeText(message.bodyText);
-                  actions.toast("Message text copied", "success");
+                  actions.toast("Сообщение text copied", "success");
                 }}
               >
-                <Copy size={14} /> Copy text
+                <Копировать size={14} /> Копировать text
               </MenuItem>
               <MenuItem
                 onClick={() => {
                   close();
                   const url = `${window.location.origin}/?conversation=${message.conversationId}&message=${message.id}`;
                   void navigator.clipboard.writeText(url);
-                  actions.toast("Link copied to clipboard", "success");
+                  actions.toast("Ссылка copied to clipboard", "success");
                 }}
               >
-                <Link2 size={14} /> Copy link
+                <Link2 size={14} /> Копировать link
               </MenuItem>
               <MenuItem
                 onClick={async () => {
@@ -413,7 +413,7 @@ export function MessageItem({
                     danger
                     onClick={async () => {
                       close();
-                      if (!window.confirm("Delete this message? This cannot be undone.")) return;
+                      if (!window.confirm("Удалить this message? This cannot be undone.")) return;
                       try {
                         await api.messages.remove(message.id);
                       } catch (error) {
@@ -421,7 +421,7 @@ export function MessageItem({
                       }
                     }}
                   >
-                    <Trash2 size={14} /> Delete message
+                    <Trash2 size={14} /> Удалить message
                   </MenuItem>
                 </>
               ) : null}
@@ -454,7 +454,7 @@ function SharedMessage({ messageId }: { messageId: string }) {
   }, [messageId]);
 
   const sender = useMemo(() => (message ? directory.get(message.senderId) : undefined), [directory, message]);
-  if (!message) return <div className="quoted-message is-loading">Loading shared message…</div>;
+  if (!message) return <div className="quoted-message is-loading">Загрузка… shared message…</div>;
 
   return (
     <div className="quoted-message">
