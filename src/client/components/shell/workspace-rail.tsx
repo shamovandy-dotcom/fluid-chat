@@ -12,7 +12,7 @@ export function WorkspaceRail() {
   if (state.memberships.length === 0) return null;
 
   return (
-    <nav className="workspace-rail" aria-label="Workspaces">
+    <nav className="workspace-rail" aria-label="Рабочие пространства">
       {state.memberships.map((membership) => {
         const active = membership.workspace.id === state.workspaceId;
         const label = membership.workspace.name;
@@ -39,8 +39,8 @@ export function WorkspaceRail() {
       <button
         type="button"
         className="rail-tile rail-add"
-        title="Create a workspace"
-        aria-label="Create a workspace"
+        title="Создать рабочее пространство"
+        aria-label="Создать рабочее пространство"
         onClick={() => actions.setModal({ kind: "create-workspace" })}
       >
         <span className="rail-badge" aria-hidden>
