@@ -162,7 +162,7 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
         <dl className="profile-facts">
           {user.pronouns ? (
             <>
-              <dt>Pronouns</dt>
+              <dt>Обращение</dt>
               <dd>{user.pronouns}</dd>
             </>
           ) : null}
@@ -172,11 +172,11 @@ function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void
           </dd>
           {localTime ? (
             <>
-              <dt>Local time</dt>
+              <dt>Местное время</dt>
               <dd>{localTime}</dd>
             </>
           ) : null}
-          <dt>Presence</dt>
+          <dt>Статус</dt>
           <dd className="capitalize">{user.presence}</dd>
         </dl>
         <div className="profile-actions">
@@ -378,9 +378,9 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                   await actions.refreshConversations();
                 }}
               >
-                <option value="all">Every new message</option>
-                <option value="mentions">Mentions only</option>
-                <option value="none">Nothing</option>
+                <option value="all">Каждое новое сообщение</option>
+                <option value="mentions">Только упоминания</option>
+                <option value="none">Ничего</option>
               </select>
             </label>
 
@@ -395,8 +395,8 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                       await actions.refreshBootstrap();
                     }}
                   >
-                    <option value="everyone">Everyone</option>
-                    <option value="admins">Admins only</option>
+                    <option value="everyone">Все</option>
+                    <option value="admins">Только администраторы</option>
                   </select>
                 </label>
 
@@ -415,8 +415,8 @@ function DetailsPanel({ conversationId, onClose }: { conversationId: string; onC
                     }}
                   />
                   <span>
-                    <strong>Add new members automatically</strong>
-                    <small>Everyone who joins the workspace lands in this channel.</small>
+                    <strong>Автоматически добавлять новых участников</strong>
+                    <small>Все who joins the workspace lands in this channel.</small>
                   </span>
                 </label>
 
