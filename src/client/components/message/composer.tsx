@@ -13,18 +13,18 @@ import {
   type SetStateAction
 } from "react";
 import {
-  Полужирный,
+  Bold,
   Code,
   CodeSquare,
-  Курсив,
+  Italic,
   Link2,
   List,
   ListOrdered,
   Paperclip,
   Quote,
-  Отправить,
+  Send,
   Smile,
-  Зачёркнутый,
+  Strikethrough,
   Timer,
   X
 } from "lucide-react";
@@ -416,13 +416,13 @@ export function Composer({
       <div className="composer-box">
         <div className="composer-toolbar">
           <IconButton label="Полужирный" onClick={() => wrapSelection("*")}>
-            <Полужирный size={15} />
+            <Bold size={15} />
           </IconButton>
           <IconButton label="Курсив" onClick={() => wrapSelection("_")}>
-            <Курсив size={15} />
+            <Italic size={15} />
           </IconButton>
           <IconButton label="Зачёркнутый" onClick={() => wrapSelection("~")}>
-            <Зачёркнутый size={15} />
+            <Strikethrough size={15} />
           </IconButton>
           <span className="toolbar-divider" />
           <IconButton label="Ссылка" onClick={() => wrapSelection("<", "|label>")}>
@@ -547,7 +547,7 @@ export function Composer({
               onClick={() => void send()}
               disabled={!text.trim() && attachments.length === 0}
             >
-              <Отправить size={15} /> Отправить
+              <Send size={15} /> Отправить
             </button>
           </div>
         </div>
