@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Check, Копировать, Hash, Lock } from "lucide-react";
+import { Check, Copy, Hash, Lock } from "lucide-react";
 import { api } from "../../api";
 import { track } from "../../analytics";
 import { EMOJI_CATEGORIES } from "../../emoji";
@@ -101,7 +101,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
                 setTimeout(() => setCopied(false), 1500);
               }}
             >
-              {copied ? <Check size={14} /> : <Копировать size={14} />} {copied ? "Copied" : "Копировать"}
+              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Копировать"}
             </button>
           </div>
         ) : (
