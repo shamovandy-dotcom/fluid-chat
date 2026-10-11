@@ -23,7 +23,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
-      title={`Пригласить участников to ${state.bootstrap?.workspace.name ?? "workspace"}`}
+      title={`Пригласить участников: ${state.bootstrap?.workspace.name ?? "Рабочее пространство"}`}
       onClose={onClose}
       footer={
         <button type="button" className="button ghost" onClick={onClose}>
@@ -65,11 +65,11 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
           />
         </label>
         <label className="field">
-          Role
+          Роль
           <select value={role} onChange={(event) => setRole(event.target.value as typeof role)}>
-            <option value="member">Участник — full access to public channels</option>
-            <option value="admin">Администратор — can manage members and channels</option>
-            <option value="guest">Гость — only the channels you add them to</option>
+            <option value="member">Участник — полный доступ к общедоступным каналам</option>
+            <option value="admin">Администратор — может управлять участниками и каналами</option>
+            <option value="guest">Гость — доступ только к каналам, в которые его добавили</option>
           </select>
         </label>
         <button type="submit" className="button primary">
@@ -88,7 +88,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
 
       <div className="modal-section">
         <h4>Поделиться ссылкой-приглашением</h4>
-        <p className="muted">Anyone with the link can join as a member. The link expires in 30 days.</p>
+        <p className="muted">Любой пользователь со ссылкой может присоединиться как участник. Ссылка действует 30 дней.</p>
         {inviteLink ? (
           <div className="copy-row">
             <code>{inviteLink}</code>
@@ -101,7 +101,7 @@ export function InviteModal({ onClose }: { onClose: () => void }) {
                 setTimeout(() => setCopied(false), 1500);
               }}
             >
-              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Copied" : "Копировать"}
+              {copied ? <Check size={14} /> : <Copy size={14} />} {copied ? "Скопировано" : "Копировать"}
             </button>
           </div>
         ) : (
@@ -194,7 +194,7 @@ export function NewChannelModal({ onClose }: { onClose: () => void }) {
           />
           <span>
             <strong>Сделать приватным</strong>
-            <small>Only invited people can see this channel.</small>
+            <small>Этот канал виден только приглашённым участникам.</small>
           </span>
         </label>
         <button type="submit" className="button primary" disabled={!name.trim() || busy}>
@@ -386,7 +386,7 @@ export function AddPeopleModal({ conversationId, onClose }: { conversationId: st
                 </span>
               </button>
             ))}
-            {visible.length === 0 ? <p className="muted">Все in the workspace is already here.</p> : null}
+            {visible.length === 0 ? <p className="muted">Все участники рабочего пространства уже здесь.</p> : null}
           </div>
         </>
       )}
@@ -462,12 +462,12 @@ export function StatusModal({ onClose }: { onClose: () => void }) {
       </div>
 
       <label className="field">
-        Очистить after
+        Очистить через
         <select value={minutes ?? ""} onChange={(event) => setMinutes(event.target.value ? Number(event.target.value) : null)}>
           <option value="">Не очищать</option>
-          <option value="30">30 minutes</option>
-          <option value="60">1 hour</option>
-          <option value="240">4 hours</option>
+          <option value="30">30 минут</option>
+          <option value="60">1 час</option>
+          <option value="240">4 часа</option>
           <option value="480">Сегодня</option>
           <option value="10080">На этой неделе</option>
         </select>
@@ -622,7 +622,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             </select>
           </label>
           <label className="field">
-            Сообщение density
+            Плотность сообщений
             <select value={preferences.messageDensity ?? "comfortable"} onChange={(event) => set({ messageDensity: event.target.value })}>
               <option value="comfortable">Обычная</option>
               <option value="compact">Компактная</option>
