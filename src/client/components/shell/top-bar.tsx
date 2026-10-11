@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, HelpCircle, LogOut, Menu, Moon, Поиск, Настройки, Smile, UserCircle } from "lucide-react";
+import { Clock, HelpCircle, LogOut, Menu, Moon, Search, Settings, Smile, UserCircle } from "lucide-react";
 import { useApp } from "../../store";
 import { Avatar, MenuDivider, MenuItem, Popover } from "../ui/primitives";
 
@@ -34,7 +34,7 @@ export function TopBar() {
           if (query.trim()) actions.setView({ kind: "search", query: query.trim() });
         }}
       >
-        <Поиск size={15} />
+        <Search size={15} />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -110,7 +110,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Настройки size={14} /> Предпочтения
+                <Settings size={14} /> Предпочтения
               </MenuItem>
               <MenuItem
                 onClick={() => {
