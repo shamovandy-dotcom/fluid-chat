@@ -11,11 +11,11 @@ import {
   Hash,
   Inbox,
   Lock,
-  СообщениеSquare,
+  MessageSquare,
   MoreHorizontal,
   PenSquare,
   Plus,
-  Отправить,
+  Send,
   Users
 } from "lucide-react";
 import type { ConversationSummary } from "@/shared/types";
@@ -29,7 +29,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const workspace = state.bootstrap?.workspace;
   const conversations = state.bootstrap?.conversations ?? [];
-  const isАдминистрирование = state.bootstrap?.role === "owner" || state.bootstrap?.role === "admin";
+  const isAdmin = state.bootstrap?.role === "owner" || state.bootstrap?.role === "admin";
 
   const groups = useMemo(() => {
     const visible = conversations.filter(
@@ -37,13 +37,13 @@ export function Sidebar() {
     );
     const starred = visible.filter((conversation) => conversation.membership?.starred);
     const rest = visible.filter((conversation) => !conversation.membership?.starred);
-    // Каналы read best alphabetically; DMs are most useful most-recent-first.
+    // Channels read best alphabetically; DMs are most useful most-recent-first.
     const channels = rest
       .filter((conversation) => conversation.type === "channel")
       .sort((a, b) => (a.channel?.name ?? "").localeCompare(b.channel?.name ?? ""));
     const dms = rest
       .filter((conversation) => conversation.type !== "channel")
-      .sort((a, b) => new Date(b.lastСообщениеAt ?? 0).getTime() - new Date(a.lastСообщениеAt ?? 0).getTime());
+      .sort((a, b) => new Date(b.lastMessageAt ?? 0).getTime() - new Date(a.lastMessageAt ?? 0).getTime());
     const sections = (state.bootstrap?.sections ?? []).map((section) => ({
       section,
       items: rest.filter((conversation) => conversation.membership?.sectionId === section.id)
@@ -57,10 +57,10 @@ export function Sidebar() {
     };
   }, [conversations, state.bootstrap?.sections]);
 
-  const navItem = (view: View, label: string, icon: Добавить реакцию.Добавить реакциюNode, badge?: number) => {
+  const navItem = (view: View, label: string, icon: React.ReactNode, badge?: number) => {
     const active = state.view.kind === view.kind;
     return (
-      <button type="button" classИмя={`side-nav-item ${active ? "is-active" : ""}`} onClick={() => actions.setView(view)}>
+      <button type="button" className={`side-nav-item ${active ? "is-active" : ""}`} onClick={() => actions.setView(view)}>
         {icon}
         <span>{label}</span>
         {badge ? <Badge count={badge} mention /> : null}
@@ -69,13 +69,13 @@ export function Sidebar() {
   };
 
   return (
-    <nav classИмя="sidebar" aria-label="Навигация по рабочему пространству">
+    <nav className="sidebar" aria-label="Workspace navigation">
       <Popover
         width={280}
         trigger={({ toggle, ref }) => (
-          <button type="button" classИмя="workspace-button" onClick={toggle} ref={ref}>
-            <span classИмя="workspace-name">
-              {workspace?.iconЭмодзи ? <span aria-hidden>{workspace.iconЭмодзи}</span> : null}
+          <button type="button" className="workspace-button" onClick={toggle} ref={ref}>
+            <span className="workspace-name">
+              {workspace?.iconEmoji ? <span aria-hidden>{workspace.iconEmoji}</span> : null}
               {workspace?.name ?? "Workspace"}
             </span>
             <ChevronDown size={16} />
@@ -83,8 +83,8 @@ export function Sidebar() {
         )}
       >
         {(close) => (
-          <div classИмя="menu">
-            <div classИмя="menu-heading">
+          <div className="menu">
+            <div className="menu-heading">
               <strong>{workspace?.name}</strong>
               <span>{workspace?.slug}</span>
             </div>
@@ -94,7 +94,7 @@ export function Sidebar() {
                 close();
               }}
             >
-              <Users size={14} /> Пригласить участников
+              <Users size={14} /> Invite people
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -102,9 +102,9 @@ export function Sidebar() {
                 close();
               }}
             >
-              <Hash size={14} /> Создать канал
+              <Hash size={14} /> Create a channel
             </MenuItem>
-            {isАдминистрирование ? (
+            {isAdmin ? (
               <MenuItem
                 onClick={() => {
                   actions.setModal({ kind: "admin" });
@@ -115,7 +115,7 @@ export function Sidebar() {
               </MenuItem>
             ) : null}
             <MenuDivider />
-            <div classИмя="menu-heading">
+            <div className="menu-heading">
               <span>Switch workspace</span>
             </div>
             {state.memberships.map((membership) => (
@@ -126,7 +126,7 @@ export function Sidebar() {
                   close();
                 }}
               >
-                <span classИмя="workspace-chip" aria-hidden>
+                <span className="workspace-chip" aria-hidden>
                   {membership.workspace.name.slice(0, 1).toUpperCase()}
                 </span>
                 {membership.workspace.name}
@@ -138,26 +138,26 @@ export function Sidebar() {
                 close();
               }}
             >
-              <Plus size={14} /> Создать рабочее пространство
+              <Plus size={14} /> Create a workspace
             </MenuItem>
           </div>
         )}
       </Popover>
 
-      <div classИмя="side-nav">
-        {navItem({ kind: "threads" }, "Обсуждениеs", <СообщениеSquare size={16} />)}
-        {navItem({ kind: "activity" }, "Активность", <AtSign size={16} />, state.unreadУведомления)}
-        {navItem({ kind: "unreads" }, "Все непрочитанные", <Inbox size={16} />)}
-        {navItem({ kind: "drafts" }, "Черновики и отправленные", <PenSquare size={16} />)}
-        {navItem({ kind: "saved" }, "На потом", <Bookmark size={16} />)}
-        {navItem({ kind: "files" }, "Файлы", <FileText size={16} />)}
-        {navItem({ kind: "people" }, "Люди", <Users size={16} />)}
+      <div className="side-nav">
+        {navItem({ kind: "threads" }, "Threads", <MessageSquare size={16} />)}
+        {navItem({ kind: "activity" }, "Activity", <AtSign size={16} />, state.unreadNotifications)}
+        {navItem({ kind: "unreads" }, "All unreads", <Inbox size={16} />)}
+        {navItem({ kind: "drafts" }, "Drafts & sent", <PenSquare size={16} />)}
+        {navItem({ kind: "saved" }, "Later", <Bookmark size={16} />)}
+        {navItem({ kind: "files" }, "Files", <FileText size={16} />)}
+        {navItem({ kind: "people" }, "People", <Users size={16} />)}
       </div>
 
-      <div classИмя="side-scroll">
+      <div className="side-scroll">
         {groups.starred.length > 0 ? (
           <SidebarSection
-            title="Избранное"
+            title="Starred"
             collapsed={collapsed.starred}
             onToggle={() => setCollapsed((value) => ({ ...value, starred: !value.starred }))}
           >
@@ -177,12 +177,12 @@ export function Sidebar() {
             {items.map((conversation) => (
               <ConversationRow key={conversation.id} conversation={conversation} />
             ))}
-            {items.length === 0 ? <p classИмя="side-empty">Drag conversations here from their ⋯ menu.</p> : null}
+            {items.length === 0 ? <p className="side-empty">Drag conversations here from their ⋯ menu.</p> : null}
           </SidebarSection>
         ))}
 
         <SidebarSection
-          title="Каналы"
+          title="Channels"
           collapsed={collapsed.channels}
           onToggle={() => setCollapsed((value) => ({ ...value, channels: !value.channels }))}
           action={
@@ -190,20 +190,20 @@ export function Sidebar() {
               width={240}
               align="end"
               trigger={({ toggle, ref }) => (
-                <button type="button" classИмя="section-action" ref={ref} onClick={toggle} aria-label="Добавить каналы">
+                <button type="button" className="section-action" ref={ref} onClick={toggle} aria-label="Add channels">
                   <Plus size={14} />
                 </button>
               )}
             >
               {(close) => (
-                <div classИмя="menu">
+                <div className="menu">
                   <MenuItem
                     onClick={() => {
                       actions.setView({ kind: "browse" });
                       close();
                     }}
                   >
-                    <Compass size={14} /> Обзор каналов
+                    <Compass size={14} /> Browse channels
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -211,7 +211,7 @@ export function Sidebar() {
                       close();
                     }}
                   >
-                    <Plus size={14} /> Создать канал
+                    <Plus size={14} /> Create a channel
                   </MenuItem>
                 </div>
               )}
@@ -221,22 +221,22 @@ export function Sidebar() {
           {groups.channels.map((conversation) => (
             <ConversationRow key={conversation.id} conversation={conversation} />
           ))}
-          <button type="button" classИмя="side-row is-muted" onClick={() => actions.setView({ kind: "browse" })}>
+          <button type="button" className="side-row is-muted" onClick={() => actions.setView({ kind: "browse" })}>
             <Plus size={15} />
-            <span classИмя="side-label">Добавить каналы</span>
+            <span className="side-label">Add channels</span>
           </button>
         </SidebarSection>
 
         <SidebarSection
-          title="Личные сообщения"
+          title="Direct messages"
           collapsed={collapsed.dms}
           onToggle={() => setCollapsed((value) => ({ ...value, dms: !value.dms }))}
           action={
             <button
               type="button"
-              classИмя="section-action"
+              className="section-action"
               onClick={() => actions.setModal({ kind: "new-dm" })}
-              aria-label="Новое личное сообщение"
+              aria-label="New direct message"
             >
               <Plus size={14} />
             </button>
@@ -246,19 +246,19 @@ export function Sidebar() {
             <ConversationRow key={conversation.id} conversation={conversation} />
           ))}
           {groups.dms.length === 0 ? (
-            <button type="button" classИмя="side-row is-muted" onClick={() => actions.setModal({ kind: "new-dm" })}>
-              <Отправить size={15} />
-              <span classИмя="side-label">Start a conversation</span>
+            <button type="button" className="side-row is-muted" onClick={() => actions.setModal({ kind: "new-dm" })}>
+              <Send size={15} />
+              <span className="side-label">Start a conversation</span>
             </button>
           ) : null}
         </SidebarSection>
       </div>
 
       {state.session ? (
-        <div classИмя="sidebar-footer">
+        <div className="sidebar-footer">
           <Avatar user={state.session} size={26} />
-          <span classИмя="side-label">{state.session.displayИмя}</span>
-          {!state.connected ? <span classИмя="connection-dot" title="Повторное подключение…" /> : null}
+          <span className="side-label">{state.session.displayName}</span>
+          {!state.connected ? <span className="connection-dot" title="Reconnecting…" /> : null}
         </div>
       ) : null}
     </nav>
@@ -273,21 +273,21 @@ function SidebarSection({
   action
 }: {
   title: string;
-  children: Добавить реакцию.Добавить реакциюNode;
+  children: React.ReactNode;
   collapsed?: boolean;
   onToggle: () => void;
-  action?: Добавить реакцию.Добавить реакциюNode;
+  action?: React.ReactNode;
 }) {
   return (
-    <section classИмя="side-section">
-      <div classИмя="side-section-head">
+    <section className="side-section">
+      <div className="side-section-head">
         <button type="button" onClick={onToggle} aria-expanded={!collapsed}>
           {collapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
           {title}
         </button>
         {action}
       </div>
-      {!collapsed ? <div classИмя="side-section-body">{children}</div> : null}
+      {!collapsed ? <div className="side-section-body">{children}</div> : null}
     </section>
   );
 }
@@ -303,10 +303,10 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
   const draft = state.drafts[`${conversation.id}:root`];
 
   return (
-    <div classИмя={`side-row-wrap ${active ? "is-active" : ""}`}>
+    <div className={`side-row-wrap ${active ? "is-active" : ""}`}>
       <button
         type="button"
-        classИмя={`side-row ${unread ? "is-unread" : ""}`}
+        className={`side-row ${unread ? "is-unread" : ""}`}
         onClick={(event) => void actions.openConversation(conversation.id, { newTab: event.metaKey || event.ctrlKey, background: (event.metaKey || event.ctrlKey) && !event.shiftKey })}
         onAuxClick={(event) => { if (event.button === 1) { event.preventDefault(); void actions.openConversation(conversation.id, { newTab: true, background: true }); } }}
       >
@@ -321,8 +321,8 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
         ) : (
           <Avatar user={other} size={20} />
         )}
-        <span classИмя="side-label">{title}</span>
-        {draft?.trim() ? <span classИмя="draft-dot" title="Черновик" /> : null}
+        <span className="side-label">{title}</span>
+        {draft?.trim() ? <span className="draft-dot" title="Unsent draft" /> : null}
         {conversation.mentionCount > 0 ? (
           <Badge count={conversation.mentionCount} mention />
         ) : conversation.unreadCount > 0 ? (
@@ -334,34 +334,34 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
         width={240}
         align="end"
         trigger={({ toggle, ref }) => (
-          <button type="button" classИмя="side-row-menu" ref={ref} onClick={toggle} aria-label={`Options for ${title}`}>
+          <button type="button" className="side-row-menu" ref={ref} onClick={toggle} aria-label={`Options for ${title}`}>
             <MoreHorizontal size={14} />
           </button>
         )}
       >
         {(close) => (
-          <div classИмя="menu">
+          <div className="menu">
             <MenuItem onClick={() => { close(); void actions.openConversation(conversation.id, { newTab: true }); }}>Open in new chat tab</MenuItem>
             <MenuDivider />
             <MenuItem
               onClick={async () => {
                 close();
-                await api.conversations.updateУчастникиhip(conversation.id, {
+                await api.conversations.updateMembership(conversation.id, {
                   starred: !conversation.membership?.starred
                 });
                 await actions.refreshConversations();
               }}
             >
-              {conversation.membership?.starred ? "Удалить from starred" : "Добавить в избранное"}
+              {conversation.membership?.starred ? "Remove from starred" : "Star conversation"}
             </MenuItem>
             <MenuItem
               onClick={async () => {
                 close();
-                await api.conversations.updateУчастникиhip(conversation.id, { muted: !conversation.membership?.muted });
+                await api.conversations.updateMembership(conversation.id, { muted: !conversation.membership?.muted });
                 await actions.refreshConversations();
               }}
             >
-              {conversation.membership?.muted ? "Unmute conversation" : "Отключить уведомления"}
+              {conversation.membership?.muted ? "Unmute conversation" : "Mute conversation"}
             </MenuItem>
             <MenuItem
               onClick={async () => {
@@ -370,7 +370,7 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
                 await actions.refreshConversations();
               }}
             >
-              Отметить как прочитанное
+              Mark as read
             </MenuItem>
             <MenuItem
               onClick={async () => {
@@ -387,7 +387,7 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
                 key={section.id}
                 onClick={async () => {
                   close();
-                  await api.conversations.updateУчастникиhip(conversation.id, { sectionId: section.id });
+                  await api.conversations.updateMembership(conversation.id, { sectionId: section.id });
                   await actions.refreshConversations();
                 }}
               >
@@ -414,11 +414,11 @@ function ConversationRow({ conversation }: { conversation: ConversationSummary }
               <MenuItem
                 onClick={async () => {
                   close();
-                  await api.conversations.updateУчастникиhip(conversation.id, { hidden: true });
+                  await api.conversations.updateMembership(conversation.id, { hidden: true });
                   await actions.refreshConversations();
                 }}
               >
-                Закрыть conversation
+                Close conversation
               </MenuItem>
             )}
           </div>
