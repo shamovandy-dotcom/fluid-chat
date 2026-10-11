@@ -283,6 +283,24 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
             </span>
           </button>
         ))}
+        {visible.length === 0 ? (
+          <div className="empty-state">
+            <strong>{query.trim() ? "No people found" : "No other members in this workspace yet"}</strong>
+            <p className="muted">
+              Direct messages are available to people in this workspace. Invite another account to join this workspace first.
+            </p>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => {
+                onClose();
+                actions.setModal({ kind: "invite" });
+              }}
+            >
+              Invite people
+            </button>
+          </div>
+        ) : null}
       </div>
     </Modal>
   );
