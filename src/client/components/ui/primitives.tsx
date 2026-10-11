@@ -199,14 +199,14 @@ export function MenuDivider() {
 
 export function Modal({
   title,
-  onЗакрыть,
+  onClose,
   children,
   footer,
   width = 560,
   align = "center"
 }: {
   title: ReactNode;
-  onЗакрыть: () => void;
+  onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
   width?: number;
@@ -227,7 +227,7 @@ export function Modal({
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onЗакрыть();
+        onClose();
         return;
       }
       if (event.key !== "Tab") return;
@@ -257,12 +257,12 @@ export function Modal({
       document.body.classList.remove("modal-open");
       previouslyFocused?.focus?.();
     };
-  }, [onЗакрыть]);
+  }, [onClose]);
 
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <div className={`modal-backdrop align-${align}`} onMouseDown={(event) => event.target === event.currentTarget && onЗакрыть()}>
+    <div className={`modal-backdrop align-${align}`} onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div
         className="modal"
         style={{ width }}
@@ -274,7 +274,7 @@ export function Modal({
       >
         <header className="modal-header">
           <h2 id={titleId}>{title}</h2>
-          <IconButton label="Закрыть" onClick={onЗакрыть}>
+          <IconButton label="Close" onClick={onClose}>
             <X size={18} />
           </IconButton>
         </header>
@@ -290,7 +290,7 @@ export function Modal({
 /* Misc                                                                        */
 /* -------------------------------------------------------------------------- */
 
-export function Spinner({ label = "Загрузка…" }: { label?: string }) {
+export function Spinner({ label = "Loading" }: { label?: string }) {
   return <span className="spinner" role="status" aria-label={label} />;
 }
 
