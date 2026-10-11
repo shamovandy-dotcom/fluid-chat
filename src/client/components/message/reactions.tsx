@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Smile } from "lucide-react";
 import type { MessageDto, ReactionSummary } from "@/shared/types";
@@ -117,7 +117,7 @@ function ReactionTooltip({
   names,
   label
 }: {
-  anchor: Добавить реакцию.RefObject<HTMLButtonElement | null>;
+  anchor: RefObject<HTMLButtonElement | null>;
   emoji: string;
   names: string;
   label: string;
