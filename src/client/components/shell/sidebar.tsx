@@ -111,12 +111,12 @@ export function Sidebar() {
                   close();
                 }}
               >
-                <MoreHorizontal size={14} /> Workspace settings
+                <MoreHorizontal size={14} /> Настройки рабочего пространства
               </MenuItem>
             ) : null}
             <MenuDivider />
             <div className="menu-heading">
-              <span>Switch workspace</span>
+              <span>Переключить рабочее пространство</span>
             </div>
             {state.memberships.map((membership) => (
               <MenuItem
@@ -177,7 +177,7 @@ export function Sidebar() {
             {items.map((conversation) => (
               <ConversationRow key={conversation.id} conversation={conversation} />
             ))}
-            {items.length === 0 ? <p className="side-empty">Drag conversations here from their ⋯ menu.</p> : null}
+            {items.length === 0 ? <p className="side-empty">Перетащите сюда переписки через меню ⋯.</p> : null}
           </SidebarSection>
         ))}
 
@@ -203,7 +203,7 @@ export function Sidebar() {
                       close();
                     }}
                   >
-                    <Compass size={14} /> Browse channels
+                    <Compass size={14} /> Обзор каналов
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
@@ -248,7 +248,7 @@ export function Sidebar() {
           {groups.dms.length === 0 ? (
             <button type="button" className="side-row is-muted" onClick={() => actions.setModal({ kind: "new-dm" })}>
               <Отправить size={15} />
-              <span className="side-label">Start a conversation</span>
+              <span className="side-label">Начать переписку</span>
             </button>
           ) : null}
         </SidebarSection>
