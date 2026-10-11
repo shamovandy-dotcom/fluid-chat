@@ -553,7 +553,7 @@ export function Composer({
         </div>
       </div>
       <p className="composer-hint">
-        {enterToSend ? "Enter to send · Shift+Enter for a new line" : "Нажмите Cmd+Enter для отправки"} · Type / for commands
+        {enterToSend ? "Enter — отправить · Shift+Enter — новая строка" : "Нажмите Cmd+Enter для отправки"} · Введите / для команд
       </p>
     </div>
   );
