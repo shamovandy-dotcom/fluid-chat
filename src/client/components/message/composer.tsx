@@ -13,18 +13,18 @@ import {
   type SetStateAction
 } from "react";
 import {
-  Полужирный,
+  Bold,
   Code,
   CodeSquare,
-  Курсив,
-  Ссылка2,
+  Italic,
+  Link2,
   List,
   ListOrdered,
   Paperclip,
   Quote,
-  Отправить,
+  Send,
   Smile,
-  Зачёркнутый,
+  Strikethrough,
   Timer,
   X
 } from "lucide-react";
@@ -32,23 +32,23 @@ import type { FileSummary } from "@/shared/types";
 import { toMentionDisplay, toMentionWire, userMentionLabel } from "@/shared/mention-text";
 import { api } from "../../api";
 import { track } from "../../analytics";
-import { searchЭмодзи } from "../../emoji";
+import { searchEmoji } from "../../emoji";
 import { formatBytes } from "../../format";
-import { useApp, useCustomЭмодзи, useDirectory, useMentionDirectory } from "../../store";
+import { useApp, useCustomEmoji, useDirectory, useMentionDirectory } from "../../store";
 import { Avatar, IconButton, Popover } from "../ui/primitives";
-import { ЭмодзиPicker } from "../ui/emoji-picker";
+import { EmojiPicker } from "../ui/emoji-picker";
 
 type Suggestion = { id: string; label: string; hint?: string; insert: string; avatarUserId?: string; preview?: string };
 
 export function Composer({
   conversationId,
-  parentСообщениеId = null,
+  parentMessageId = null,
   placeholder,
   autoFocus,
   onSent
 }: {
   conversationId: string;
-  parentСообщениеId?: string | null;
+  parentMessageId?: string | null;
   placeholder: string;
   autoFocus?: boolean;
   onSent?: () => void;
@@ -56,8 +56,8 @@ export function Composer({
   const { state, actions } = useApp();
   const directory = useDirectory();
   const mentions = useMentionDirectory();
-  const customЭмодзи = useCustomЭмодзи();
-  const draftKey = `${conversationId}:${parentСообщениеId ?? "root"}`;
+  const customEmoji = useCustomEmoji();
+  const draftKey = `${conversationId}:${parentMessageId ?? "root"}`;
   // `text` is always display form (`@bob`); tokens are restored at every exit.
   const [text, setText] = useState(() => toMentionDisplay(state.drafts[draftKey] ?? "", mentions));
   const attachments = state.composerAttachments[draftKey] ?? [];
@@ -80,12 +80,12 @@ export function Composer({
   useEffect(() => () => {
     if (draftTimer.current) clearTimeout(draftTimer.current);
     if (pendingDraft.current !== null) {
-      actions.saveDraft(conversationId, pendingDraft.current, parentСообщениеId);
+      actions.saveDraft(conversationId, pendingDraft.current, parentMessageId);
       pendingDraft.current = null;
     }
-  }, [actions, conversationId, parentСообщениеId]);
+  }, [actions, conversationId, parentMessageId]);
 
-  const enterToОтправить = state.session?.preferences?.enterToОтправить !== false;
+  const enterToSend = state.session?.preferences?.enterToSend !== false;
   const conversation = state.bootstrap?.conversations.find((entry) => entry.id === conversationId);
 
   useEffect(() => {
@@ -115,13 +115,13 @@ export function Composer({
       if (draftTimer.current) clearTimeout(draftTimer.current);
       const bodyText = toMentionWire(value, mentions);
       pendingDraft.current = bodyText;
-      actions.setDraftLocally(conversationId, bodyText, parentСообщениеId);
+      actions.setDraftLocally(conversationId, bodyText, parentMessageId);
       draftTimer.current = setTimeout(() => {
         pendingDraft.current = null;
-        actions.saveDraft(conversationId, bodyText, parentСообщениеId);
+        actions.saveDraft(conversationId, bodyText, parentMessageId);
       }, 700);
     },
-    [actions, conversationId, mentions, parentСообщениеId]
+    [actions, conversationId, mentions, parentMessageId]
   );
 
   const broadcastTyping = useCallback(() => {
@@ -129,9 +129,9 @@ export function Composer({
     if (now - typingSentAt.current < 3000) return;
     typingSentAt.current = now;
     const socket = actions.socketRef.current;
-    if (socket?.connected) socket.emit("typing", { conversationId, parentСообщениеId });
-    else void api.conversations.typing(conversationId, parentСообщениеId).catch(() => undefined);
-  }, [actions, conversationId, parentСообщениеId]);
+    if (socket?.connected) socket.emit("typing", { conversationId, parentMessageId });
+    else void api.conversations.typing(conversationId, parentMessageId).catch(() => undefined);
+  }, [actions, conversationId, parentMessageId]);
 
   /* ------------------------------------------------------------ suggestions */
 
@@ -197,11 +197,11 @@ export function Composer({
 
     if (symbol === ":") {
       if (query.length < 1) return [];
-      const custom = [...customЭмодзи.entries()]
+      const custom = [...customEmoji.entries()]
         .filter(([name]) => name.includes(query))
         .slice(0, 4)
         .map(([name, url]) => ({ id: name, label: `:${name}:`, insert: `:${name}: `, preview: url }));
-      const standard = searchЭмодзи(query, 8).map(([name, char]) => ({
+      const standard = searchEmoji(query, 8).map(([name, char]) => ({
         id: name,
         label: `:${name}:`,
         insert: `${char} `,
@@ -214,7 +214,7 @@ export function Composer({
       .filter((command) => !query || command.name.startsWith(query))
       .slice(0, 8)
       .map((command) => ({ id: command.name, label: command.usage, hint: command.description, insert: `/${command.name} ` }));
-  }, [caret, commands, customЭмодзи, dismissedAt, state.bootstrap, state.session?.id, trigger]);
+  }, [caret, commands, customEmoji, dismissedAt, state.bootstrap, state.session?.id, trigger]);
 
   useEffect(() => setSuggestionIndex(0), [suggestions.length]);
 
@@ -288,11 +288,11 @@ export function Composer({
     setAttachments([]);
     if (draftTimer.current) clearTimeout(draftTimer.current);
     pendingDraft.current = null;
-    await actions.sendСообщение({
+    await actions.sendMessage({
       conversationId,
       bodyText: body,
-      parentСообщениеId,
-      threadBroadcast: parentСообщениеId ? broadcast : undefined,
+      parentMessageId,
+      threadBroadcast: parentMessageId ? broadcast : undefined,
       fileIds: attachments.map((file) => file.id)
     });
     setBroadcast(false);
@@ -328,12 +328,12 @@ export function Composer({
         .at(-1);
       if (own) {
         event.preventDefault();
-        actions.setИзменитьingСообщение(own.id);
+        actions.setEditingMessage(own.id);
         return;
       }
     }
 
-    if (event.key === "Enter" && !event.shiftKey && enterToОтправить) {
+    if (event.key === "Enter" && !event.shiftKey && enterToSend) {
       event.preventDefault();
       void send();
       return;
@@ -415,32 +415,32 @@ export function Composer({
 
       <div className="composer-box">
         <div className="composer-toolbar">
-          <IconButton label="Полужирный" onClick={() => wrapSelection("*")}>
-            <Полужирный size={15} />
+          <IconButton label="Bold" onClick={() => wrapSelection("*")}>
+            <Bold size={15} />
           </IconButton>
-          <IconButton label="Курсив" onClick={() => wrapSelection("_")}>
-            <Курсив size={15} />
+          <IconButton label="Italic" onClick={() => wrapSelection("_")}>
+            <Italic size={15} />
           </IconButton>
-          <IconButton label="Зачёркнутый" onClick={() => wrapSelection("~")}>
-            <Зачёркнутый size={15} />
+          <IconButton label="Strikethrough" onClick={() => wrapSelection("~")}>
+            <Strikethrough size={15} />
           </IconButton>
           <span className="toolbar-divider" />
-          <IconButton label="Ссылка" onClick={() => wrapSelection("<", "|label>")}>
-            <Ссылка2 size={15} />
+          <IconButton label="Link" onClick={() => wrapSelection("<", "|label>")}>
+            <Link2 size={15} />
           </IconButton>
-          <IconButton label="Нумерованный список" onClick={() => prefixLines("1. ")}>
+          <IconButton label="Ordered list" onClick={() => prefixLines("1. ")}>
             <ListOrdered size={15} />
           </IconButton>
-          <IconButton label="Маркированный список" onClick={() => prefixLines("- ")}>
+          <IconButton label="Bulleted list" onClick={() => prefixLines("- ")}>
             <List size={15} />
           </IconButton>
-          <IconButton label="Цитата" onClick={() => prefixLines("> ")}>
+          <IconButton label="Blockquote" onClick={() => prefixLines("> ")}>
             <Quote size={15} />
           </IconButton>
-          <IconButton label="Строчный код" onClick={() => wrapSelection("`")}>
+          <IconButton label="Inline code" onClick={() => wrapSelection("`")}>
             <Code size={15} />
           </IconButton>
-          <IconButton label="Блок кода" onClick={() => wrapSelection("```\n", "\n```")}>
+          <IconButton label="Code block" onClick={() => wrapSelection("```\n", "\n```")}>
             <CodeSquare size={15} />
           </IconButton>
         </div>
@@ -497,28 +497,28 @@ export function Composer({
               hidden
               onChange={(event) => event.target.files && void uploadFiles(event.target.files)}
             />
-            <IconButton label="Прикрепить файл" onClick={() => fileInputRef.current?.click()}>
+            <IconButton label="Attach file" onClick={() => fileInputRef.current?.click()}>
               <Paperclip size={17} />
             </IconButton>
             <Popover
               width={340}
               trigger={({ toggle, ref }) => (
-                <button type="button" className="icon-button" ref={ref} onClick={toggle} aria-label="Эмодзи">
+                <button type="button" className="icon-button" ref={ref} onClick={toggle} aria-label="Emoji">
                   <Smile size={17} />
                 </button>
               )}
             >
               {(close) => (
-                <ЭмодзиPicker
+                <EmojiPicker
                   onPick={(value) => {
                     const next = `${text}${text.endsWith(" ") || !text ? "" : " "}${value} `;
                     replaceText(next, next.length);
                   }}
-                  onЗакрыть={close}
+                  onClose={close}
                 />
               )}
             </Popover>
-            {parentСообщениеId ? (
+            {parentMessageId ? (
               <label className="broadcast-toggle">
                 <input type="checkbox" checked={broadcast} onChange={(event) => setBroadcast(event.target.checked)} />
                 Also send to {conversation?.channel ? `#${conversation.channel.name}` : "conversation"}
@@ -528,13 +528,13 @@ export function Composer({
 
           <div className="composer-right">
             <IconButton
-              label="Отправить позже"
+              label="Schedule for later"
               onClick={() =>
                 actions.setModal({
                   kind: "schedule",
                   conversationId,
                   bodyText: toMentionWire(text, mentions),
-                  parentСообщениеId
+                  parentMessageId
                 })
               }
               disabled={!text.trim()}
@@ -547,13 +547,13 @@ export function Composer({
               onClick={() => void send()}
               disabled={!text.trim() && attachments.length === 0}
             >
-              <Отправить size={15} /> Отправить
+              <Send size={15} /> Send
             </button>
           </div>
         </div>
       </div>
       <p className="composer-hint">
-        {enterToОтправить ? "Enter to send · Shift+Enter for a new line" : "Нажмите Cmd+Enter для отправки"} · Type / for commands
+        {enterToSend ? "Enter to send · Shift+Enter for a new line" : "Cmd+Enter to send"} · Type / for commands
       </p>
     </div>
   );
