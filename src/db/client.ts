@@ -4,7 +4,7 @@ import * as schema from "./schema";
 
 const globalForDb = globalThis as unknown as {
 fluidchatPool?: pg.Pool;
-fluidchatDb?: ReturnType<typeof drizzle<typeof schema>>;
+fluidchatDb?: ReturnType<typeof drizzle>;
 };
 
 function getConnectionString(): string {
@@ -50,7 +50,7 @@ return typeof value === "function" ? value.bind(actualPool) : value;
 },
 });
 
-export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 get(_target, property) {
 const actualDb = getDb();
 const value = Reflect.get(actualDb, property, actualDb);
