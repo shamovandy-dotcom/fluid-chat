@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AtSign, Bell, Bookmark, Clock, Inbox, MessageSquare, PenSquare, Trash2 } from "lucide-react";
-import type { DraftDto, MessageDto, NotificationDto, ReminderDto, ScheduledMessageDto } from "@/shared/types";
+import { AtSign, Bell, Bookmark, Clock, Inbox, СообщениеSquare, PenSquare, Trash2 } from "lucide-react";
+import type { DraftDto, СообщениеDto, NotificationDto, ReminderDto, ScheduledСообщениеDto } from "@/shared/types";
 import { api } from "../../api";
 import { formatRelative, compactTimestamp } from "../../format";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, EmptyState, Spinner } from "../ui/primitives";
-import { MessageItem } from "../message/message-item";
+import { СообщениеItem } from "../message/message-item";
 import { RichText } from "../message/rich-text";
 
 function ViewHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
   return (
-    <header className="view-header">
+    <header classИмя="view-header">
       <div>
         <h1>{title}</h1>
         {subtitle ? <p>{subtitle}</p> : null}
@@ -35,58 +35,58 @@ export function useConversationLabel() {
   };
 }
 
-export function ActivityView() {
+export function АктивностьView() {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const label = useConversationLabel();
-  const [notifications, setNotifications] = useState<NotificationDto[] | null>(null);
+  const [notifications, setУведомления] = useState<NotificationDto[] | null>(null);
   const [filter, setFilter] = useState<"all" | "mention" | "thread_reply" | "reaction">("all");
 
   useEffect(() => {
     if (!state.workspaceId) return;
     api.activity
       .notifications(state.workspaceId)
-      .then(({ notifications: list }) => setNotifications(list))
-      .catch(() => setNotifications([]));
+      .then(({ notifications: list }) => setУведомления(list))
+      .catch(() => setУведомления([]));
   }, [state.workspaceId, state.notifications.length]);
 
   const visible = (notifications ?? []).filter((entry) => filter === "all" || entry.type === filter);
 
   return (
-    <section className="view">
+    <section classИмя="view">
       <ViewHeader
-        title="Activity"
-        subtitle="Mentions, replies and reactions"
+        title="Активность"
+        subtitle="Упоминания, ответы и реакции"
         action={
           <button
             type="button"
-            className="button ghost"
+            classИмя="button ghost"
             onClick={async () => {
               if (!state.workspaceId) return;
-              await api.activity.markNotificationsRead(state.workspaceId);
-              await actions.loadNotifications();
-              setNotifications((current) =>
+              await api.activity.markУведомленияRead(state.workspaceId);
+              await actions.loadУведомления();
+              setУведомления((current) =>
                 (current ?? []).map((entry) => ({ ...entry, readAt: entry.readAt ?? new Date().toISOString() }))
               );
             }}
           >
-            Mark all read
+            Отметить всё прочитанным
           </button>
         }
       />
-      <div className="view-filters">
+      <div classИмя="view-filters">
         {(
           [
             ["all", "All", <Bell key="a" size={14} />],
             ["mention", "Mentions", <AtSign key="b" size={14} />],
-            ["thread_reply", "Threads", <MessageSquare key="c" size={14} />],
+            ["thread_reply", "Обсуждениеs", <СообщениеSquare key="c" size={14} />],
             ["reaction", "Reactions", <Bookmark key="d" size={14} />]
           ] as const
         ).map(([value, text, icon]) => (
           <button
             key={value}
             type="button"
-            className={filter === value ? "is-active" : ""}
+            classИмя={filter === value ? "is-active" : ""}
             onClick={() => setFilter(value as typeof filter)}
           >
             {icon}
@@ -95,11 +95,11 @@ export function ActivityView() {
         ))}
       </div>
 
-      <div className="view-scroll">
+      <div classИмя="view-scroll">
         {!notifications ? (
-          <Spinner label="Loading activity" />
+          <Spinner label="Загрузка активности" />
         ) : visible.length === 0 ? (
-          <EmptyState title="You are all caught up" body="Mentions, thread replies and reactions land here." />
+          <EmptyState title="Вы are all caught up" body="Здесь отображаются упоминания, ответы в обсуждениях и реакции." />
         ) : (
           visible.map((notification) => {
             const actor = notification.actorUserId ? directory.get(notification.actorUserId) : undefined;
@@ -107,20 +107,20 @@ export function ActivityView() {
               <button
                 key={notification.id}
                 type="button"
-                className={`activity-row ${notification.readAt ? "" : "is-unread"}`}
+                classИмя={`activity-row ${notification.readAt ? "" : "is-unread"}`}
                 onClick={() => {
                   if (notification.conversationId) void actions.openConversation(notification.conversationId);
                 }}
               >
                 <Avatar user={actor} size={34} />
                 <div>
-                  <div className="activity-meta">
-                    <strong>{actor?.displayName ?? "Fluid Chat"}</strong>
+                  <div classИмя="activity-meta">
+                    <strong>{actor?.displayИмя ?? "Fluid Chat"}</strong>
                     <span>{describeNotification(notification.type)}</span>
-                    <span className="muted">{label(notification.conversationId)}</span>
+                    <span classИмя="muted">{label(notification.conversationId)}</span>
                     <time>{formatRelative(notification.createdAt)}</time>
                   </div>
-                  {notification.body ? <p className="activity-body">{notification.body}</p> : null}
+                  {notification.body ? <p classИмя="activity-body">{notification.body}</p> : null}
                 </div>
               </button>
             );
@@ -154,41 +154,41 @@ function describeNotification(type: string) {
   }
 }
 
-export function ThreadsView() {
+export function ОбсуждениеsView() {
   const { state, actions } = useApp();
   const label = useConversationLabel();
-  const [threads, setThreads] = useState<Array<{ root: MessageDto; replies: MessageDto[] }> | null>(null);
+  const [threads, setОбсуждениеs] = useState<Array<{ root: СообщениеDto; replies: СообщениеDto[] }> | null>(null);
 
   useEffect(() => {
     if (!state.workspaceId) return;
     api.activity
       .threads(state.workspaceId)
-      .then(({ threads: list }) => setThreads(list))
-      .catch(() => setThreads([]));
+      .then(({ threads: list }) => setОбсуждениеs(list))
+      .catch(() => setОбсуждениеs([]));
   }, [state.workspaceId]);
 
   return (
-    <section className="view">
-      <ViewHeader title="Threads" subtitle="Conversations you are part of" />
-      <div className="view-scroll">
+    <section classИмя="view">
+      <ViewHeader title="Обсуждениеs" subtitle="Переписки, в которых вы участвуете" />
+      <div classИмя="view-scroll">
         {!threads ? (
-          <Spinner label="Loading threads" />
+          <Spinner label="Загрузка обсужденияs" />
         ) : threads.length === 0 ? (
-          <EmptyState title="No threads yet" body="Reply to a message in a thread and it shows up here." />
+          <EmptyState title="Пока нет обсуждений" body="Ответьте на сообщение в обсуждении — оно появится здесь." />
         ) : (
           threads.map(({ root, replies }) => (
-            <div key={root.id} className="thread-card">
-              <button type="button" className="thread-card-head" onClick={() => void actions.openThread(root.id)}>
+            <div key={root.id} classИмя="thread-card">
+              <button type="button" classИмя="thread-card-head" onClick={() => void actions.openОбсуждение(root.id)}>
                 {label(root.conversationId)}
                 <span>
                   {root.thread.replyCount} {root.thread.replyCount === 1 ? "reply" : "replies"}
                 </span>
               </button>
-              <MessageItem message={root} context="list" />
+              <СообщениеItem message={root} context="list" />
               {replies.map((reply) => (
-                <MessageItem key={reply.id} message={reply} context="list" />
+                <СообщениеItem key={reply.id} message={reply} context="list" />
               ))}
-              <button type="button" className="button ghost" onClick={() => void actions.openThread(root.id)}>
+              <button type="button" classИмя="button ghost" onClick={() => void actions.openОбсуждение(root.id)}>
                 Open thread
               </button>
             </div>
@@ -199,33 +199,33 @@ export function ThreadsView() {
   );
 }
 
-export function SavedView() {
+export function СохранитьdView() {
   const { state } = useApp();
-  const [saved, setSaved] = useState<Array<{ message: MessageDto; savedAt: string }> | null>(null);
+  const [saved, setСохранитьd] = useState<Array<{ message: СообщениеDto; savedAt: string }> | null>(null);
 
   useEffect(() => {
     if (!state.workspaceId) return;
     api.activity
       .saved(state.workspaceId)
-      .then(({ saved: list }) => setSaved(list))
-      .catch(() => setSaved([]));
+      .then(({ saved: list }) => setСохранитьd(list))
+      .catch(() => setСохранитьd([]));
   }, [state.workspaceId]);
 
   return (
-    <section className="view">
-      <ViewHeader title="Later" subtitle="Messages you saved" />
-      <div className="view-scroll">
+    <section classИмя="view">
+      <ViewHeader title="На потом" subtitle="Сохранённые сообщения" />
+      <div classИмя="view-scroll">
         {!saved ? (
-          <Spinner label="Loading saved items" />
+          <Spinner label="Загрузка сохранённых сообщений" />
         ) : saved.length === 0 ? (
-          <EmptyState title="Nothing saved" body="Use the bookmark action on a message to keep it here." />
+          <EmptyState title="Пока ничего не сохранено" body="Нажмите на значок закладки у сообщения, чтобы сохранить его здесь." />
         ) : (
           saved.map(({ message, savedAt }) => (
-            <div key={message.id} className="panel-card">
-              <div className="panel-card-head">
-                <Bookmark size={13} /> Saved {formatRelative(savedAt)}
+            <div key={message.id} classИмя="panel-card">
+              <div classИмя="panel-card-head">
+                <Bookmark size={13} /> Сохранитьd {formatRelative(savedAt)}
               </div>
-              <MessageItem message={message} context="list" />
+              <СообщениеItem message={message} context="list" />
             </div>
           ))
         )}
@@ -238,7 +238,7 @@ export function DraftsView() {
   const { state, actions } = useApp();
   const label = useConversationLabel();
   const [drafts, setDrafts] = useState<DraftDto[] | null>(null);
-  const [scheduled, setScheduled] = useState<ScheduledMessageDto[]>([]);
+  const [scheduled, setScheduled] = useState<ScheduledСообщениеDto[]>([]);
   const [reminders, setReminders] = useState<ReminderDto[]>([]);
 
   const load = () => {
@@ -251,16 +251,16 @@ export function DraftsView() {
   useEffect(load, [state.workspaceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className="view">
-      <ViewHeader title="Drafts & sent" subtitle="Unsent drafts, scheduled messages and reminders" />
-      <div className="view-scroll">
-        <h3 className="view-subhead">
+    <section classИмя="view">
+      <ViewHeader title="Черновики и отправленные" subtitle="Черновикs, scheduled messages and reminders" />
+      <div classИмя="view-scroll">
+        <h3 classИмя="view-subhead">
           <PenSquare size={14} /> Drafts
         </h3>
         {!drafts ? (
-          <Spinner label="Loading drafts" />
+          <Spinner label="Загрузка черновиков" />
         ) : drafts.filter((draft) => draft.bodyText.trim()).length === 0 ? (
-          <EmptyState title="No drafts" body="Messages you start but do not send are kept here." />
+          <EmptyState title="Нет черновиков" body="Здесь хранятся начатые, но не отправленные сообщения." />
         ) : (
           drafts
             .filter((draft) => draft.bodyText.trim())
@@ -268,10 +268,10 @@ export function DraftsView() {
               <button
                 key={draft.id}
                 type="button"
-                className="list-row"
+                classИмя="list-row"
                 onClick={() => void actions.openConversation(draft.conversationId)}
               >
-                <div className="list-row-head">
+                <div classИмя="list-row-head">
                   <strong>{label(draft.conversationId)}</strong>
                   <time>{formatRelative(draft.updatedAt)}</time>
                 </div>
@@ -280,21 +280,21 @@ export function DraftsView() {
             ))
         )}
 
-        <h3 className="view-subhead">
+        <h3 classИмя="view-subhead">
           <Clock size={14} /> Scheduled
         </h3>
         {scheduled.length === 0 ? (
-          <p className="muted padded">Nothing scheduled.</p>
+          <p classИмя="muted padded">Nothing scheduled.</p>
         ) : (
           scheduled.map((entry) => (
-            <div key={entry.id} className="list-row is-static">
-              <div className="list-row-head">
+            <div key={entry.id} classИмя="list-row is-static">
+              <div classИмя="list-row-head">
                 <strong>{label(entry.conversationId)}</strong>
-                <time>Sends {compactTimestamp(entry.sendAt)}</time>
+                <time>Отправитьs {compactTimestamp(entry.sendAt)}</time>
                 <button
                   type="button"
-                  className="icon-button"
-                  aria-label="Cancel scheduled message"
+                  classИмя="icon-button"
+                  aria-label="Отменить запланированное сообщение"
                   onClick={async () => {
                     await api.activity.cancelScheduled(entry.id);
                     load();
@@ -308,20 +308,20 @@ export function DraftsView() {
           ))
         )}
 
-        <h3 className="view-subhead">
+        <h3 classИмя="view-subhead">
           <Bell size={14} /> Reminders
         </h3>
         {reminders.length === 0 ? (
-          <p className="muted padded">No reminders set.</p>
+          <p classИмя="muted padded">No reminders set.</p>
         ) : (
           reminders.map((reminder) => (
-            <div key={reminder.id} className="list-row is-static">
-              <div className="list-row-head">
+            <div key={reminder.id} classИмя="list-row is-static">
+              <div classИмя="list-row-head">
                 <strong>{reminder.text}</strong>
                 <time>{compactTimestamp(reminder.remindAt)}</time>
                 <button
                   type="button"
-                  className="button ghost"
+                  classИмя="button ghost"
                   onClick={async () => {
                     await api.activity.completeReminder(reminder.id);
                     load();
@@ -341,7 +341,7 @@ export function DraftsView() {
 export function UnreadsView() {
   const { state, actions } = useApp();
   const label = useConversationLabel();
-  const [unreads, setUnreads] = useState<Array<{ conversationId: string; messages: MessageDto[] }> | null>(null);
+  const [unreads, setUnreads] = useState<Array<{ conversationId: string; messages: СообщениеDto[] }> | null>(null);
 
   const load = () => {
     if (!state.workspaceId) return;
@@ -354,14 +354,14 @@ export function UnreadsView() {
   useEffect(load, [state.workspaceId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className="view">
+    <section classИмя="view">
       <ViewHeader
-        title="All unreads"
-        subtitle="Everything you have not read yet"
+        title="Все непрочитанные"
+        subtitle="Все сообщения, которые вы ещё не прочитали"
         action={
           <button
             type="button"
-            className="button ghost"
+            classИмя="button ghost"
             onClick={async () => {
               for (const entry of unreads ?? []) {
                 await api.conversations.markRead(entry.conversationId, entry.messages.at(-1)?.id);
@@ -370,24 +370,24 @@ export function UnreadsView() {
               load();
             }}
           >
-            <Inbox size={14} /> Mark all read
+            <Inbox size={14} /> Отметить всё прочитанным
           </button>
         }
       />
-      <div className="view-scroll">
+      <div classИмя="view-scroll">
         {!unreads ? (
-          <Spinner label="Loading unreads" />
+          <Spinner label="Загрузка непрочитанных сообщений" />
         ) : unreads.length === 0 ? (
-          <EmptyState title="You are all caught up" body="No unread messages anywhere." />
+          <EmptyState title="Вы are all caught up" body="Непрочитанных сообщений нет." />
         ) : (
           unreads.map((entry) => (
-            <div key={entry.conversationId} className="unread-group">
-              <button type="button" className="unread-group-head" onClick={() => void actions.openConversation(entry.conversationId)}>
+            <div key={entry.conversationId} classИмя="unread-group">
+              <button type="button" classИмя="unread-group-head" onClick={() => void actions.openConversation(entry.conversationId)}>
                 {label(entry.conversationId)}
                 <span>{entry.messages.length} new</span>
               </button>
               {entry.messages.map((message) => (
-                <MessageItem key={message.id} message={message} context="list" />
+                <СообщениеItem key={message.id} message={message} context="list" />
               ))}
             </div>
           ))
