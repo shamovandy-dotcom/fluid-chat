@@ -8,8 +8,8 @@ import { useApp } from "../store";
 export function AuthScreen() {
   const { actions } = useApp();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
-  const [email, setЭлектронная почта] = useState("");
-  const [password, setПароль] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -84,7 +84,7 @@ export function AuthScreen() {
             <input
               type="email"
               value={email}
-              onChange={(event) => setЭлектронная почта(event.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
               autoFocus
@@ -96,7 +96,7 @@ export function AuthScreen() {
               <input
                 type="password"
                 value={password}
-                onChange={(event) => setПароль(event.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
                 required
                 minLength={8}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
