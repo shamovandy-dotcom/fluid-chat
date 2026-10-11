@@ -1,47 +1,47 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Поиск } from "lucide-react";
-import { EMOJI_CATEGORIES, applySkinTone, emojiChar, frequentЭмодзи, rememberЭмодзи, searchЭмодзи } from "../../emoji";
-import { useApp, useCustomЭмодзи } from "../../store";
+import { Search } from "lucide-react";
+import { EMOJI_CATEGORIES, applySkinTone, emojiChar, frequentEmoji, rememberEmoji, searchEmoji } from "../../emoji";
+import { useApp, useCustomEmoji } from "../../store";
 
 /**
  * Reaction values are stored either as a literal emoji character or as
  * `:name:` for workspace custom emoji, which keeps rendering trivial everywhere.
  */
-export function ЭмодзиPicker({ onPick, onЗакрыть }: { onPick: (value: string) => void; onЗакрыть?: () => void }) {
+export function EmojiPicker({ onPick, onClose }: { onPick: (value: string) => void; onClose?: () => void }) {
   const { state, actions } = useApp();
-  const customЭмодзи = useCustomЭмодзи();
+  const customEmoji = useCustomEmoji();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(EMOJI_CATEGORIES[0].id);
   const skinTone = state.session?.preferences?.skinTone ?? 0;
 
-  const results = useMemo(() => (query.trim() ? searchЭмодзи(query) : []), [query]);
+  const results = useMemo(() => (query.trim() ? searchEmoji(query) : []), [query]);
   const customMatches = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return [...customЭмодзи.entries()].filter(([name]) => !term || name.includes(term));
-  }, [customЭмодзи, query]);
+    return [...customEmoji.entries()].filter(([name]) => !term || name.includes(term));
+  }, [customEmoji, query]);
 
   const active = EMOJI_CATEGORIES.find((entry) => entry.id === category) ?? EMOJI_CATEGORIES[0];
 
-  const frequent = useMemo(() => frequentЭмодзи(), []);
+  const frequent = useMemo(() => frequentEmoji(), []);
 
   const pick = (value: string) => {
-    rememberЭмодзи(value);
+    rememberEmoji(value);
     onPick(value);
-    onЗакрыть?.();
+    onClose?.();
   };
 
   return (
     <div className="emoji-picker">
       <div className="emoji-search">
-        <Поиск size={14} />
+        <Search size={14} />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Поиск эмодзи"
+          placeholder="Search emoji"
           autoFocus
-          aria-label="Поиск эмодзи"
+          aria-label="Search emoji"
         />
       </div>
 
@@ -68,7 +68,7 @@ export function ЭмодзиPicker({ onPick, onЗакрыть }: { onPick: (valu
               {frequent.map((entry) => {
                 const custom = /^:([a-z0-9_+-]+):$/i.exec(entry);
                 if (custom) {
-                  const url = customЭмодзи.get(custom[1].toLowerCase());
+                  const url = customEmoji.get(custom[1].toLowerCase());
                   if (!url) return null;
                   return (
                     <button key={entry} type="button" title={entry} onClick={() => pick(entry)}>
@@ -135,7 +135,7 @@ export function ЭмодзиPicker({ onPick, onЗакрыть }: { onPick: (valu
               type="button"
               className={tone === skinTone ? "is-active" : ""}
               aria-label={`Skin tone ${tone + 1}`}
-              onClick={() => void actions.updateПредпочтения({ skinTone: tone })}
+              onClick={() => void actions.updatePreferences({ skinTone: tone })}
             >
               {applySkinTone("👍", tone)}
             </button>
