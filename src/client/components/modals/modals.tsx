@@ -289,16 +289,6 @@ export function NewDmModal({ onClose }: { onClose: () => void }) {
             <p className="muted">
               Direct messages are available to people in this workspace. Invite another account to join this workspace first.
             </p>
-            <button
-              type="button"
-              className="button ghost"
-              onClick={() => {
-                onClose();
-                actions.setModal({ kind: "invite" });
-              }}
-            >
-              Invite people
-            </button>
           </div>
         ) : null}
       </div>
