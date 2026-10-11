@@ -20,7 +20,7 @@ export function AuthScreen() {
     setNotice("");
     try {
       if (mode === "forgot") {
-        const { resetToken } = await api.auth.forgotПароль(email);
+        const { resetToken } = await api.auth.forgotPassword(email);
         setNotice(
           resetToken
             ? `На сервере не настроена отправка писем. Вот ссылка для сброса пароля: /reset-password/${resetToken}`
