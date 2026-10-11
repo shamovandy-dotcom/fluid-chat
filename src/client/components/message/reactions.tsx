@@ -3,12 +3,12 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { Smile } from "lucide-react";
-import type { MessageDto, ReactionSummary } from "@/shared/types";
-import { emojiLabel, reactionShortcuts, rememberEmoji } from "../../emoji";
+import type { СообщениеDto, Добавить реакциюionSummary } from "@/shared/types";
+import { emojiLabel, reactionShortcuts, rememberЭмодзи } from "../../emoji";
 import { useApp } from "../../store";
 import { Popover } from "../ui/primitives";
-import { EmojiPicker } from "../ui/emoji-picker";
-import { EmojiValue } from "./rich-text";
+import { ЭмодзиPicker } from "../ui/emoji-picker";
+import { ЭмодзиValue } from "./rich-text";
 
 /** Names beyond this are collapsed into "and N others", as Slack does. */
 const NAMES_SHOWN = 8;
@@ -17,7 +17,7 @@ const NAMES_SHOWN = 8;
  * Reads the reactor list the way a person would say it: you first, then who
  * else, then what they reacted with.
  */
-function reactorNames(reaction: ReactionSummary, viewerId: string | undefined) {
+function reactorNames(reaction: Добавить реакциюionSummary, viewerId: string | undefined) {
   const others = reaction.users.filter((user) => user.id !== viewerId).map((user) => user.displayName);
   const names = reaction.reacted ? ["You", ...others] : others;
   const hidden = names.length - NAMES_SHOWN;
@@ -28,37 +28,37 @@ function reactorNames(reaction: ReactionSummary, viewerId: string | undefined) {
   return `${shown.slice(0, -1).join(", ")} and ${shown[shown.length - 1]}`;
 }
 
-export function MessageReactions({ message }: { message: MessageDto }) {
+export function СообщениеДобавить реакциюions({ message }: { message: СообщениеDto }) {
   const { actions } = useApp();
   if (message.reactions.length === 0) return null;
 
   return (
     <div className="reactions">
       {message.reactions.map((reaction) => (
-        <ReactionChip
+        <Добавить реакциюionChip
           key={reaction.emoji}
           reaction={reaction}
           onToggle={() => {
-            if (!reaction.reacted) rememberEmoji(reaction.emoji);
-            void actions.toggleReaction(message, reaction.emoji);
+            if (!reaction.reacted) rememberЭмодзи(reaction.emoji);
+            void actions.toggleДобавить реакциюion(message, reaction.emoji);
           }}
         />
       ))}
       <Popover
         width={340}
         trigger={({ toggle, ref }) => (
-          <button type="button" className="reaction add-reaction" onClick={toggle} ref={ref} aria-label="Add reaction">
+          <button type="button" className="reaction add-reaction" onClick={toggle} ref={ref} aria-label="Добавить реакцию">
             <Smile size={14} />
           </button>
         )}
       >
-        {(close) => <EmojiPicker onPick={(value) => void actions.toggleReaction(message, value)} onClose={close} />}
+        {(close) => <ЭмодзиPicker onPick={(value) => void actions.toggleДобавить реакциюion(message, value)} onЗакрыть={close} />}
       </Popover>
     </div>
   );
 }
 
-function ReactionChip({ reaction, onToggle }: { reaction: ReactionSummary; onToggle: () => void }) {
+function Добавить реакциюionChip({ reaction, onToggle }: { reaction: Добавить реакциюionSummary; onToggle: () => void }) {
   const { state } = useApp();
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
@@ -96,11 +96,11 @@ function ReactionChip({ reaction, onToggle }: { reaction: ReactionSummary; onTog
         onFocus={() => setHovered(true)}
         onBlur={() => setHovered(false)}
       >
-        <EmojiValue value={reaction.emoji} />
+        <ЭмодзиValue value={reaction.emoji} />
         <span>{reaction.count}</span>
       </button>
       {hovered ? (
-        <ReactionTooltip anchor={ref} emoji={reaction.emoji} names={names} label={label} />
+        <Добавить реакциюionTooltip anchor={ref} emoji={reaction.emoji} names={names} label={label} />
       ) : null}
     </>
   );
@@ -111,13 +111,13 @@ function ReactionChip({ reaction, onToggle }: { reaction: ReactionSummary; onTog
  * positioned like the popover: above the chip, flipping below when the top of
  * the viewport is closer than the card is tall.
  */
-function ReactionTooltip({
+function Добавить реакциюionTooltip({
   anchor,
   emoji,
   names,
   label
 }: {
-  anchor: React.RefObject<HTMLButtonElement | null>;
+  anchor: Добавить реакцию.RefObject<HTMLButtonElement | null>;
   emoji: string;
   names: string;
   label: string;
@@ -147,7 +147,7 @@ function ReactionTooltip({
   return createPortal(
     <div className="reaction-tooltip" role="tooltip" ref={cardRef} style={position}>
       <span className="reaction-tooltip-emoji">
-        <EmojiValue value={emoji} />
+        <ЭмодзиValue value={emoji} />
       </span>
       <p>
         <strong>{names}</strong> reacted with <span className="reaction-tooltip-name">{label}</span>
@@ -158,12 +158,12 @@ function ReactionTooltip({
 }
 
 /** Hover-toolbar shortcuts, learned from what this user actually reaches for. */
-export function QuickReactions({ message }: { message: MessageDto }) {
+export function QuickДобавить реакциюions({ message }: { message: СообщениеDto }) {
   const { actions } = useApp();
   // The frequency list lives in localStorage, so it is read after mount to keep
   // the server and client renders identical.
-  const [emoji, setEmoji] = useState<string[]>([]);
-  useEffect(() => setEmoji(reactionShortcuts()), []);
+  const [emoji, setЭмодзи] = useState<string[]>([]);
+  useEffect(() => setЭмодзи(reactionShortcuts()), []);
 
   return (
     <>
@@ -171,13 +171,13 @@ export function QuickReactions({ message }: { message: MessageDto }) {
         <button
           key={value}
           type="button"
-          title={`React with ${emojiLabel(value)}`}
+          title={`Добавить реакцию with ${emojiLabel(value)}`}
           onClick={() => {
-            rememberEmoji(value);
-            void actions.toggleReaction(message, value);
+            rememberЭмодзи(value);
+            void actions.toggleДобавить реакциюion(message, value);
           }}
         >
-          <EmojiValue value={value} />
+          <ЭмодзиValue value={value} />
         </button>
       ))}
     </>
