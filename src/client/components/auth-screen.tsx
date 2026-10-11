@@ -8,8 +8,8 @@ import { useApp } from "../store";
 export function AuthScreen() {
   const { actions } = useApp();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setЭлектронная почта] = useState("");
+  const [password, setПароль] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
@@ -20,7 +20,7 @@ export function AuthScreen() {
     setNotice("");
     try {
       if (mode === "forgot") {
-        const { resetToken } = await api.auth.forgotPassword(email);
+        const { resetToken } = await api.auth.forgotПароль(email);
         setNotice(
           resetToken
             ? `На сервере не настроена отправка писем. Вот ссылка для сброса пароля: /reset-password/${resetToken}`
@@ -35,6 +35,7 @@ export function AuthScreen() {
           ? await api.auth.signup({ email, password, displayName })
           : await api.auth.login(email, password);
       actions.setSession(result.user, result.workspaces);
+      // Identify before capturing so the conversion lands on the person, not the anonymous id.
       identifyUser(result.user);
       track(mode === "signup" ? "signed_up" : "signed_in", { workspace_count: result.workspaces.length });
       if (result.workspaces[0]) await actions.selectWorkspace(result.workspaces[0].workspace.id);
@@ -55,7 +56,7 @@ export function AuthScreen() {
         </p>
         <ul className="auth-points">
           <li>Общение в открытых и закрытых каналах</li>
-          <li>Ветки обсуждений, упоминания, реакции, закреплённые и сохранённые сообщения</li>
+          <li>Обсуждения, упоминания, реакции, закреплённые и сохранённые сообщения</li>
           <li>Статус присутствия в реальном времени, индикаторы набора текста и непрочитанные сообщения</li>
           <li>Полнотекстовый поиск по всем доступным вам материалам</li>
         </ul>
@@ -83,7 +84,7 @@ export function AuthScreen() {
             <input
               type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => setЭлектронная почта(event.target.value)}
               required
               autoComplete="email"
               autoFocus
@@ -95,7 +96,7 @@ export function AuthScreen() {
               <input
                 type="password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => setПароль(event.target.value)}
                 required
                 minLength={8}
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
@@ -104,7 +105,7 @@ export function AuthScreen() {
           ) : null}
 
           <button type="submit" className="button primary" disabled={busy}>
-            {busy ? "Подождите…" : mode === "signup" ? "Создать аккаунт" : mode === "forgot" ? "Отправить ссылку" : "Войти"}
+            {mode === "signup" ? "Создать аккаунт" : mode === "forgot" ? "Отправить ссылку" : "Войти"}
           </button>
 
           {mode === "login" ? (
@@ -162,7 +163,7 @@ export function WorkspaceSetupScreen() {
             <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Например, АНДРОЛИТ" required autoFocus />
           </label>
           <button type="submit" className="button primary" disabled={busy || name.trim().length < 2}>
-            {busy ? "Создаём…" : "Создать рабочее пространство"}
+            Создать рабочее пространство
           </button>
           <button type="button" className="link-button" onClick={() => void actions.signOut()}>
             Выйти из аккаунта
