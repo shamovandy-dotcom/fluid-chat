@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Download, Hash, Lock, Поиск } from "lucide-react";
+import { Download, Hash, Lock, Search } from "lucide-react";
 import type { ChannelSummary, FileSummary, MessageDto } from "@/shared/types";
 import { api } from "../../api";
 import { track } from "../../analytics";
@@ -53,7 +53,7 @@ export function BrowseChannelsView() {
 
       <div className="view-toolbar">
         <div className="search-field">
-          <Поиск size={15} />
+          <Search size={15} />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск channels" />
         </div>
         <div className="view-filters">
@@ -138,7 +138,7 @@ export function PeopleView() {
 
       <div className="view-toolbar">
         <div className="search-field">
-          <Поиск size={15} />
+          <Search size={15} />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск people" />
         </div>
       </div>
@@ -276,7 +276,7 @@ export function SearchView({ query }: { query: string }) {
             actions.setView({ kind: "search", query: term });
           }}
         >
-          <Поиск size={15} />
+          <Search size={15} />
           <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Поиск messages" autoFocus />
         </form>
         <div className="view-filters">
