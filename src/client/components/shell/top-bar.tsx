@@ -24,7 +24,7 @@ export function TopBar() {
         >
           <Menu size={18} />
         </button>
-        <span className="brand">Fluid Chat</span>
+        <span className="brand">Androlit Chat</span>
       </div>
 
       <form
@@ -77,7 +77,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Smile size={14} /> Обновить your status
+                <Smile size={14} /> Обновить статус
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -85,7 +85,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <UserCircle size={14} /> Set yourself {session?.presence === "away" ? "active" : "away"}
+                <UserCircle size={14} /> {session?.presence === "away" ? "Перейти в активный режим" : "Отметить как отошедшего"}
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -93,7 +93,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Clock size={14} /> Pause notifications for 1 hour
+                <Clock size={14} /> Приостановить уведомления на 1 час
               </MenuItem>
               <MenuDivider />
               <MenuItem
@@ -102,7 +102,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <UserCircle size={14} /> Изменить profile
+                <UserCircle size={14} /> Изменить профиль
               </MenuItem>
               <MenuItem
                 onClick={() => {
@@ -118,7 +118,7 @@ export function TopBar() {
                   close();
                 }}
               >
-                <Moon size={14} /> Switch to {resolvedTheme === "dark" ? "light" : "dark"} theme
+                <Moon size={14} /> Переключить на {resolvedTheme === "dark" ? "светлую" : "тёмную"} тему
               </MenuItem>
               <MenuDivider />
               <MenuItem
