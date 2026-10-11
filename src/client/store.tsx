@@ -545,7 +545,7 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
       const workspaceId = stateRef.current.workspaceId;
       const key = `${workspaceId}:${conversationId}`;
       const cached = stateRef.current.messages[conversationId];
-      if (cached?.loaded && (!options?.refresh || Date.now() - (messageLoadTimes.current.get(key) ?? 0) < 10_000)) return;
+      if (cached?.loaded && (!options?.refresh || Date.now() - (messageLoadTimes.current.get(key) ?? 0) < 2_000)) return;
       const pending = messageLoads.current.get(key);
       if (pending) return pending;
       const request = (async () => {
@@ -1013,7 +1013,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         void actions.loadMessages(activeConversationId, { refresh: true });
       }
     };
-    const timer = window.setInterval(refreshVisibleConversation, 12_000);
+    const timer = window.setInterval(refreshVisibleConversation, 3_000);
     return () => window.clearInterval(timer);
   }, [activeConversationId, actions]);
 
