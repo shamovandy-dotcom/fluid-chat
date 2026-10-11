@@ -274,7 +274,7 @@ export function Modal({
       >
         <header className="modal-header">
           <h2 id={titleId}>{title}</h2>
-          <IconButton label="Close" onClick={onClose}>
+          <IconButton label="Закрыть" onClick={onClose}>
             <X size={18} />
           </IconButton>
         </header>
@@ -290,7 +290,7 @@ export function Modal({
 /* Misc                                                                        */
 /* -------------------------------------------------------------------------- */
 
-export function Spinner({ label = "Loading" }: { label?: string }) {
+export function Spinner({ label = "Загрузка…" }: { label?: string }) {
   return <span className="spinner" role="status" aria-label={label} />;
 }
 
