@@ -46,7 +46,7 @@ export function WorkspaceRail() {
         <span className="rail-badge" aria-hidden>
           <Plus size={18} />
         </span>
-        <span className="rail-name">Add</span>
+        <span className="rail-name">Создать</span>
       </button>
     </nav>
   );
