@@ -55,8 +55,8 @@ export function ActivityView() {
   return (
     <section className="view">
       <ViewHeader
-        title="Activity"
-        subtitle="Mentions, replies and reactions"
+        title="Активность"
+        subtitle="Упоминания, ответы и реакции"
         action={
           <button
             type="button"
@@ -70,7 +70,7 @@ export function ActivityView() {
               );
             }}
           >
-            Mark all read
+            Отметить всё прочитанным
           </button>
         }
       />
@@ -79,7 +79,7 @@ export function ActivityView() {
           [
             ["all", "All", <Bell key="a" size={14} />],
             ["mention", "Mentions", <AtSign key="b" size={14} />],
-            ["thread_reply", "Threads", <MessageSquare key="c" size={14} />],
+            ["thread_reply", "Обсуждения", <MessageSquare key="c" size={14} />],
             ["reaction", "Reactions", <Bookmark key="d" size={14} />]
           ] as const
         ).map(([value, text, icon]) => (
@@ -97,9 +97,9 @@ export function ActivityView() {
 
       <div className="view-scroll">
         {!notifications ? (
-          <Spinner label="Loading activity" />
+          <Spinner label="Загрузка активности" />
         ) : visible.length === 0 ? (
-          <EmptyState title="You are all caught up" body="Mentions, thread replies and reactions land here." />
+          <EmptyState title="Вы are all caught up" body="Здесь отображаются упоминания, ответы в обсуждениях и реакции." />
         ) : (
           visible.map((notification) => {
             const actor = notification.actorUserId ? directory.get(notification.actorUserId) : undefined;
@@ -169,12 +169,12 @@ export function ThreadsView() {
 
   return (
     <section className="view">
-      <ViewHeader title="Threads" subtitle="Conversations you are part of" />
+      <ViewHeader title="Обсуждения" subtitle="Переписки, в которых вы участвуете" />
       <div className="view-scroll">
         {!threads ? (
-          <Spinner label="Loading threads" />
+          <Spinner label="Загрузка обсуждений" />
         ) : threads.length === 0 ? (
-          <EmptyState title="No threads yet" body="Reply to a message in a thread and it shows up here." />
+          <EmptyState title="Пока нет обсуждений" body="Ответьте на сообщение в обсуждении — оно появится здесь." />
         ) : (
           threads.map(({ root, replies }) => (
             <div key={root.id} className="thread-card">
@@ -213,12 +213,12 @@ export function SavedView() {
 
   return (
     <section className="view">
-      <ViewHeader title="Later" subtitle="Messages you saved" />
+      <ViewHeader title="На потом" subtitle="Сохранённые сообщения" />
       <div className="view-scroll">
         {!saved ? (
-          <Spinner label="Loading saved items" />
+          <Spinner label="Загрузка сохранённых сообщений" />
         ) : saved.length === 0 ? (
-          <EmptyState title="Nothing saved" body="Use the bookmark action on a message to keep it here." />
+          <EmptyState title="Пока ничего не сохранено" body="Нажмите на значок закладки у сообщения, чтобы сохранить его здесь." />
         ) : (
           saved.map(({ message, savedAt }) => (
             <div key={message.id} className="panel-card">
@@ -252,15 +252,15 @@ export function DraftsView() {
 
   return (
     <section className="view">
-      <ViewHeader title="Drafts & sent" subtitle="Unsent drafts, scheduled messages and reminders" />
+      <ViewHeader title="Черновики и отправленные" subtitle="Черновики, запланированные сообщения и напоминания" />
       <div className="view-scroll">
         <h3 className="view-subhead">
           <PenSquare size={14} /> Drafts
         </h3>
         {!drafts ? (
-          <Spinner label="Loading drafts" />
+          <Spinner label="Загрузка черновиков" />
         ) : drafts.filter((draft) => draft.bodyText.trim()).length === 0 ? (
-          <EmptyState title="No drafts" body="Messages you start but do not send are kept here." />
+          <EmptyState title="Нет черновиков" body="Здесь хранятся начатые, но не отправленные сообщения." />
         ) : (
           drafts
             .filter((draft) => draft.bodyText.trim())
@@ -294,7 +294,7 @@ export function DraftsView() {
                 <button
                   type="button"
                   className="icon-button"
-                  aria-label="Cancel scheduled message"
+                  aria-label="Отменить запланированное сообщение"
                   onClick={async () => {
                     await api.activity.cancelScheduled(entry.id);
                     load();
@@ -356,8 +356,8 @@ export function UnreadsView() {
   return (
     <section className="view">
       <ViewHeader
-        title="All unreads"
-        subtitle="Everything you have not read yet"
+        title="Все непрочитанные"
+        subtitle="Все сообщения, которые вы ещё не прочитали"
         action={
           <button
             type="button"
@@ -370,15 +370,15 @@ export function UnreadsView() {
               load();
             }}
           >
-            <Inbox size={14} /> Mark all read
+            <Inbox size={14} /> Отметить всё прочитанным
           </button>
         }
       />
       <div className="view-scroll">
         {!unreads ? (
-          <Spinner label="Loading unreads" />
+          <Spinner label="Загрузка непрочитанных сообщений" />
         ) : unreads.length === 0 ? (
-          <EmptyState title="You are all caught up" body="No unread messages anywhere." />
+          <EmptyState title="Вы are all caught up" body="Непрочитанных сообщений нет." />
         ) : (
           unreads.map((entry) => (
             <div key={entry.conversationId} className="unread-group">
