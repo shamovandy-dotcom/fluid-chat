@@ -126,14 +126,14 @@ export function ConversationView({ conversationId }: { conversationId: string })
             />
           </label>
 
-          <IconButton label="Закреплено messages" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
+          <IconButton label="Закреплённые сообщения" onClick={() => actions.setRightPanel({ kind: "pins", conversationId })}>
             <Pin size={17} />
           </IconButton>
           <IconButton label="Файлы" onClick={() => actions.setRightPanel({ kind: "files", conversationId })}>
             <FileText size={17} />
           </IconButton>
           <IconButton
-            label={conversation.membership?.muted ? "Unmute conversation" : "Отключить уведомления"}
+            label={conversation.membership?.muted ? "Включить уведомления" : "Отключить уведомления"}
             onClick={async () => {
               await api.conversations.updateMembership(conversationId, { muted: !conversation.membership?.muted });
               await actions.refreshConversations();
@@ -164,7 +164,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
             width={320}
             trigger={({ toggle, ref }) => (
               <button type="button" className="bookmark add" ref={ref} onClick={toggle}>
-                <Plus size={13} /> Add a bookmark
+                <Plus size={13} /> Добавить закладку
               </button>
             )}
           >
@@ -187,7 +187,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
                 }}
               >
                 <label>
-                  Title
+                  Название
                   <input name="title" required maxLength={120} placeholder="Инструкция" />
                 </label>
                 <label>
@@ -195,7 +195,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
                   <input name="url" type="url" required placeholder="https://" />
                 </label>
                 <button className="button primary" type="submit">
-                  Add bookmark
+                  Добавить закладку
                 </button>
               </form>
             )}
@@ -207,7 +207,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
 
       {channel?.archivedAt ? (
         <div className="composer-locked">
-          This channel is archived. It is read-only.
+          Этот канал находится в архиве. Доступен только просмотр.
           {state.bootstrap?.role !== "member" ? (
             <button
               type="button"
@@ -223,7 +223,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
         </div>
       ) : !joined && channel ? (
         <div className="composer-locked">
-          Вы are previewing #{channel.name}.
+          Вы просматриваете канал #{channel.name}.
           <button
             type="button"
             className="button primary"
@@ -237,7 +237,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
               }
             }}
           >
-            Join channel
+            Присоединиться к каналу
           </button>
         </div>
       ) : (
@@ -256,7 +256,7 @@ export function ConversationMenuItems({ conversationId }: { conversationId: stri
   if (!conversation) return null;
   return (
     <>
-      <MenuItem onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>Open details</MenuItem>
+      <MenuItem onClick={() => actions.setRightPanel({ kind: "details", conversationId })}>Открыть сведения</MenuItem>
       <MenuDivider />
       <MenuItem
         onClick={async () => {
@@ -266,7 +266,7 @@ export function ConversationMenuItems({ conversationId }: { conversationId: stri
           await actions.refreshConversations();
         }}
       >
-        Notify me about {conversation.membership?.notificationLevel === "all" ? "mentions only" : "every message"}
+        {conversation.membership?.notificationLevel === "all" ? "Уведомлять только об упоминаниях" : "Уведомлять о каждом сообщении"}
       </MenuItem>
     </>
   );
