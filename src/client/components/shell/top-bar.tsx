@@ -24,7 +24,7 @@ export function TopBar() {
         >
           <Menu size={18} />
         </button>
-        <span className="brand">Androlit Chat</span>
+        <span className="brand" aria-label="АНДРОЛИТ — корпоративный мессенджер"><span className="brand-wordmark"><span>АНДР</span><span>ОЛИТ</span></span><span className="brand-product">MESSENGER</span></span>
       </div>
 
       <form
