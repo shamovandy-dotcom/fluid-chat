@@ -1002,6 +1002,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (activeConversationId) void actions.loadMessages(activeConversationId);
   }, [activeConversationId, actions]);
 
+  // Safety net for missed realtime events: keep the open conversation fresh
+  // even if the Socket.IO endpoint is temporarily unavailable. Socket.IO still
+  // delivers messages instantly when healthy; this only revalidates the active
+  // conversation in the background while the page is visible.
+  useEffect(() => {
+    if (!activeConversationId) return;
+    const refreshVisibleConversation = () => {
+      if (document.visibilityState === "visible") {
+        void actions.loadMessages(activeConversationId, { refresh: true });
+      }
+    };
+    const timer = window.setInterval(refreshVisibleConversation, 12_000);
+    return () => window.clearInterval(timer);
+  }, [activeConversationId, actions]);
+
   useEffect(() => {
     if (!activeConversationId) return;
     const readVisible = () => {
