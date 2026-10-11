@@ -3,7 +3,7 @@ import "./styles.css";
 
 export const metadata: Metadata = {
   title: "Androlit Chat",
-  description: "Androlit Chat — team messaging, channels, direct messages, threads, search and files",
+  description: "Androlit Chat — корпоративный мессенджер для команды",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }]
   }
@@ -20,7 +20,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="ru" data-theme="light" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
