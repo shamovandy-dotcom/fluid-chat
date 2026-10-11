@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Download, СообщениеSquare, Pin, Trash2, X } from "lucide-react";
-import type { FileSummary, СообщениеDto, PublicUser } from "@/shared/types";
+import { Download, MessageSquare, Pin, Trash2, X } from "lucide-react";
+import type { FileSummary, MessageDto, PublicUser } from "@/shared/types";
 import { api } from "../../api";
 import { formatBytes, formatDateTime, formatRelative, localTimeIn } from "../../format";
 import { conversationTitle, useApp, useDirectory } from "../../store";
 import { Avatar, EmptyState, IconButton, Spinner } from "../ui/primitives";
 import { Composer } from "../message/composer";
-import { СообщениеItem } from "../message/message-item";
-import { СообщениеStack, TypingIndicator } from "../message/message-list";
+import { MessageItem } from "../message/message-item";
+import { MessageStack, TypingIndicator } from "../message/message-list";
 
 export function RightPanel() {
   const { state, actions } = useApp();
@@ -19,12 +19,12 @@ export function RightPanel() {
   const close = () => actions.setRightPanel(null);
 
   return (
-    <aside classИмя="right-panel" aria-label="Панель сведений">
-      {panel.kind === "thread" ? <ОбсуждениеPanel key={panel.messageId} messageId={panel.messageId} onЗакрыть={close} /> : null}
-      {panel.kind === "profile" ? <ПрофильPanel userId={panel.userId} onЗакрыть={close} /> : null}
-      {panel.kind === "details" ? <СведенияPanel conversationId={panel.conversationId} onЗакрыть={close} /> : null}
-      {panel.kind === "pins" ? <PinsPanel conversationId={panel.conversationId} onЗакрыть={close} /> : null}
-      {panel.kind === "files" ? <ФайлыPanel conversationId={panel.conversationId} onЗакрыть={close} /> : null}
+    <aside className="right-panel" aria-label="Details panel">
+      {panel.kind === "thread" ? <ThreadPanel key={panel.messageId} messageId={panel.messageId} onClose={close} /> : null}
+      {panel.kind === "profile" ? <ProfilePanel userId={panel.userId} onClose={close} /> : null}
+      {panel.kind === "details" ? <DetailsPanel conversationId={panel.conversationId} onClose={close} /> : null}
+      {panel.kind === "pins" ? <PinsPanel conversationId={panel.conversationId} onClose={close} /> : null}
+      {panel.kind === "files" ? <FilesPanel conversationId={panel.conversationId} onClose={close} /> : null}
     </aside>
   );
 }
@@ -32,23 +32,23 @@ export function RightPanel() {
 function PanelHeader({
   title,
   subtitle,
-  onЗакрыть,
+  onClose,
   action
 }: {
   title: string;
   subtitle?: string;
-  onЗакрыть: () => void;
+  onClose: () => void;
   action?: React.ReactNode;
 }) {
   return (
-    <header classИмя="panel-header">
+    <header className="panel-header">
       <div>
         <h2>{title}</h2>
         {subtitle ? <p>{subtitle}</p> : null}
       </div>
-      <div classИмя="panel-header-actions">
+      <div className="panel-header-actions">
         {action}
-        <IconButton label="Закрыть панель" onClick={onЗакрыть}>
+        <IconButton label="Close panel" onClick={onClose}>
           <X size={18} />
         </IconButton>
       </div>
@@ -56,7 +56,7 @@ function PanelHeader({
   );
 }
 
-function ОбсуждениеPanel({ messageId, onЗакрыть }: { messageId: string; onЗакрыть: () => void }) {
+function ThreadPanel({ messageId, onClose }: { messageId: string; onClose: () => void }) {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const messages = state.threads[messageId];
@@ -64,65 +64,65 @@ function ОбсуждениеPanel({ messageId, onЗакрыть }: { messageId:
   const conversation = state.bootstrap?.conversations.find((entry) => entry.id === root?.conversationId);
 
   useEffect(() => {
-    if (!state.threads[messageId]) void actions.openОбсуждение(messageId);
+    if (!state.threads[messageId]) void actions.openThread(messageId);
   }, [messageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
       <PanelHeader
-        title="Обсуждение"
+        title="Thread"
         subtitle={conversation ? conversationTitle(conversation, directory, state.session?.id) : undefined}
-        onЗакрыть={onЗакрыть}
+        onClose={onClose}
         action={
           root ? (
             <button
               type="button"
-              classИмя="button ghost small"
+              className="button ghost small"
               onClick={async () => {
                 const next = root.thread.following ? "muted" : "following";
                 try {
                   await api.messages.follow(root.id, next);
-                  actions.upsertСообщение({ ...root, thread: { ...root.thread, following: next === "following" } });
+                  actions.upsertMessage({ ...root, thread: { ...root.thread, following: next === "following" } });
                 } catch (error) {
                   actions.fail(error);
                 }
               }}
             >
-              {root.thread.following ? "Следитьing" : "Следить"}
+              {root.thread.following ? "Following" : "Follow"}
             </button>
           ) : null
         }
       />
-      <div classИмя="panel-scroll">
+      <div className="panel-scroll">
         {!messages ? (
-          <Spinner label="Загрузка обсуждения" />
+          <Spinner label="Loading thread" />
         ) : (
           <>
-            <СообщениеItem message={messages[0]} context="thread" />
+            <MessageItem message={messages[0]} context="thread" />
             {messages.length > 1 ? (
-              <div classИмя="thread-divider">
+              <div className="thread-divider">
                 {messages.length - 1} {messages.length === 2 ? "reply" : "replies"}
               </div>
             ) : null}
-            <СообщениеStack messages={messages.slice(1)} context="thread" />
+            <MessageStack messages={messages.slice(1)} context="thread" />
           </>
         )}
       </div>
-      {root ? <TypingIndicator conversationId={root.conversationId} parentСообщениеId={root.id} /> : null}
+      {root ? <TypingIndicator conversationId={root.conversationId} parentMessageId={root.id} /> : null}
       {root && conversation ? (
         <Composer
           conversationId={root.conversationId}
-          parentСообщениеId={root.id}
-          placeholder="Ответить…"
+          parentMessageId={root.id}
+          placeholder="Reply…"
           autoFocus
-          onSent={() => void actions.openОбсуждение(messageId)}
+          onSent={() => void actions.openThread(messageId)}
         />
       ) : null}
     </>
   );
 }
 
-function ПрофильPanel({ userId, onЗакрыть }: { userId: string; onЗакрыть: () => void }) {
+function ProfilePanel({ userId, onClose }: { userId: string; onClose: () => void }) {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const [user, setUser] = useState<PublicUser | undefined>(directory.get(userId));
@@ -140,33 +140,33 @@ function ПрофильPanel({ userId, onЗакрыть }: { userId: string; on�
     }
   }, [userId, directory]);
 
-  if (!user) return <PanelHeader title="Профиль" onЗакрыть={onЗакрыть} />;
+  if (!user) return <PanelHeader title="Profile" onClose={onClose} />;
 
   const localTime = localTimeIn(user.timezone, timeFormat);
 
   return (
     <>
-      <PanelHeader title="Профиль" onЗакрыть={onЗакрыть} />
-      <div classИмя="panel-scroll profile-panel">
-        <div classИмя="profile-avatar">
+      <PanelHeader title="Profile" onClose={onClose} />
+      <div className="panel-scroll profile-panel">
+        <div className="profile-avatar">
           <Avatar user={user} size={160} presence={false} />
         </div>
-        <h3>{user.displayИмя}</h3>
-        {user.handle ? <p classИмя="muted">@{user.handle}</p> : null}
-        {user.title ? <p classИмя="profile-title">{user.title}</p> : null}
+        <h3>{user.displayName}</h3>
+        {user.handle ? <p className="muted">@{user.handle}</p> : null}
+        {user.title ? <p className="profile-title">{user.title}</p> : null}
         {user.statusText ? (
-          <p classИмя="profile-status">
-            {user.statusЭмодзи ? <span aria-hidden>:{user.statusЭмодзи}:</span> : null} {user.statusText}
+          <p className="profile-status">
+            {user.statusEmoji ? <span aria-hidden>:{user.statusEmoji}:</span> : null} {user.statusText}
           </p>
         ) : null}
-        <dl classИмя="profile-facts">
+        <dl className="profile-facts">
           {user.pronouns ? (
             <>
               <dt>Pronouns</dt>
               <dd>{user.pronouns}</dd>
             </>
           ) : null}
-          <dt>Электронная почта</dt>
+          <dt>Email</dt>
           <dd>
             <a href={`mailto:${user.email}`}>{user.email}</a>
           </dd>
@@ -177,17 +177,17 @@ function ПрофильPanel({ userId, onЗакрыть }: { userId: string; on�
             </>
           ) : null}
           <dt>Presence</dt>
-          <dd classИмя="capitalize">{user.presence}</dd>
+          <dd className="capitalize">{user.presence}</dd>
         </dl>
-        <div classИмя="profile-actions">
+        <div className="profile-actions">
           {isSelf ? (
-            <button type="button" classИмя="button primary" onClick={() => actions.setModal({ kind: "profile-editor" })}>
-              Изменить profile
+            <button type="button" className="button primary" onClick={() => actions.setModal({ kind: "profile-editor" })}>
+              Edit profile
             </button>
           ) : (
             <button
               type="button"
-              classИмя="button primary"
+              className="button primary"
               onClick={async () => {
                 if (!state.workspaceId) return;
                 try {
@@ -199,7 +199,7 @@ function ПрофильPanel({ userId, onЗакрыть }: { userId: string; on�
                 }
               }}
             >
-              <СообщениеSquare size={15} /> Сообщение
+              <MessageSquare size={15} /> Message
             </button>
           )}
         </div>
@@ -208,54 +208,54 @@ function ПрофильPanel({ userId, onЗакрыть }: { userId: string; on�
   );
 }
 
-function СведенияPanel({ conversationId, onЗакрыть }: { conversationId: string; onЗакрыть: () => void }) {
+function DetailsPanel({ conversationId, onClose }: { conversationId: string; onClose: () => void }) {
   const { state, actions } = useApp();
   const directory = useDirectory();
   const conversation = state.bootstrap?.conversations.find((entry) => entry.id === conversationId);
   const channel = conversation?.channel;
   const [tab, setTab] = useState<"about" | "members" | "settings">("about");
-  const [topic, setТема] = useState(channel?.topic ?? "");
-  const [description, setОписание] = useState(channel?.description ?? "");
+  const [topic, setTopic] = useState(channel?.topic ?? "");
+  const [description, setDescription] = useState(channel?.description ?? "");
   const isAdmin = state.bootstrap?.role === "owner" || state.bootstrap?.role === "admin";
 
   useEffect(() => {
-    setТема(channel?.topic ?? "");
-    setОписание(channel?.description ?? "");
+    setTopic(channel?.topic ?? "");
+    setDescription(channel?.description ?? "");
   }, [channel?.id, channel?.topic, channel?.description]);
 
-  if (!conversation) return <PanelHeader title="Сведения" onЗакрыть={onЗакрыть} />;
+  if (!conversation) return <PanelHeader title="Details" onClose={onClose} />;
 
   return (
     <>
       <PanelHeader
         title={conversationTitle(conversation, directory, state.session?.id)}
-        subtitle={channel ? `${conversation.memberIds.length} members` : "Личное сообщение"}
-        onЗакрыть={onЗакрыть}
+        subtitle={channel ? `${conversation.memberIds.length} members` : "Direct message"}
+        onClose={onClose}
       />
-      <div classИмя="panel-tabs" role="tablist">
+      <div className="panel-tabs" role="tablist">
         {(["about", "members", ...(channel ? (["settings"] as const) : [])] as const).map((entry) => (
           <button
             key={entry}
             type="button"
             role="tab"
             aria-selected={tab === entry}
-            classИмя={tab === entry ? "is-active" : ""}
+            className={tab === entry ? "is-active" : ""}
             onClick={() => setTab(entry)}
           >
-            {entry === "about" ? "About" : entry === "members" ? "Участники" : "Настройки"}
+            {entry === "about" ? "About" : entry === "members" ? "Members" : "Settings"}
           </button>
         ))}
       </div>
 
-      <div classИмя="panel-scroll">
+      <div className="panel-scroll">
         {tab === "about" ? (
           channel ? (
-            <div classИмя="panel-section">
-              <label classИмя="field">
-                Тема
+            <div className="panel-section">
+              <label className="field">
+                Topic
                 <input
                   value={topic}
-                  onChange={(event) => setТема(event.target.value)}
+                  onChange={(event) => setTopic(event.target.value)}
                   onBlur={async () => {
                     if (topic === (channel.topic ?? "")) return;
                     try {
@@ -265,14 +265,14 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                       actions.fail(error);
                     }
                   }}
-                  placeholder="Добавить тему"
+                  placeholder="Add a topic"
                 />
               </label>
-              <label classИмя="field">
-                Описание
+              <label className="field">
+                Description
                 <textarea
                   value={description}
-                  onChange={(event) => setОписание(event.target.value)}
+                  onChange={(event) => setDescription(event.target.value)}
                   onBlur={async () => {
                     if (description === (channel.description ?? "")) return;
                     try {
@@ -283,36 +283,36 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                     }
                   }}
                   rows={4}
-                  placeholder="О чём этот канал?"
+                  placeholder="What is this channel about?"
                 />
               </label>
-              <p classИмя="muted">
-                Создатьd {formatDateTime(channel.createdAt)} by {directory.get(channel.createdByUserId)?.displayИмя ?? "someone"}
+              <p className="muted">
+                Created {formatDateTime(channel.createdAt)} by {directory.get(channel.createdByUserId)?.displayName ?? "someone"}
               </p>
             </div>
           ) : (
-            <div classИмя="panel-section">
-              <p classИмя="muted">Личные сообщения are private to their participants.</p>
+            <div className="panel-section">
+              <p className="muted">Direct messages are private to their participants.</p>
             </div>
           )
         ) : null}
 
         {tab === "members" ? (
-          <div classИмя="panel-section member-list">
+          <div className="panel-section member-list">
             {conversation.memberIds.map((id) => {
               const member = directory.get(id);
               return (
-                <div key={id} classИмя="member-row">
+                <div key={id} className="member-row">
                   <button type="button" onClick={() => actions.setRightPanel({ kind: "profile", userId: id })}>
                     <Avatar user={member} size={30} />
                     <span>
-                      <strong>{member?.displayИмя ?? "Unknown"}</strong>
+                      <strong>{member?.displayName ?? "Unknown"}</strong>
                       {member?.title ? <small>{member.title}</small> : null}
                     </span>
                   </button>
                   {channel && isAdmin && id !== state.session?.id ? (
                     <IconButton
-                      label={`Удалить ${member?.displayИмя ?? "member"}`}
+                      label={`Remove ${member?.displayName ?? "member"}`}
                       onClick={async () => {
                         try {
                           await api.channels.removeMember(channel.id, id);
@@ -331,20 +331,20 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
             {channel ? (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={() => actions.setModal({ kind: "add-people", conversationId })}
               >
-                Добавить участников
+                Add people
               </button>
             ) : null}
           </div>
         ) : null}
 
         {tab === "settings" && channel ? (
-          <div classИмя="panel-section">
+          <div className="panel-section">
             {isAdmin || channel.createdByUserId === state.session?.id ? (
               <form
-                classИмя="field"
+                className="field"
                 onSubmit={async (event) => {
                   event.preventDefault();
                   const name = new FormData(event.currentTarget).get("name");
@@ -357,22 +357,22 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                   }
                 }}
               >
-                Название канала
-                <div classИмя="inline-field">
+                Channel name
+                <div className="inline-field">
                   <input name="name" defaultValue={channel.name} maxLength={80} />
-                  <button type="submit" classИмя="button ghost">
+                  <button type="submit" className="button ghost">
                     Rename
                   </button>
                 </div>
               </form>
             ) : null}
 
-            <label classИмя="field">
-              Уведомления
+            <label className="field">
+              Notifications
               <select
                 value={conversation.membership?.notificationLevel ?? "all"}
                 onChange={async (event) => {
-                  await api.conversations.updateУчастникиhip(conversationId, {
+                  await api.conversations.updateMembership(conversationId, {
                     notificationLevel: event.target.value as "all" | "mentions" | "none"
                   });
                   await actions.refreshConversations();
@@ -386,7 +386,7 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
 
             {isAdmin ? (
               <>
-                <label classИмя="field">
+                <label className="field">
                   Who can post
                   <select
                     value={channel.postingPolicy}
@@ -400,7 +400,7 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                   </select>
                 </label>
 
-                <label classИмя="checkbox-field">
+                <label className="checkbox-field">
                   <input
                     type="checkbox"
                     checked={channel.autoJoin}
@@ -420,7 +420,7 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                   </span>
                 </label>
 
-                <label classИмя="field">
+                <label className="field">
                   Keep messages for
                   <select
                     value={channel.retentionDays ?? ""}
@@ -444,14 +444,14 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
                   </select>
                 </label>
 
-                <WebhookНастройки channelId={channel.id} />
+                <WebhookSettings channelId={channel.id} />
               </>
             ) : null}
 
             {isAdmin && channel.visibility === "public" ? (
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
                   if (!window.confirm(`Make #${channel.name} private? This cannot be undone.`)) return;
                   try {
@@ -467,15 +467,15 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
               </button>
             ) : null}
 
-            <div classИмя="panel-danger">
+            <div className="panel-danger">
               <button
                 type="button"
-                classИмя="button ghost"
+                className="button ghost"
                 onClick={async () => {
                   try {
                     await api.channels.leave(channel.id);
                     await actions.refreshBootstrap();
-                    onЗакрыть();
+                    onClose();
                   } catch (error) {
                     actions.fail(error);
                   }
@@ -486,13 +486,13 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
               {isAdmin && channel.name !== "general" ? (
                 <button
                   type="button"
-                  classИмя="button danger"
+                  className="button danger"
                   onClick={async () => {
                     if (!window.confirm(`Archive #${channel.name}?`)) return;
                     try {
                       await api.channels.archive(channel.id);
                       await actions.refreshBootstrap();
-                      onЗакрыть();
+                      onClose();
                     } catch (error) {
                       actions.fail(error);
                     }
@@ -510,10 +510,10 @@ function СведенияPanel({ conversationId, onЗакрыть }: { conversat
 }
 
 /** Incoming webhooks for a channel: create, copy once, revoke. */
-function WebhookНастройки({ channelId }: { channelId: string }) {
+function WebhookSettings({ channelId }: { channelId: string }) {
   const { actions } = useApp();
   const [hooks, setHooks] = useState<Array<{ id: string; name: string; lastUsedAt: string | null }>>([]);
-  const [name, setИмя] = useState("");
+  const [name, setName] = useState("");
   const [freshUrl, setFreshUrl] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -526,56 +526,56 @@ function WebhookНастройки({ channelId }: { channelId: string }) {
   useEffect(load, [load]);
 
   return (
-    <div classИмя="field">
+    <div className="field">
       Incoming webhooks
-      <p classИмя="muted small">Let a build, alert or script post here without a user account.</p>
-      <div classИмя="inline-field">
-        <input value={name} onChange={(event) => setИмя(event.target.value)} placeholder="Deploy bot" maxLength={60} />
+      <p className="muted small">Let a build, alert or script post here without a user account.</p>
+      <div className="inline-field">
+        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Deploy bot" maxLength={60} />
         <button
           type="button"
-          classИмя="button ghost"
+          className="button ghost"
           disabled={!name.trim()}
           onClick={async () => {
             try {
               const { url } = await api.channels.createWebhook(channelId, name.trim());
               setFreshUrl(url);
-              setИмя("");
+              setName("");
               load();
             } catch (error) {
               actions.fail(error);
             }
           }}
         >
-          Создать
+          Create
         </button>
       </div>
 
       {freshUrl ? (
-        <div classИмя="copy-row">
+        <div className="copy-row">
           <code>{freshUrl}</code>
           <button
             type="button"
-            classИмя="button ghost"
+            className="button ghost"
             onClick={() => {
               void navigator.clipboard.writeText(freshUrl);
               actions.toast("Webhook URL copied — it is not shown again", "success");
             }}
           >
-            Копировать
+            Copy
           </button>
         </div>
       ) : null}
 
-      <div classИмя="webhook-list">
+      <div className="webhook-list">
         {hooks.map((hook) => (
-          <div key={hook.id} classИмя="webhook-row">
+          <div key={hook.id} className="webhook-row">
             <span>
               <strong>{hook.name}</strong>
               <small>{hook.lastUsedAt ? `last used ${formatRelative(hook.lastUsedAt)}` : "never used"}</small>
             </span>
             <button
               type="button"
-              classИмя="button ghost"
+              className="button ghost"
               onClick={async () => {
                 if (!window.confirm(`Revoke ${hook.name}?`)) return;
                 await api.channels.deleteWebhook(hook.id);
@@ -591,8 +591,8 @@ function WebhookНастройки({ channelId }: { channelId: string }) {
   );
 }
 
-function PinsPanel({ conversationId, onЗакрыть }: { conversationId: string; onЗакрыть: () => void }) {
-  const [pins, setPins] = useState<Array<{ message: СообщениеDto; pinnedAt: string }> | null>(null);
+function PinsPanel({ conversationId, onClose }: { conversationId: string; onClose: () => void }) {
+  const [pins, setPins] = useState<Array<{ message: MessageDto; pinnedAt: string }> | null>(null);
 
   useEffect(() => {
     api.conversations
@@ -603,19 +603,19 @@ function PinsPanel({ conversationId, onЗакрыть }: { conversationId: strin
 
   return (
     <>
-      <PanelHeader title="Закреплено" subtitle="Сообщения, закреплённые в этой переписке" onЗакрыть={onЗакрыть} />
-      <div classИмя="panel-scroll">
+      <PanelHeader title="Pinned" subtitle="Messages pinned to this conversation" onClose={onClose} />
+      <div className="panel-scroll">
         {!pins ? (
-          <Spinner label="Загрузка закреплённых сообщений" />
+          <Spinner label="Loading pins" />
         ) : pins.length === 0 ? (
-          <EmptyState title="Пока ничего не закреплено" body="Закрепляйте важные сообщения через меню ⋯." />
+          <EmptyState title="Nothing pinned yet" body="Pin important messages from their ⋯ menu." />
         ) : (
           pins.map(({ message }) => (
-            <div key={message.id} classИмя="panel-card">
-              <div classИмя="panel-card-head">
-                <Pin size={13} /> Закреплено
+            <div key={message.id} className="panel-card">
+              <div className="panel-card-head">
+                <Pin size={13} /> Pinned
               </div>
-              <СообщениеItem message={message} context="list" />
+              <MessageItem message={message} context="list" />
             </div>
           ))
         )}
@@ -624,28 +624,28 @@ function PinsPanel({ conversationId, onЗакрыть }: { conversationId: strin
   );
 }
 
-function ФайлыPanel({ conversationId, onЗакрыть }: { conversationId: string; onЗакрыть: () => void }) {
-  const [files, setФайлы] = useState<FileSummary[] | null>(null);
+function FilesPanel({ conversationId, onClose }: { conversationId: string; onClose: () => void }) {
+  const [files, setFiles] = useState<FileSummary[] | null>(null);
 
   useEffect(() => {
     api.conversations
       .files(conversationId)
-      .then(({ files: list }) => setФайлы(list))
-      .catch(() => setФайлы([]));
+      .then(({ files: list }) => setFiles(list))
+      .catch(() => setFiles([]));
   }, [conversationId]);
 
   return (
     <>
-      <PanelHeader title="Файлы" subtitle="Все файлы, которыми поделились здесь" onЗакрыть={onЗакрыть} />
-      <div classИмя="panel-scroll">
+      <PanelHeader title="Files" subtitle="Everything shared here" onClose={onClose} />
+      <div className="panel-scroll">
         {!files ? (
-          <Spinner label="Загрузка файлов" />
+          <Spinner label="Loading files" />
         ) : files.length === 0 ? (
-          <EmptyState title="Пока нет файлов" body="Перетащите файл в поле сообщения, чтобы поделиться им." />
+          <EmptyState title="No files yet" body="Drag a file into the message box to share it." />
         ) : (
-          <div classИмя="file-grid">
+          <div className="file-grid">
             {files.map((file) => (
-              <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" classИмя="file-card">
+              <a key={file.id} href={file.url} target="_blank" rel="noopener noreferrer" className="file-card">
                 {file.mimeType.startsWith("image/") ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={file.url} alt="" loading="lazy" />
