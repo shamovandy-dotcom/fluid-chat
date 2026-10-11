@@ -23,8 +23,8 @@ export function AuthScreen() {
         const { resetToken } = await api.auth.forgotPassword(email);
         setNotice(
           resetToken
-            ? `Email is not configured on this server, so here is your reset link: /reset-password/${resetToken}`
-            : "If that email exists, a reset link is on its way."
+            ? `На сервере не настроена отправка писем. Вот ссылка для сброса пароля: /reset-password/${resetToken}`
+            : "Если аккаунт с таким адресом существует, ссылка для сброса пароля будет отправлена."
         );
         setBusy(false);
         return;
@@ -35,12 +35,11 @@ export function AuthScreen() {
           ? await api.auth.signup({ email, password, displayName })
           : await api.auth.login(email, password);
       actions.setSession(result.user, result.workspaces);
-      // Identify before capturing so the conversion lands on the person, not the anonymous id.
       identifyUser(result.user);
       track(mode === "signup" ? "signed_up" : "signed_in", { workspace_count: result.workspaces.length });
       if (result.workspaces[0]) await actions.selectWorkspace(result.workspaces[0].workspace.id);
     } catch (error) {
-      setNotice(error instanceof ApiError ? error.message : "Something went wrong");
+      setNotice(error instanceof ApiError ? error.message : "Что-то пошло не так");
     } finally {
       setBusy(false);
     }
@@ -50,37 +49,37 @@ export function AuthScreen() {
     <main className="auth-page">
       <section className="auth-hero">
         <p className="eyebrow">Androlit Chat</p>
-        <h1>Where work happens, on your own terms.</h1>
+        <h1>Работа на ваших условиях.</h1>
         <p className="lede">
-          Channels, direct messages, threads, search, files and reactions — self-hosted, exportable and yours.
+          Каналы, личные сообщения, обсуждения, поиск, файлы и реакции — всё под вашим контролем.
         </p>
         <ul className="auth-points">
-          <li>Organized conversations in public and private channels</li>
-          <li>Threads, mentions, reactions, pins and saved items</li>
-          <li>Realtime presence, typing indicators and unread tracking</li>
-          <li>Full-text search across everything you can see</li>
+          <li>Общение в открытых и закрытых каналах</li>
+          <li>Ветки обсуждений, упоминания, реакции, закреплённые и сохранённые сообщения</li>
+          <li>Статус присутствия в реальном времени, индикаторы набора текста и непрочитанные сообщения</li>
+          <li>Полнотекстовый поиск по всем доступным вам материалам</li>
         </ul>
       </section>
 
       <section className="auth-panel">
         <div className="segmented">
           <button type="button" className={mode === "login" ? "is-active" : ""} onClick={() => setMode("login")}>
-            Sign in
+            Войти
           </button>
           <button type="button" className={mode === "signup" ? "is-active" : ""} onClick={() => setMode("signup")}>
-            Create account
+            Создать аккаунт
           </button>
         </div>
 
         <form className="stack-form" onSubmit={submit}>
           {mode === "signup" ? (
             <label className="field">
-              Full name
+              Имя и фамилия
               <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} required autoComplete="name" />
             </label>
           ) : null}
           <label className="field">
-            Email
+            Электронная почта
             <input
               type="email"
               value={email}
@@ -92,7 +91,7 @@ export function AuthScreen() {
           </label>
           {mode !== "forgot" ? (
             <label className="field">
-              Password
+              Пароль
               <input
                 type="password"
                 value={password}
@@ -105,17 +104,17 @@ export function AuthScreen() {
           ) : null}
 
           <button type="submit" className="button primary" disabled={busy}>
-            {mode === "signup" ? "Create account" : mode === "forgot" ? "Send reset link" : "Sign in"}
+            {busy ? "Подождите…" : mode === "signup" ? "Создать аккаунт" : mode === "forgot" ? "Отправить ссылку" : "Войти"}
           </button>
 
           {mode === "login" ? (
             <button type="button" className="link-button" onClick={() => setMode("forgot")}>
-              Forgot your password?
+              Забыли пароль?
             </button>
           ) : null}
           {mode === "forgot" ? (
             <button type="button" className="link-button" onClick={() => setMode("login")}>
-              Back to sign in
+              Вернуться ко входу
             </button>
           ) : null}
           {notice ? <p className="notice">{notice}</p> : null}
@@ -133,10 +132,10 @@ export function WorkspaceSetupScreen() {
   return (
     <main className="auth-page">
       <section className="auth-hero">
-        <p className="eyebrow">Welcome, {state.session?.displayName}</p>
-        <h1>Create your first workspace.</h1>
+        <p className="eyebrow">Добро пожаловать, {state.session?.displayName}</p>
+        <h1>Создайте первое рабочее пространство.</h1>
         <p className="lede">
-          A workspace holds your channels, people and history. You can create more later, or join one from an invite link.
+          В рабочем пространстве находятся каналы, участники и история переписки. Позже можно создать дополнительные пространства или присоединиться к существующему по приглашению.
         </p>
       </section>
       <section className="auth-panel">
@@ -159,14 +158,14 @@ export function WorkspaceSetupScreen() {
           }}
         >
           <label className="field">
-            Workspace name
-            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Acme Inc" required autoFocus />
+            Название рабочего пространства
+            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Например, АНДРОЛИТ" required autoFocus />
           </label>
           <button type="submit" className="button primary" disabled={busy || name.trim().length < 2}>
-            Create workspace
+            {busy ? "Создаём…" : "Создать рабочее пространство"}
           </button>
           <button type="button" className="link-button" onClick={() => void actions.signOut()}>
-            Sign out
+            Выйти из аккаунта
           </button>
         </form>
       </section>
