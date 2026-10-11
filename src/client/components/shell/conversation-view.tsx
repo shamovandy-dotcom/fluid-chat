@@ -47,7 +47,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
   if (!conversation) {
     return (
       <section className="conversation">
-        <div className="conversation-empty">This conversation is no longer available.</div>
+        <div className="conversation-empty">Эта переписка больше недоступна.</div>
       </section>
     );
   }
@@ -75,7 +75,7 @@ export function ConversationView({ conversationId }: { conversationId: string })
           <button
             type="button"
             className={`star-toggle ${conversation.membership?.starred ? "is-on" : ""}`}
-            aria-label={conversation.membership?.starred ? "Unstar conversation" : "Добавить в избранное"}
+            aria-label={conversation.membership?.starred ? "Убрать из избранного" : "Добавить в избранное"}
             onClick={async () => {
               await api.conversations.updateMembership(conversationId, { starred: !conversation.membership?.starred });
               await actions.refreshConversations();
