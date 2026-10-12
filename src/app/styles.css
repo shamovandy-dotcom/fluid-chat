@@ -3607,3 +3607,18 @@ textarea:focus {
     height: 100dvh;
   }
 }
+
+
+/* Compact read status for the latest direct message. */
+.message-read-receipt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 5px;
+  color: var(--gold, #d4af37);
+  font-size: 11px;
+  line-height: 1.2;
+}
+.message-read-receipt svg {
+  flex: 0 0 auto;
+}
