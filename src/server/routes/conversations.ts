@@ -92,6 +92,10 @@ export const conversationRoutes = defineRoutes({
         memberCount: members.length
       }),
       members: members.map((row) => toPublicUser(row.user)),
+      readReceipts: members.map((row) => ({
+        userId: row.member.userId,
+        lastReadAt: row.member.lastReadAt ? new Date(row.member.lastReadAt).toISOString() : null
+      })),
       label: await conversationLabel(access.conversation, user.id)
     };
   },
