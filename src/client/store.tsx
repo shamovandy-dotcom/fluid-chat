@@ -541,6 +541,25 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
     dispatch({ type: "notifications", notifications, unreadCount });
   }, [dispatch]);
 
+  const refreshReadReceipts = useCallback(async (conversationId: string) => {
+    try {
+      const { readReceipts } = await api.conversations.get(conversationId);
+      if (stateRef.current.view.kind !== "conversation" || stateRef.current.view.conversationId !== conversationId) return;
+      for (const receipt of readReceipts) {
+        if (receipt.lastReadAt) {
+          dispatch({
+            type: "read-receipt",
+            conversationId,
+            userId: receipt.userId,
+            lastReadAt: receipt.lastReadAt
+          });
+        }
+      }
+    } catch {
+      /* read receipts are best-effort */
+    }
+  }, [dispatch]);
+
   const markRead = useCallback(
     async (conversationId: string, messageId?: string) => {
       try {
@@ -912,6 +931,7 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
       sendMessage,
       toggleReaction,
       markRead,
+      refreshReadReceipts,
       markEverythingRead,
       saveDraft,
       selectWorkspace,
@@ -946,6 +966,7 @@ function useActions(state: State, dispatch: React.Dispatch<Action>) {
       openThread,
       refreshBootstrap,
       refreshConversations,
+      refreshReadReceipts,
       saveDraft,
       selectWorkspace,
       sendMessage,
@@ -1025,8 +1046,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const refreshVisibleConversation = () => {
       if (document.visibilityState === "visible") {
         void actions.loadMessages(activeConversationId, { refresh: true });
+        void actions.refreshReadReceipts(activeConversationId);
       }
     };
+    void actions.refreshReadReceipts(activeConversationId);
     const timer = window.setInterval(refreshVisibleConversation, 3_000);
     return () => window.clearInterval(timer);
   }, [activeConversationId, actions]);
