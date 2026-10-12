@@ -270,9 +270,12 @@ export const api = {
     openDm: (workspaceId: string, userIds: string[]) =>
       post<{ conversation: ConversationSummary }>("/conversations/dm", { workspaceId, userIds }),
     get: (conversationId: string) =>
-      get<{ conversation: ConversationSummary; members: PublicUser[]; label: string }>(
-        `/conversations/${conversationId}`
-      ),
+      get<{
+        conversation: ConversationSummary;
+        members: PublicUser[];
+        readReceipts: Array<{ userId: string; lastReadAt: string | null }>;
+        label: string;
+      }>(`/conversations/${conversationId}`),
     messages: (conversationId: string, options?: { before?: string; after?: string; limit?: number }) => {
       const params = new URLSearchParams();
       if (options?.before) params.set("before", options.before);
