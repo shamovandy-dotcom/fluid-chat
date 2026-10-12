@@ -122,8 +122,7 @@ export const authRoutes = defineRoutes({
             and(
               eq(channels.workspaceId, companyWorkspace.id),
               eq(channels.autoJoin, true),
-              isNull(channels.archivedAt),
-              isNull(conversations.deletedAt)
+              isNull(channels.archivedAt)
             )
           );
 
