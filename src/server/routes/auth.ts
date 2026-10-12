@@ -1,7 +1,10 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import {
+  channels,
+  conversationMembers,
+  conversations,
   emailVerificationTokens,
   passwordResetTokens,
   sessions,
@@ -90,6 +93,52 @@ export const authRoutes = defineRoutes({
         tokenHash: tokenHash(verificationToken),
         expiresAt: addDays(7)
       });
+
+      // Automatically add new accounts to the existing company workspace.
+      // Match the workspace by its display name, never create a second workspace.
+      const [companyWorkspace] = await tx
+        .select({ id: workspaces.id })
+        .from(workspaces)
+        .where(
+          and(
+            sql`lower(${workspaces.name}) in ('андролит', 'androlit')`,
+            isNull(workspaces.deletedAt)
+          )
+        )
+        .limit(1);
+
+      if (companyWorkspace) {
+        await tx.insert(workspaceMembers).values({
+          workspaceId: companyWorkspace.id,
+          userId: created.id,
+          role: "member"
+        });
+
+        const autoJoinChannels = await tx
+          .select({ conversationId: conversations.id })
+          .from(channels)
+          .innerJoin(conversations, eq(conversations.channelId, channels.id))
+          .where(
+            and(
+              eq(channels.workspaceId, companyWorkspace.id),
+              eq(channels.autoJoin, true),
+              isNull(channels.archivedAt),
+              isNull(conversations.deletedAt)
+            )
+          );
+
+        if (autoJoinChannels.length > 0) {
+          await tx.insert(conversationMembers).values(
+            autoJoinChannels.map(({ conversationId }) => ({
+              workspaceId: companyWorkspace.id,
+              conversationId,
+              userId: created.id,
+              role: "member" as const,
+              lastReadAt: new Date()
+            }))
+          );
+        }
+      }
       return created;
     });
 
@@ -103,7 +152,7 @@ export const authRoutes = defineRoutes({
       text: `Verify your email: ${appUrl()}/verify-email/${verificationToken}`
     });
 
-    return json({ user: toSessionUser({ ...user, avatarColor: avatarColorFor(user.id) }), workspaces: [] }, 201);
+    return json({ user: toSessionUser({ ...user, avatarColor: avatarColorFor(user.id) }), workspaces: await membershipsFor(user.id) }, 201);
   },
 
   "POST /auth/login": async (ctx) => {
