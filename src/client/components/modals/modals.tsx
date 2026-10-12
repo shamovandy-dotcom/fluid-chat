@@ -614,7 +614,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
       {tab === "appearance" ? (
         <div className="stack-form">
           <label className="field">
-            Theme
+            Тема
             <select value={preferences.theme ?? "system"} onChange={(event) => set({ theme: event.target.value })}>
               <option value="system">Как в системе</option>
               <option value="light">Светлая</option>
@@ -629,17 +629,17 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             </select>
           </label>
           <label className="field">
-            Time format
+            Формат времени
             <select value={preferences.timeFormat ?? "12h"} onChange={(event) => set({ timeFormat: event.target.value })}>
-              <option value="12h">12-hour</option>
-              <option value="24h">24-hour</option>
+              <option value="12h">12-часовой</option>
+              <option value="24h">24-часовой</option>
             </select>
           </label>
           <label className="checkbox-field">
             <input type="checkbox" checked={preferences.enterToSend !== false} onChange={(event) => set({ enterToSend: event.target.checked })} />
             <span>
               <strong>Нажимать Enter для отправки</strong>
-              <small>When off, use Cmd/Ctrl+Enter to send.</small>
+              <small>Если выключено, используйте Cmd/Ctrl+Enter для отправки.</small>
             </span>
           </label>
         </div>
@@ -648,18 +648,18 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
       {tab === "notifications" ? (
         <div className="stack-form">
           <label className="field">
-            Desktop notifications
+            Уведомления на рабочем столе
             <select value={preferences.desktopNotifications ?? "mentions"} onChange={(event) => set({ desktopNotifications: event.target.value })}>
               <option value="all">Каждое новое сообщение</option>
-              <option value="mentions">Личные сообщения and mentions</option>
+              <option value="mentions">Личные сообщения и упоминания</option>
               <option value="none">Ничего</option>
             </select>
           </label>
           <label className="field">
-            Электронная почта notifications
+            Уведомления по электронной почте
             <select value={preferences.emailNotifications ?? "mentions"} onChange={(event) => set({ emailNotifications: event.target.value })}>
               <option value="all">Все пропущенные сообщения</option>
-              <option value="mentions">Личные сообщения and mentions</option>
+              <option value="mentions">Личные сообщения и упоминания</option>
               <option value="none">Ничего</option>
             </select>
           </label>
@@ -667,11 +667,11 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             <input type="checkbox" checked={preferences.notificationSound !== false} onChange={(event) => set({ notificationSound: event.target.checked })} />
             <span>
               <strong>Воспроизводить звук при новых сообщениях</strong>
-              <small>Follows the desktop setting above, and pauses during your notification schedule.</small>
+              <small>Зависит от настройки уведомлений на рабочем столе и отключается на время расписания уведомлений.</small>
             </span>
           </label>
           <label className="field">
-            Highlight words
+            Подсвечивать слова
             <input
               value={keywords}
               onChange={(event) => setKeywords(event.target.value)}
@@ -683,13 +683,13 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
                     .filter(Boolean)
                 })
               }
-              placeholder="deploy, incident, roadmap"
+              placeholder="срочно, сбой, проект"
             />
           </label>
 
           <div className="field">
-            Notification schedule
-            <p className="muted small">Pause sounds, desktop alerts and email between these times.</p>
+            Расписание уведомлений
+            <p className="muted small">Приостанавливать звуки, уведомления на рабочем столе и письма в указанное время.</p>
             <div className="inline-field">
               <input
                 type="time"
@@ -697,7 +697,7 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
                 onChange={(event) => set({ quietHoursStart: event.target.value || null })}
                 aria-label="Начало тихого времени"
               />
-              <span className="muted small">to</span>
+              <span className="muted small">до</span>
               <input
                 type="time"
                 value={preferences.quietHoursEnd ?? ""}
@@ -721,10 +721,10 @@ export function PreferencesModal({ onClose }: { onClose: () => void }) {
             onClick={async () => {
               if (typeof Notification === "undefined") return;
               const permission = await Notification.requestPermission();
-              actions.toast(permission === "granted" ? "Desktop notifications enabled" : "Недостаточно прав");
+              actions.toast(permission === "granted" ? "Уведомления на рабочем столе enabled" : "Недостаточно прав");
             }}
           >
-            Enable browser notifications
+            Включить уведомления браузера
           </button>
         </div>
       ) : null}
