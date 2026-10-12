@@ -120,6 +120,7 @@ export type State = {
   toasts: Toast[];
   connected: boolean;
   lastReadMarkers: Record<string, string | null>;
+  readReceipts: Record<string, Record<string, string>>;
   editingMessageId: string | null;
   sidebarOpen: boolean;
 };
@@ -146,6 +147,7 @@ const initialState: State = {
   toasts: [],
   connected: false,
   lastReadMarkers: {},
+  readReceipts: {},
   editingMessageId: null,
   sidebarOpen: false
 };
@@ -172,6 +174,7 @@ type Action =
   | { type: "notifications"; notifications: NotificationDto[]; unreadCount: number }
   | { type: "notification"; notification: NotificationDto }
   | { type: "read"; conversationId: string; lastReadAt: string | null }
+  | { type: "read-receipt"; conversationId: string; userId: string; lastReadAt: string }
   | { type: "unread-marker"; conversationId: string; messageId: string | null }
   | { type: "draft"; key: string; bodyText: string }
   | { type: "presence"; userId: string; presence: PublicUser["presence"] }
@@ -408,6 +411,17 @@ function reducer(state: State, action: Action): State {
             }
           }
         : state;
+    case "read-receipt":
+      return {
+        ...state,
+        readReceipts: {
+          ...state.readReceipts,
+          [action.conversationId]: {
+            ...(state.readReceipts[action.conversationId] ?? {}),
+            [action.userId]: action.lastReadAt
+          }
+        }
+      };
     case "unread-marker":
       return { ...state, lastReadMarkers: { ...state.lastReadMarkers, [action.conversationId]: action.messageId } };
     case "draft":
@@ -1111,6 +1125,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             messageId: event.messageId,
             reactions: event.reactions
           });
+          break;
+        case "conversation.read":
+          if (event.userId !== stateRef.current.session?.id) {
+            dispatch({ type: "read-receipt", conversationId: event.conversationId, userId: event.userId, lastReadAt: event.lastReadAt });
+          }
           break;
         case "typing":
           if (event.userId !== stateRef.current.session?.id) {
