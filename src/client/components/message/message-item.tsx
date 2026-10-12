@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   Bookmark,
+  CheckCheck,
   BookmarkCheck,
   Clock,
   Copy,
@@ -62,6 +63,13 @@ export function MessageItem({
   const pending = (message.metadata as { pending?: boolean } | null)?.pending === true;
   const isMeMessage = (message.metadata as { subtype?: string } | null)?.subtype === "me_message";
   const sharedId = (message.metadata as { sharedMessageId?: string } | null)?.sharedMessageId;
+  const conversation = state.bootstrap?.conversations.find((entry) => entry.id === message.conversationId);
+  const ownMessages = state.messages[message.conversationId]?.items ?? [];
+  const latestOwnMessageId = [...ownMessages].reverse().find((entry) => entry.senderId === state.session?.id && entry.type === "user" && !entry.deletedAt)?.id;
+  const readByAnotherMember = Object.entries(state.readReceipts[message.conversationId] ?? {}).some(
+    ([userId, lastReadAt]) => userId !== state.session?.id && new Date(lastReadAt).getTime() >= new Date(message.createdAt).getTime()
+  );
+  const showReadReceipt = isAuthor && conversation?.type === "dm" && latestOwnMessageId === message.id && readByAnotherMember;
 
   useEffect(() => {
     if (state.editingMessageId === message.id) setEditText(toMentionDisplay(message.bodyText, mentions));
@@ -230,6 +238,12 @@ export function MessageItem({
         ))}
 
         <MessageReactions message={message} />
+        {showReadReceipt ? (
+          <div className="message-read-receipt" aria-label="Прочитано собеседником">
+            <CheckCheck size={13} />
+            <span>Прочитано</span>
+          </div>
+        ) : null}
 
         {context !== "thread" && message.thread.replyCount > 0 ? (
           <button type="button" className="thread-summary" onClick={() => void actions.openThread(message.id)}>
